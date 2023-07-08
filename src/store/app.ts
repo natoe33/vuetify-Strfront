@@ -59,13 +59,15 @@ export const useAppStore = defineStore({
     addEvent(event: Event) {
       console.log(`AppStore: event added ${event.content}`);
       this.events.push(event);
-      const product = this.utils.parseProduct(event);
-      // this.db.products.add(product);
+      const product: Product = this.utils.parseProduct(event);
+      this.db.products.add(product);
       this.products.push(product);
       this.utils.parseTags(event).forEach((tag) => {
         if (this.tags.filter((t) => t === tag).length === 0) {
           this.tags.push(tag);
-          //this.db.tags.add(tag);
+          const prodTag: ProductTags = { product_id: product.id, tag: tag }
+          this.productTags.push(prodTag);
+          this.db.productTags.add(prodTag);
         }
       });
       // this.products.push(product);

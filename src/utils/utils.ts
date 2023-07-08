@@ -3,7 +3,6 @@ import { Event } from "@/nostr-tools";
 
 export class Utils {
   parseProduct = (event: Event): Product => {
-    const tags = event.tags.filter((tag) => tag[0] === "t");
     const content: IContent = JSON.parse(event.content);
     const product: Product = new Product(
       event.id,
@@ -14,9 +13,7 @@ export class Utils {
       content.images,
       content.currency,
       content.price,
-      content.quantity,
-      tags,
-      tags
+      content.quantity
     );
     // console.log(product);
     return product;

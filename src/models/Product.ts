@@ -65,8 +65,11 @@ interface IProduct {
   currency: string;
   price: number;
   quantity: number;
-  specs: string[][];
-  tags: string[][];
+}
+
+interface ITags {
+  product_id: string;
+  tag: string;
 }
 
 export class Product implements IProduct {
@@ -79,8 +82,6 @@ export class Product implements IProduct {
   currency: string;
   price: number;
   quantity: number;
-  specs: string[][];
-  tags: string[][];
 
   /**
    *
@@ -95,8 +96,6 @@ export class Product implements IProduct {
     currency: string,
     price: number,
     quantity: number,
-    specs: string[][],
-    tags: string[][]
   ) {
     this.id = id;
     this.product_id = product_id;
@@ -107,8 +106,6 @@ export class Product implements IProduct {
     this.currency = currency;
     this.price = price;
     this.quantity = quantity;
-    this.specs = specs;
-    this.tags = tags;
   }
 }
 

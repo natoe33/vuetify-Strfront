@@ -17,7 +17,7 @@ export class dbService extends Dexie {
     this.version(1).stores({
       tags: "++tag",
       productTag: "++id, product_id, tag",
-      products: "Product",
+      products: "++product_id, id, stall_id, name, description, images, currency, price, quantity",
     });
   }
 }
