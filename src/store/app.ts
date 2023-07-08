@@ -1,6 +1,6 @@
 // Utilities
 import { defineStore } from "pinia";
-import { useLocalStorage, useStorage, type RemovableRef } from "@vueuse/core";
+import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product } from "@/models";
 import { RelayHelper, Utils } from "@/utils";
 import { Event, type Filter } from "@/nostr-tools";
@@ -8,11 +8,17 @@ import { db, dbService } from "@/utils/db";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
 
+type ProductTags = {
+  product_id: string;
+  tag: string;
+}
+
 type State = {
   relay: RelayHelper;
   utils: Utils;
   db: dbService;
   products: RemovableRef<Product[]>;
+  productTags: RemovableRef<ProductTags[]>;
   events: RemovableRef<Event[]>;
   tags: RemovableRef<string[]>;
 };
@@ -24,6 +30,7 @@ export const useAppStore = defineStore({
     utils: new Utils(),
     db: db,
     products: useLocalStorage("products", [] as Product[]),
+    productTags: useLocalStorage("productTags", [] as ProductTags[]),
     events: useLocalStorage("events", [] as Event[]),
     tags: useLocalStorage("tags", [] as string[]),
   }),
@@ -32,22 +39,17 @@ export const useAppStore = defineStore({
       return state.tags;
     },
     getSortedTags: async (state) => {
-      // return state.tags.sort();
-      // const list: string[] = [];
-      // const tags = await state.db.tags.toArray();
-      // tags.forEach((tag) => {
-      //   const t = Object.entries(tag);
-      //   console.log(t[0][1]);
-      //   list.push(t[0][1]);
-      // });
-      console.log(state.tags);
       return state.tags.sort();
     },
     getProducts: (state) => {
       return state.products;
     },
     getProduct: (state) => {
-      return (id: string) => state.products.find((product) => product.id === id)
+      return (id: string) => state.products.find((product) => product.id === id);
+    },
+    getProductsWithTags: (state) => {
+      const products = (tag: string) => state.productTags.filter((product) => product.tag === tag);
+      console.log(products);
     },
     getEvents: (state) => {
       return state.events;

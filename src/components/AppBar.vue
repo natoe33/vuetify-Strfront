@@ -2,14 +2,18 @@
 import { ref, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { useAppStore } from "@/store";
+import { storeToRefs } from "pinia";
 const appStore = useAppStore();
 const { getSortedTags } = appStore;
+const { getProductsWithTags } = storeToRefs(appStore);
 
 const drawer = ref(false);
 const group = ref(null);
 const router = useRouter();
 
-async function loadWithTags(tag: string) {}
+async function loadWithTags(tag: string) {
+  getProductsWithTags(tag);
+}
 
 async function goHome() {
   router.push({ name: "home" });
