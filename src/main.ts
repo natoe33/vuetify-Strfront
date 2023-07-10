@@ -6,7 +6,6 @@
 
 // Components
 import App from "./App.vue";
-// import { NostrProviderService } from "@/utils/nostrProvider";
 
 // Composables
 import { createApp } from "vue";
@@ -15,9 +14,5 @@ import { createApp } from "vue";
 import { registerPlugins } from "@/plugins";
 
 const app = createApp(App);
-
 registerPlugins(app);
-// app.config.globalProperties.$nostr = new NostrProviderService();
-// app.provide("nostr", new NostrProviderService());
-
 app.mount("#app");

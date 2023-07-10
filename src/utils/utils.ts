@@ -5,8 +5,8 @@ export class Utils {
   parseProduct = (event: Event): Product => {
     const content: IContent = JSON.parse(event.content);
     const product: Product = new Product(
-      event.id,
       content.id,
+      event.id,
       content.stall_id,
       content.name,
       content.description,

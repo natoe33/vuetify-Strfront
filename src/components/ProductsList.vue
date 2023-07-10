@@ -32,7 +32,7 @@ onMounted(() => {
 <template>
   <v-sheet class="d-flex flex-wrap align-content-center">
     <template v-for="event of events" :key="event.id">
-      <ProductCard :product="(event as Product)" @click="loadProduct(event)"/>
+      <ProductCard :product="(event as Product)" @click="loadProduct(event)" />
     </template>
   </v-sheet>
 </template>

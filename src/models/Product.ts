@@ -56,8 +56,8 @@ export class Stall implements IStall {
 }
 
 interface IProduct {
-  id: string;
   product_id: string;
+  id: string;
   stall_id: string;
   name: string;
   description: string;
@@ -73,8 +73,8 @@ interface ITags {
 }
 
 export class Product implements IProduct {
-  id: string;
   product_id: string;
+  id: string;
   stall_id: string;
   name: string;
   description: string;
@@ -87,15 +87,15 @@ export class Product implements IProduct {
    *
    */
   constructor(
-    id: string,
     product_id: string,
+    id: string,
     stall_id: string,
     name: string,
     description: string,
     images: string[],
     currency: string,
     price: number,
-    quantity: number,
+    quantity: number
   ) {
     this.id = id;
     this.product_id = product_id;
