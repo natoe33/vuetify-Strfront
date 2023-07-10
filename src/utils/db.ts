@@ -7,7 +7,7 @@ export interface IProductTag {
   tag: string;
 }
 
-interface IEvent {
+export interface IEvent {
   id: string;
   pubkey: string;
   created_at: number;
@@ -38,8 +38,8 @@ export class dbService extends Dexie {
     });
     this.version(2).stores({
       events: "++id, pubkey, created_at, kind, content, sig",
-      eventTags: "event_id, type, tag"
-    })
+      eventTags: "event_id, type, tag",
+    });
   }
 }
 export const db = new dbService();

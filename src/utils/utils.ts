@@ -1,8 +1,9 @@
 import { Product, type IContent } from "@/models";
 import { Event } from "@/nostr-tools";
+import { NDKEvent } from "@/ndk";
 
 export class Utils {
-  parseProduct = (event: Event): Product => {
+  parseProduct = (event: NDKEvent): Product => {
     const content: IContent = JSON.parse(event.content);
     const product: Product = new Product(
       content.id,
@@ -19,7 +20,7 @@ export class Utils {
     return product;
   };
 
-  parseTags = (event: Event): string[] => {
+  parseTags = (event: NDKEvent): string[] => {
     const returnTags: string[] = [];
     const validTags = event.tags.filter((tag) => tag[0] === "t");
     validTags.forEach((tag) => {

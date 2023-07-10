@@ -1,10 +1,10 @@
 // Utilities
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
-import { Product } from "@/models";
-import { RelayHelper, Utils } from "@/utils";
+import { Product, Relay } from "@/models";
 import { Event as NEvent, type Filter } from "@/nostr-tools";
-import { db, dbService } from "@/utils/db";
+import { db, dbService, Utils, IEvent, NostrProviderService } from "@/utils";
+import NDK, { NDKEvent, NDKKind, NostrEvent } from "@/ndk";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
 
@@ -14,26 +14,36 @@ type ProductTags = {
 };
 
 type State = {
-  relay: RelayHelper;
+  relay: NDK;
+  nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
   page: number;
+  npub: RemovableRef<string>;
+  pkey: RemovableRef<string>;
+  pubKey: RemovableRef<string>;
+  relayList: RemovableRef<Relay[]>;
   products: RemovableRef<Product[]>;
   productTags: RemovableRef<ProductTags[]>;
-  events: RemovableRef<NEvent[]>;
+  events: RemovableRef<NDKEvent[]>;
   tags: RemovableRef<string[]>;
 };
 
 export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
-    relay: new RelayHelper(relayUrls),
+    relay: new NDK({ explicitRelayUrls: relayUrls }),
+    nostrProvider: new NostrProviderService(db),
     utils: new Utils(),
     db: db,
     page: 0,
+    npub: useLocalStorage("npub", ""),
+    pkey: useLocalStorage("pkey", ""),
+    pubKey: useLocalStorage("pubkey", ""),
+    relayList: useLocalStorage("relayList", [] as Relay[]),
     products: useLocalStorage("products", [] as Product[]),
     productTags: useLocalStorage("productTags", [] as ProductTags[]),
-    events: useLocalStorage("events", [] as NEvent[]),
+    events: useLocalStorage("events", [] as NDKEvent[]),
     tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
@@ -46,6 +56,15 @@ export const useAppStore = defineStore({
     getProducts: (state) => {
       return state.products;
     },
+    getNpub: (state) => {
+      return state.npub;
+    },
+    getPKey: (state) => {
+      return state.pkey;
+    },
+    getPubKey: (state) => {
+      return state.pubKey;
+    },
     getProduct: (state) => {
       return (id: string) =>
         state.products.find((product) => product.id === id);
@@ -57,6 +76,9 @@ export const useAppStore = defineStore({
     },
     getEvents: (state) => {
       return state.events;
+    },
+    getRelays: (state) => {
+      return state.relayList;
     },
   },
   actions: {
@@ -78,10 +100,19 @@ export const useAppStore = defineStore({
       // this.products.push(product);
     },
     createSub(filters: Filter) {
-      this.relay.createSub(this.relay.getPool(), filters);
+      // this.relay.createSub(this.relay.getPool(), filters);
+    },
+    initialEvents() {
+      this.nostrProvider.fetchEvents(NDKKind.Product)
     },
     saveEvent(event: NEvent) {
-      this.db.events.add({event.id, event.pubkey, event.})
+      
+    },
+    clearRelays() {
+      this.relayList = [];
+    },
+    addRelays(relays: Relay[]) {
+      this.relayList = relays;
     },
   },
 });

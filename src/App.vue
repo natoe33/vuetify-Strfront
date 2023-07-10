@@ -5,8 +5,7 @@ import { type Filter, Kind } from "@/nostr-tools";
 import { useAppStore } from "@/store";
 
 const appStore = useAppStore();
-const filter: Filter = { kinds: [Kind.Product] };
-appStore.createSub(filter);
+appStore.initialEvents();
 </script>
 <template>
   <v-app>
