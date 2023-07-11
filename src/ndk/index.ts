@@ -1,6 +1,6 @@
 import debug from "debug";
 import EventEmitter from "eventemitter3";
-import { NDKCacheAdapter } from "./cache/index.js";
+import { type NDKCacheAdapter } from "./cache/index.js";
 import dedupEvent from "./events/dedup.js";
 import NDKEvent from "./events/index.js";
 import { NDKPool } from "./relay/pool/index.js";
@@ -8,14 +8,14 @@ import { calculateRelaySetFromEvent } from "./relay/sets/calculate.js";
 import { NDKRelaySet } from "./relay/sets/index.js";
 import type { NDKSigner } from "./signers/index.js";
 import {
-  NDKFilter,
+  type NDKFilter,
   NDKFilterOptions,
   NDKSubscription,
   NDKSubscriptionOptions,
   filterFromId,
 } from "./subscription/index.js";
 import NDKUser, { NDKUserParams } from "./user/index.js";
-import { NDKUserProfile } from "./user/profile.js";
+import { type NDKUserProfile } from "./user/profile.js";
 
 export * from "./events/index.js";
 export * from "./events/kinds/index.js";
@@ -31,7 +31,7 @@ export * from "./signers/nip46/index.js";
 export * from "./signers/private-key/index.js";
 export * from "./subscription/index.js";
 export * from "./user/profile.js";
-export { NDKZapInvoice, zapInvoiceFromEvent } from "./zap/invoice";
+export { type NDKZapInvoice, zapInvoiceFromEvent } from "./zap/invoice";
 export { NDKEvent, NDKUser, NDKFilter, NDKUserProfile, NDKCacheAdapter };
 
 export interface NDKConstructorParams {

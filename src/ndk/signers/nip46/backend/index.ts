@@ -6,7 +6,7 @@ import GetPublicKeyHandlingStrategy from "./get-public-key.js";
 import SignEventHandlingStrategy from "./sign-event.js";
 import Nip04DecryptHandlingStrategy from "./nip04-decrypt.js";
 import Nip04EncryptHandlingStrategy from "./nip04-encrypt.js";
-import { verifySignature, Event } from "nostr-tools";
+import { verifySignature, Event } from "@/nostr-tools";
 
 export type Nip46PermitCallback = (
   pubkey: string,

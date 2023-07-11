@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { Filter as NostrFilter, matchFilter, Sub, nip19 } from "nostr-tools";
+import { Filter as NostrFilter, matchFilter, Sub, nip19 } from "@/nostr-tools";
 import NDKEvent, { NDKEventId } from "../events/index.js";
 import NDK from "../index.js";
 import { NDKRelay } from "../relay";
@@ -476,7 +476,9 @@ export function filterFromId(id: string): NDKFilter {
           kinds: [decoded.data.kind],
         };
     }
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 
   return { ids: [id] };
 }

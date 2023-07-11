@@ -1,5 +1,5 @@
 import EventEmitter from "eventemitter3";
-import { getEventHash, UnsignedEvent } from "nostr-tools";
+import { getEventHash, UnsignedEvent } from "@/nostr-tools";
 import NDK, { NDKFilter, NDKRelay, NDKRelaySet, NDKUser } from "../index.js";
 import { NDKSigner } from "../signers/index.js";
 import Zap from "../zap/index.js";

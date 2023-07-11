@@ -1,4 +1,4 @@
-import { nip05, nip19 } from "nostr-tools";
+import { nip05, nip19 } from "@/nostr-tools";
 import Event, { NDKTag, NostrEvent } from "../events/index.js";
 import NDK, { NDKKind } from "../index.js";
 import { NDKFilterOptions } from "../subscription/index.js";
@@ -87,7 +87,9 @@ export default class NDKUser {
       sortedSetMetadataEvents.forEach((event) => {
         try {
           this.profile = mergeEvent(event, this.profile!);
-        } catch (e) {}
+        } catch (e) {
+          console.log(e);
+        }
       });
     }
 

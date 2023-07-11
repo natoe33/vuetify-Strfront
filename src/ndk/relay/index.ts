@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
-import type { Event as SignedEvent } from "nostr-tools";
-import { relayInit, Sub } from "nostr-tools";
+import type { Event as SignedEvent } from "@/nostr-tools";
+import { relayInit, Sub } from "@/nostr-tools";
 import "websocket-polyfill";
 import NDKEvent, { NDKTag, NostrEvent } from "../events/index.js";
 import { NDKSubscription } from "../subscription/index.js";

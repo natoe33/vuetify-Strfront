@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay } from "@/models";
-import { Event as NEvent, type Filter } from "@/nostr-tools";
+// import { Event as NEvent, type Filter } from "@/nostr-tools";
 import { db, dbService, Utils, IEvent, NostrProviderService } from "@/utils";
 import NDK, { NDKEvent, NDKKind, NostrEvent } from "@/ndk";
 
@@ -73,6 +73,7 @@ export const useAppStore = defineStore({
       const products = (tag: string) =>
         state.productTags.filter((product) => product.tag === tag);
       console.log(products);
+      return products
     },
     getEvents: (state) => {
       return state.events;
@@ -82,7 +83,7 @@ export const useAppStore = defineStore({
     },
   },
   actions: {
-    addEvent(event: NEvent) {
+    addEvent(event: NDKEvent) {
       // console.log(`AppStore: event added ${event.content}`);
       this.saveEvent(event);
       this.events.push(event);
@@ -102,11 +103,15 @@ export const useAppStore = defineStore({
     createSub(filters: Filter) {
       // this.relay.createSub(this.relay.getPool(), filters);
     },
-    initialEvents() {
-      this.nostrProvider.fetchEvents(NDKKind.Product)
+    async initialEvents() {
+      const eventSet = await this.nostrProvider.fetchEvents(NDKKind.Product)
+      if(eventSet){
+        console.log(eventSet.entries)
+      }
+      // console.log(events);
     },
-    saveEvent(event: NEvent) {
-      
+    saveEvent(event: NDKEvent) {
+      this.events.push(event);
     },
     clearRelays() {
       this.relayList = [];
