@@ -2,7 +2,6 @@ import Dexie, { Table } from "dexie";
 import { Product } from "@/models";
 
 export interface IProductTag {
-  id?: number;
   product_id: string;
   tag: string;
 }
@@ -32,7 +31,7 @@ export class dbService extends Dexie {
     super("StrFront");
     this.version(1).stores({
       tags: "++tag",
-      productTag: "++id, product_id, tag",
+      productTags: "product_id, tag",
       products:
         "++product_id, id, stall_id, name, description, images, currency, price, quantity",
     });

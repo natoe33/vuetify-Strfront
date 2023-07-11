@@ -15,36 +15,18 @@ import NDK, {
   NDKPrivateKeySigner,
   NDKKind,
 } from "@/ndk";
-import { nip57 } from "@/nostr-tools";
-import { bech32 } from "@scure/base";
-import { type Event, Kind } from "@/nostr-tools";
+// import { nip57 } from "@/nostr-tools";
+// import { bech32 } from "@scure/base";
+// import { type Event, Kind } from "@/nostr-tools";
 import { Product, type IContent, Relay } from "@/models";
-import { NostrFetcher } from "nostr-fetch";
-import { db, dbService } from "@/utils";
+// import { NostrFetcher } from "nostr-fetch";
+// import { db, dbService } from "@/utils";
 import { useAppStore } from "@/store";
 import { BehaviorSubject, retry } from "rxjs";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
 const nHoursAgo = (hrs: number): number =>
   Math.floor((Date.now() - hrs * 60 * 60 * 1000) / 1000);
-
-const parseProduct = (event: Event): Product => {
-  const tags = event.tags.filter((tag) => tag[0] === "t");
-  const content: IContent = JSON.parse(event.content);
-  const product: Product = new Product(
-    event.id,
-    content.id,
-    content.stall_id,
-    content.name,
-    content.description,
-    content.images,
-    content.currency,
-    content.price,
-    content.quantity
-  );
-  console.log(product);
-  return product;
-};
 
 export class NostrProviderService {
   // fetcher: NostrFetcher;
@@ -64,7 +46,7 @@ export class NostrProviderService {
   isLoggedInUsingNsec: boolean = false;
   appStore;
 
-  constructor(private dbService: dbService) {
+  constructor() {
     // this.fetcher = NostrFetcher.init();
     this.appStore = useAppStore();
     const { getNpub, getPKey, getPubKey } = this.appStore;
@@ -314,8 +296,8 @@ export class NostrProviderService {
   //   if (productEvent) return parseProduct(productEvent);
   // }
 
-  async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined>{
-    const filter: NDKFilter = { kinds: [kind]};
+  async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
+    const filter: NDKFilter = { kinds: [kind] };
     const events = await this.ndk?.fetchEvents(filter, {});
     return events;
   }
@@ -396,7 +378,7 @@ export class NostrProviderService {
   }
 
   parseRelayEventContent(content: string): Relay[] {
-    let relays: Relay[] = [];
+    const relays: Relay[] = [];
     const relayJSON = JSON.parse(content);
     const rel = Object.entries(relayJSON);
     rel.forEach((relay) => {
@@ -407,7 +389,7 @@ export class NostrProviderService {
   }
 
   parseRelayEventTags(tags: NDKTag[]): Relay[] {
-    let relays: Relay[] = [];
+    const relays: Relay[] = [];
     // console.log(tags);
     tags.forEach((tag) => {
       if (tag[0] === "r") {
@@ -419,7 +401,7 @@ export class NostrProviderService {
   }
 
   async getUserSubscribedRelays(): Promise<Relay[]> {
-    let relays: Relay[] = [];
+    const relays: Relay[] = [];
     let author: string = "";
     if (this.currentUser?.hexpubkey()) {
       author = this.currentUser.hexpubkey();
@@ -470,7 +452,7 @@ export class NostrProviderService {
 
   async fetchSubscribedRelaysFromCache(): Promise<Relay[]> {
     const { getRelays } = this.appStore;
-    var subscribedRelaysFromCache = await getRelays;
+    const subscribedRelaysFromCache = await getRelays;
     console.log(
       `Subscribed Relays from cache : ${subscribedRelaysFromCache?.length}`
     );

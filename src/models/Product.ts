@@ -24,6 +24,7 @@ export class Shipping implements IShipping {
 
 interface IStall {
   id: string;
+  pubkey: string;
   name: string;
   description: string;
   currency: string;
@@ -32,6 +33,7 @@ interface IStall {
 
 export class Stall implements IStall {
   id: string;
+  pubkey: string;
   name: string;
   description: string;
   currency: string;
@@ -42,12 +44,14 @@ export class Stall implements IStall {
    */
   constructor(
     id: string,
+    pubkey: string,
     name: string,
     description: string,
     currency: string,
     shipping: Shipping[]
   ) {
     this.id = id;
+    this.pubkey = pubkey;
     this.name = name;
     this.description = description;
     this.currency = currency;
@@ -65,6 +69,7 @@ interface IProduct {
   currency: string;
   price: number;
   quantity: number;
+  tags: string[];
 }
 
 interface ITags {
@@ -82,6 +87,7 @@ export class Product implements IProduct {
   currency: string;
   price: number;
   quantity: number;
+  tags: string[];
 
   /**
    *
@@ -95,7 +101,8 @@ export class Product implements IProduct {
     images: string[],
     currency: string,
     price: number,
-    quantity: number
+    quantity: number,
+    tags: string[]
   ) {
     this.id = id;
     this.product_id = product_id;
@@ -106,6 +113,7 @@ export class Product implements IProduct {
     this.currency = currency;
     this.price = price;
     this.quantity = quantity;
+    this.tags = tags;
   }
 }
 

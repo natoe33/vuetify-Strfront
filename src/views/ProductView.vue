@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
-import { Product } from "@/models/Product";
 
 const appStore = useAppStore();
 const { getProduct } = storeToRefs(appStore);
@@ -15,11 +13,12 @@ const props = defineProps({
 });
 
 const product = getProduct.value(props.id);
+// const merchant = 
 </script>
 <template>
   <v-sheet class="d-md-inline ma-2 pa-0">
     <template v-if="product?.images">
-      <v-carousel show-arrows="hover">
+      <v-carousel show-arrows="hover" hide-delimiters progress="primary">
         <v-carousel-item
           v-for="(image, i) in product?.images"
           :key="i"
