@@ -306,7 +306,7 @@ export class NostrProviderService {
     kind: number,
     limit: number
   ): Promise<Set<NDKEvent> | undefined> {
-    const filter: NDKFilter = { kinds: [NDKKind.Product], limit: limit };
+    const filter: NDKFilter = { kinds: [30018], limit: limit };
     const productEvents = await this.ndk?.fetchEvents(filter, {});
     return productEvents;
   }
@@ -314,14 +314,13 @@ export class NostrProviderService {
   async fetchMerchantEvents(
     authors: string[]
   ): Promise<Set<NDKEvent> | undefined> {
-    const filter: NDKFilter = { kinds: [NDKKind.Stall], authors: authors };
+    const filter: NDKFilter = { kinds: [30017], authors: authors };
     const stallEvents = await this.ndk?.fetchEvents(filter, {});
     return stallEvents;
   }
 
   async fetchProductEvent(id: string): Promise<NDKEvent | null | undefined> {
-    const filter: NDKFilter = { id: id };
-    const productEvent = await this.ndk?.fetchEvent(filter);
+    const productEvent = await this.ndk?.fetchEvent(id)
     return productEvent;
   }
 

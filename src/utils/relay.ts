@@ -22,7 +22,7 @@ export class RelayHelper {
 
     const sub = pool.sub(this._relays, [filters]);
     sub.on("event", (event) => {
-      this._appStore.addEvent(event);
+      // this._appStore.addEvent(event);
     });
     sub.on("eose", () => {
       sub.unsub;
