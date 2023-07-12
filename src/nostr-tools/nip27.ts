@@ -52,15 +52,15 @@ export function* matchAll(content: string): Iterable<NostrURIMatch> {
  * })
  * ```
  */
-export function replaceAll(
-  content: string,
-  replacer: (match: NostrURI) => string
-): string {
-  return content.replaceAll(regex(), (uri, value) => {
-    return replacer({
-      uri: uri as `nostr:${string}`,
-      value,
-      decoded: decode(value),
-    });
-  });
-}
+// export function replaceAll(
+//   content: string,
+//   replacer: (match: NostrURI) => string
+// ): string {
+//   return content.replaceAll(regex(), (uri, value) => {
+//     return replacer({
+//       uri: uri as `nostr:${string}`,
+//       value,
+//       decoded: decode(value),
+//     });
+//   });
+// }
