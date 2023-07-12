@@ -62,6 +62,11 @@ export const useAppStore = defineStore({
         state.page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
       );
     },
+    getNumOfPages: (state) => {
+      const numPages: number = state.products.length / ITEMS_PER_PAGE;
+      console.log(`products: ${state.products.length}, items per page: ${ITEMS_PER_PAGE}, num of pages: ${numPages}`)
+      return numPages;
+    },
     getNpub: (state) => {
       return state.npub;
     },

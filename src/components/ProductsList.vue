@@ -12,11 +12,13 @@ const router = useRouter();
 
 const { tagLoading, loading, tag, page } = storeToRefs(appStore);
 const events = ref([] as Product[]);
+const pages = ref(0);
 
 const eventList = computed(() => events.value);
 
 async function loadProducts() {
   events.value = appStore.getProducts;
+  pages.value = appStore.getNumOfPages;
   loading.value = false;
 }
 
@@ -64,6 +66,5 @@ onMounted(() => {
       <ProductCard :product="(event as Product)" @click="loadProduct(event)" />
     </template>
   </v-sheet>
-  <v-btn v-if="page > 0" @click="appStore.prevPage">Prev</v-btn>
-  <v-btn @click="appStore.nextPage">Next</v-btn>
+  <v-pagination theme="dark" :length="pages" @next="appStore.nextPage" @prev="appStore.prevPage"></v-pagination>
 </template>

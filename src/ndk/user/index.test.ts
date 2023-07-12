@@ -1,4 +1,4 @@
-import { nip19 } from "nostr-tools";
+import { nip19 } from "@/nostr-tools";
 import NDKUser, { NDKUserParams } from "./index.js";
 import NDK, { NDKEvent, NDKSubscription } from "../index.js";
 

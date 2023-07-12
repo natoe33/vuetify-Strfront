@@ -11,15 +11,18 @@ const props = defineProps({
 </script>
 
 <template>
-  <v-card class="mx-auto my-auto" width="175" height="250" variant="outlined">
-    <template v-if="props.product.images">
-      <v-img :src="props.product?.images[0]" height="150px" />
+  <v-card class="mx-auto my-1" width="175" height="250" variant="tonal">
+    <template v-if="props.product.images[0]">
+      <v-img :src="props.product?.images[0]" height="150px" class="grey-darken-2"/>
+    </template>
+    <template v-else>
+      <v-img src="https://placehold.co/600x400?text=No+Image" height="150px" />
     </template>
     <v-card-item class="ma-auto pa-1" min-height="100">
       <v-card-item class="ma-auto pa-1 overflow-hidden" height="90">
-        <v-card-title class="text-caption ma-auto pa-0">{{
+        <v-card-subtitle class="ma-auto pa-0">{{
           props.product?.name
-        }}</v-card-title>
+        }}</v-card-subtitle>
         <v-card-text class="text-caption ma-auto pa-0 text-truncate">{{
           props.product?.description
         }}</v-card-text>

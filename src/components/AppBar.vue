@@ -27,13 +27,17 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
 <template>
   <v-app-bar color="teal-darken-4" flat>
     <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    <v-container class="fill-height d-flex align-center">
+    <v-container class="fill-height d-flex mx-2 align-left">
+    <v-img src="@/assets/logo-no-background.svg" height="32" @click="goHome"/>
+    </v-container>
+    <!-- <v-container class="fill-height d-flex mx-2">
+      <v-img src="@/assets/logo-no-background.svg" height="64" width="30" class="float-left"/>
       <v-avatar class="me-10 ms-4" color="grey-darken-1" size="32"></v-avatar>
       <v-btn @click="goHome">Home</v-btn>
       <v-btn v-for="link in links" :key="link" variant="text">
         {{ link }}
       </v-btn>
-    </v-container>
+    </v-container> -->
   </v-app-bar>
   <v-navigation-drawer v-model="drawer" temporary>
     <v-list>
