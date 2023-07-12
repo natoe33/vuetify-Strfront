@@ -1,44 +1,22 @@
-# default
+# Nostr Storefront
 
-## Project setup
+## Buy and sell on Nostr Marketplace without setting up LNBits
 
-```
-# yarn
-yarn
+## What's been implemented
+- [x] Load Marketplace Items
+- [x] View Items By Tag
 
-# npm
-npm install
+## What's planned
+- [] View Merchant's Stall Information
+- [] View Merchant's Other Items
+- [] Login With npub/nsec
+- [] Set Up a Marketplace Stall
+- [] Nip07 Login
+- [] LN Wallet Connect
+- [] LN Payments
+- [] Other Things I Can Think Of
+- [] Requested Features
 
-# pnpm
-pnpm install
-```
+## Visit The Site
+(Strfront)[https://strfront.com]
 
-### Compiles and hot-reloads for development
-
-```
-# yarn
-yarn dev
-
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-```
-
-### Compiles and minifies for production
-
-```
-# yarn
-yarn build
-
-# npm
-npm run build
-
-# pnpm
-pnpm build
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/config/).
