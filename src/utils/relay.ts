@@ -1,9 +1,9 @@
 import { SimplePool, type Filter, type Sub } from "@/nostr-tools";
-import { useAppStore } from "@/store/app";
+import { Utils } from "@/utils";
 
 export class RelayHelper {
   private _pool = new SimplePool();
-  private _appStore = useAppStore();
+  private _utils = new Utils();
 
   private _relays: string[] = [];
 
@@ -22,7 +22,7 @@ export class RelayHelper {
 
     const sub = pool.sub(this._relays, [filters]);
     sub.on("event", (event) => {
-      // this._appStore.addEvent(event);
+      this._utils.parseEvent(event);
     });
     sub.on("eose", () => {
       sub.unsub;

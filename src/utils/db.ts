@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import { Product } from "@/models";
+import { TableProduct, TableProductImg, TableProductTag } from "@/models";
 
 export interface IProductTag {
   product_id: string;
@@ -22,8 +22,9 @@ interface IEventTag {
 
 export class dbService extends Dexie {
   tags!: Table<string>;
-  productTags!: Table<IProductTag>;
-  products!: Table<Product>;
+  productTags!: Table<TableProductTag>;
+  productImages!: Table<TableProductImg>;
+  products!: Table<TableProduct>;
   events!: Table<IEvent>;
   eventTags!: Table<IEventTag>;
 
@@ -31,9 +32,10 @@ export class dbService extends Dexie {
     super("StrFront");
     this.version(1).stores({
       tags: "++tag",
-      productTags: "product_id, tag",
+      productTags: "++id, product_id, tag",
+      productImages: "product_id, url",
       products:
-        "++product_id, id, stall_id, name, description, images, currency, price, quantity",
+        "++product_id, event_id, stall_id, name, description, currency, price, quantity, created_at",
     });
     this.version(2).stores({
       events: "++id, pubkey, created_at, kind, content, sig",

@@ -6,8 +6,6 @@ import { useAppStore } from "@/store";
 import MyWorker from "@/worker?worker";
 // import { useWebWorker } from "@vueuse/core";
 
-
-
 export class Utils {
   worker: Worker;
   appStore: StoreGeneric;
@@ -31,7 +29,7 @@ export class Utils {
   }
 
   parseProduct = (event: NDKEvent): Product => {
-    this.worker.postMessage({type: 'parseProduct', data: event.content})
+    this.worker.postMessage({type: 'parseProduct', data: {id: event.id, created_at: event.created_at, content: event.content, tags: event.tags}})
     const tags: string[] = [];
     event.tags.forEach((t) => {
       if (t[0] === "t") tags.push(t[1]);
