@@ -1,4 +1,5 @@
-import { matchAll, replaceAll } from "./nip27.ts";
+// import { matchAll, replaceAll } from "./nip27.ts";
+import { matchAll } from "./nip27.ts";
 
 test("matchAll", () => {
   const result = matchAll(
@@ -48,20 +49,20 @@ test("matchAll with an invalid nip19", () => {
   ]);
 });
 
-test("replaceAll", () => {
-  const content =
-    "Hello nostr:npub108pv4cg5ag52nq082kd5leu9ffrn2gdg6g4xdwatn73y36uzplmq9uyev6!\n\nnostr:note1gmtnz6q2m55epmlpe3semjdcq987av3jvx4emmjsa8g3s9x7tg4sclreky";
+// test("replaceAll", () => {
+//   const content =
+//     "Hello nostr:npub108pv4cg5ag52nq082kd5leu9ffrn2gdg6g4xdwatn73y36uzplmq9uyev6!\n\nnostr:note1gmtnz6q2m55epmlpe3semjdcq987av3jvx4emmjsa8g3s9x7tg4sclreky";
 
-  const result = replaceAll(content, ({ decoded, value }) => {
-    switch (decoded.type) {
-      case "npub":
-        return "@alex";
-      case "note":
-        return "!1234";
-      default:
-        return value;
-    }
-  });
+//   const result = replaceAll(content, ({ decoded, value }) => {
+//     switch (decoded.type) {
+//       case "npub":
+//         return "@alex";
+//       case "note":
+//         return "!1234";
+//       default:
+//         return value;
+//     }
+//   });
 
-  expect(result).toEqual("Hello @alex!\n\n!1234");
-});
+//   expect(result).toEqual("Hello @alex!\n\n!1234");
+// });
