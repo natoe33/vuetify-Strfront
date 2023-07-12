@@ -52,6 +52,9 @@ export const useAppStore = defineStore({
     tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
+    getNDK: (state) => {
+      return state.relay;
+    },
     getSortedTags: async (state) => {
       return state.tags.sort();
     },
