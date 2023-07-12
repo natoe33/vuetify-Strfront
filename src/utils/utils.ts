@@ -18,7 +18,7 @@ export class Utils {
   constructor() {
     this.worker = new MyWorker();
     this.appStore = useAppStore();
-    this.ndk = this.appStore.$state.getNDK();
+    this.ndk = this.appStore.getNDK;
   }
 
   parseEvent = (event: Event) => {
