@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import { TableProduct, TableProductImg, TableProductTag } from "@/models";
+import { Product, Shipping, Stall } from "@/models";
 
 export interface IProductTag {
   product_id: string;
@@ -14,40 +14,44 @@ export interface IEvent {
   content: string;
   sig: string;
 }
-interface IEventTag {
+
+/**
+class IStall {
   id: string;
-  type: string;
-  tag: string;
+  pubkey: string;
+  created_at: number;
+  name: string;
+  description: string;
+  currency: string;
 }
+
+class Shipping {
+  id: string;
+  stall_id: string;
+  name: string;
+  currency: string;
+  cost: number;
+  countries: string[];
+}
+ */
 
 export class dbService extends Dexie {
   tags!: Table<string>;
-  productTags!: Table<TableProductTag>;
-  productImages!: Table<TableProductImg>;
-  products!: Table<TableProduct>;
-  events!: Table<IEvent>;
-  eventTags!: Table<IEventTag>;
-
+  products!: Table<Product>;
+  merchants!: Table<Stall>;
+  shipping!: Table<Shipping>;
 
   // TODO: update products to use multi-entry indexes for images and tags
   constructor() {
     super("StrFront");
     this.version(1).stores({
-      tags: "++id, &tag",
-      productTags: "++id, product_id, tag",
-      productImages: "product_id, url",
+      tags: "&tag",
       products:
-        "++product_id, event_id, stall_id, name, description, currency, price, quantity, created_at",
-    });
-    this.version(2).stores({
-      events: "++id, pubkey, created_at, kind, content, sig",
-      eventTags: "event_id, type, tag",
+        "++product_id, event_id, stall_id, name, description, &images, currency, price, quantity, &tags, created_at",
+      merchants:
+        "++stall_id, event_id, pubkey, created_at, name, description, currency",
+      shipping: "++shipping_id, stall_id, name, currency, cost, &countries",
     });
   }
 }
 export const db = new dbService();
-
-// dbService.version(1).stores({
-//     tags: '++id, event_id, tag',
-//     products: '++id, Product',
-// })

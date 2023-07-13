@@ -2,7 +2,13 @@
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay } from "@/models";
-import { Utils, NostrProviderService, RelayHelper } from "@/utils";
+import {
+  Utils,
+  NostrProviderService,
+  RelayHelper,
+  db,
+  dbService,
+} from "@/utils";
 import NDK, { NDKEvent, NDKKind } from "@/ndk";
 import { type Filter } from "@/nostr-tools";
 
@@ -18,8 +24,9 @@ type ProductTags = {
 type State = {
   relay: NDK;
   helper: RelayHelper;
-  nostrProvider: NostrProviderService;
+  // nostrProvider: NostrProviderService;
   utils: Utils;
+  db: dbService;
   page: number;
   tag: string;
   tagLoading: boolean;
@@ -40,8 +47,9 @@ export const useAppStore = defineStore({
   state: (): State => ({
     relay: new NDK({ explicitRelayUrls: relayUrls }),
     helper: new RelayHelper(relayUrls),
-    nostrProvider: new NostrProviderService(),
+    // nostrProvider: new NostrProviderService(),
     utils: new Utils(),
+    db: db,
     page: 0,
     tag: "",
     tagLoading: false,
@@ -57,27 +65,31 @@ export const useAppStore = defineStore({
     tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
-    getNDK: (state) => {
-      return state.relay;
-    },
+    // getNDK: (state) => {
+    //   return state.relay;
+    // },
     getSortedTags: async (state) => {
       return state.tags.sort();
     },
-    getProducts: (state) => {
+    getProducts: async (state) => {
       console.log(`return products for page ${state.page}`);
-      return state.products.slice(
-        state.page * ITEMS_PER_PAGE,
-        state.page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
-      );
+      return await state.db.products
+        .orderBy("created_at")
+        .offset(state.page * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .toArray();
     },
-    getNumOfPages: (state) => {
-      const numPages: number = Math.ceil(
-        state.products.length / ITEMS_PER_PAGE
-      );
-      console.log(
-        `products: ${state.products.length}, items per page: ${ITEMS_PER_PAGE}, num of pages: ${numPages}`
-      );
-      return numPages;
+    getMerchant: (state) => {
+      return async (stall_id: string) =>
+        await state.db.merchants
+          .where("stall_id")
+          .equalsIgnoreCase(stall_id)
+          .limit(1)
+          .toArray();
+    },
+    getNumOfPages: async (state) => {
+      const numItems = await state.db.products.count();
+      return Math.ceil(numItems / ITEMS_PER_PAGE);
     },
     getNpub: (state) => {
       return state.npub;
@@ -89,8 +101,13 @@ export const useAppStore = defineStore({
       return state.pubKey;
     },
     getProduct: (state) => {
-      return (id: string) =>
-        state.products.find((product) => product.id === id);
+      return async (id: string) =>
+        await state.db.products
+          .where("event_id")
+          .equalsIgnoreCase(id)
+          .toArray();
+      // return (id: string) =>
+      //   state.products.find((product) => product.event_id === id);
     },
     getProductsWithTags: (state) => {
       console.log(`getProductsWithTags tag: ${state.tag}`);
@@ -115,17 +132,17 @@ export const useAppStore = defineStore({
     },
     addEvent(event: NDKEvent) {
       // console.log(`AppStore: event added ${event.content}`);
-      this.saveEvent(event);
-      this.events.push(event);
-      const product: Product = this.utils.parseProduct(event);
-      this.products.push(product);
-      this.utils.parseTags(event).forEach((tag) => {
-        if (this.tags.filter((t) => t === tag).length === 0) {
-          this.tags.push(tag);
-          const prodTag: ProductTags = { product_id: product.id, tag: tag };
-          this.productTags.push(prodTag);
-        }
-      });
+      // this.saveEvent(event);
+      // this.events.push(event);
+      // const product: Product = this.utils.parseProduct(event);
+      // this.products.push(product);
+      // this.utils.parseTags(event).forEach((tag) => {
+      //   if (this.tags.filter((t) => t === tag).length === 0) {
+      //     this.tags.push(tag);
+      //     const prodTag: ProductTags = { product_id: product.event_id, tag: tag };
+      //     this.productTags.push(prodTag);
+      //   }
+      // });
       // this.products.push(product);
     },
     setTagandLoading(tag: string) {
@@ -137,35 +154,37 @@ export const useAppStore = defineStore({
       this.page = 0;
       this.loading = false;
     },
-    async initialEvents() {
-      const eventSet = await this.nostrProvider.fetchEvents(NDKKind.Product);
-      const merchSet = await this.nostrProvider.fetchEvents(NDKKind.Stall);
-      console.log(merchSet);
-      if (eventSet) {
-        eventSet.forEach((event) => {
-          const product: Product = this.utils.parseProduct(event);
-          if (
-            this.products.filter((prod) => prod.id === product.id).length === 0
-          )
-            this.products.push(product);
-          this.utils.parseTags(event).forEach((tag) => {
-            const prodTag: ProductTags = {
-              product_id: product.product_id,
-              tag: tag,
-            };
-            if (
-              this.productTags.filter(
-                (t) => t.product_id === product.product_id && t.tag === tag
-              ).length === 0
-            )
-              this.productTags.push(prodTag);
-            if (this.tags.filter((t) => t === tag).length === 0)
-              this.tags.push(tag);
-          });
-        });
-      }
-    },
-    async merchantEvent() {},
+    // async initialEvents() {
+    //   const eventSet = await this.nostrProvider.fetchEvents(NDKKind.Product);
+    //   const merchSet = await this.nostrProvider.fetchEvents(NDKKind.Stall);
+    //   console.log(merchSet);
+    //   if (eventSet) {
+    //     eventSet.forEach((event) => {
+    //       const product: Product = this.utils.parseProduct(event);
+    //       if (
+    //         this.products.filter((prod) => prod.event_id === product.event_id).length === 0
+    //       )
+    //         this.products.push(product);
+    //       this.utils.parseTags(event).forEach((tag) => {
+    //         const prodTag: ProductTags = {
+    //           product_id: product.product_id,
+    //           tag: tag,
+    //         };
+    //         if (
+    //           this.productTags.filter(
+    //             (t) => t.product_id === product.product_id && t.tag === tag
+    //           ).length === 0
+    //         )
+    //           this.productTags.push(prodTag);
+    //         if (this.tags.filter((t) => t === tag).length === 0)
+    //           this.tags.push(tag);
+    //       });
+    //     });
+    //   }
+    // },
+    // async merchantEvent(filters: Filter) {
+    //   this.helper.createSub(this.helper.getPool(), filters);
+    // },
     nextPage() {
       this.page++;
       this.loading = true;

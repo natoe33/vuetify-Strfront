@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// TODO: Display item quantity
+
 import ProductCard from "./ProductCard.vue";
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
@@ -17,8 +19,8 @@ const pages = ref(0);
 const eventList = computed(() => events.value);
 
 async function loadProducts() {
-  events.value = appStore.getProducts;
-  pages.value = appStore.getNumOfPages;
+  events.value = await appStore.getProducts;
+  pages.value = await appStore.getNumOfPages;
   loading.value = false;
 }
 
@@ -26,7 +28,7 @@ async function loadProduct(event: Product) {
   router.push({
     name: "product",
     params: {
-      id: event.id,
+      id: event.event_id,
     },
   });
 }

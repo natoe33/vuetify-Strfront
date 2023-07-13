@@ -28,7 +28,7 @@ export class Utils {
     }
   };
 
-  parseProduct = (event: NDKEvent): Product => {
+  parseProduct = (event: NDKEvent) => {
     this.worker.postMessage({
       type: "parseProduct",
       data: {
@@ -38,40 +38,20 @@ export class Utils {
         tags: event.tags,
       },
     });
-    const tags: string[] = [];
-    event.tags.forEach((t) => {
-      if (t[0] === "t") tags.push(t[1]);
-    });
-    const content: IContent = JSON.parse(event.content);
-    const product: Product = new Product(
-      content.id,
-      event.id,
-      content.stall_id,
-      content.name,
-      content.description,
-      content.images,
-      content.currency,
-      content.price,
-      content.quantity,
-      tags
-    );
-    // console.log(product);
-    return product;
   };
 
-  parseMerchant = (event: NDKEvent) => {};
-  // parseMerchant = (event: NDKEvent): Stall => {
-  //   const content: IContent = JSON.parse(event.content);
-  //   const shipping: string[][]
-  //   const stall: Stall = new Stall(
-  //     content.id,
-  //     event.pubkey,
-  //     content.name,
-  //     content.description,
-  //     content.currency,
-  //     content.shipping
-  //   )
-  // }
+  parseMerchant = (event: NDKEvent) => {
+    this.worker.postMessage({
+      type: "parseMerchant",
+      data: {
+        id: event.id,
+        pubkey: event.pubkey,
+        created_at: event.created_at,
+        content: event.content,
+        tags: event.tags,
+      },
+    });
+  };
 
   parseTags = (event: NDKEvent): string[] => {
     const returnTags: string[] = [];

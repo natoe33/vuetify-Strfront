@@ -1,6 +1,6 @@
 interface IProduct {
   product_id: string;
-  id: string;
+  event_id: string;
   stall_id: string;
   name: string;
   description: string;
@@ -9,6 +9,7 @@ interface IProduct {
   price: number;
   quantity: number;
   tags: string[];
+  created_at: number;
 }
 
 interface ITags {
@@ -73,7 +74,7 @@ export class TableProductTag {
 
 export class Product implements IProduct {
   product_id: string;
-  id: string;
+  event_id: string;
   stall_id: string;
   name: string;
   description: string;
@@ -82,13 +83,14 @@ export class Product implements IProduct {
   price: number;
   quantity: number;
   tags: string[];
+  created_at: number;
 
   /**
    *
    */
   constructor(
     product_id: string,
-    id: string,
+    event_id: string,
     stall_id: string,
     name: string,
     description: string,
@@ -96,9 +98,10 @@ export class Product implements IProduct {
     currency: string,
     price: number,
     quantity: number,
-    tags: string[]
+    tags: string[],
+    created_at: number
   ) {
-    this.id = id;
+    this.event_id = event_id;
     this.product_id = product_id;
     this.stall_id = stall_id;
     this.name = name;
@@ -108,6 +111,7 @@ export class Product implements IProduct {
     this.price = price;
     this.quantity = quantity;
     this.tags = tags;
+    this.created_at = created_at;
   }
 }
 

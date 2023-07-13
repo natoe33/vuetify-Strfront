@@ -5,9 +5,11 @@ import { type Filter, Kind } from "@/nostr-tools";
 import { useAppStore } from "@/store";
 
 const appStore = useAppStore();
-appStore.initialEvents();
+// appStore.initialEvents();
 const filter: Filter = { kinds: [Kind.Product] };
+const filter2: Filter = { kinds: [Kind.Stall] };
 appStore.createSub(filter);
+appStore.createSub(filter2);
 </script>
 <template>
   <v-app>
