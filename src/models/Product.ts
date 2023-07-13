@@ -41,15 +41,15 @@ export class TableProduct {
     quantity: number,
     created_at: number
   ) {
-    this.product_id = product_id,
-    this.event_id = event_id,
-    this.stall_id = stall_id,
-    this.name = name,
-    this.description = description,
-    this.currency = currency,
-    this.price = price,
-    this.quantity = quantity
-    this.created_at = created_at
+    (this.product_id = product_id),
+      (this.event_id = event_id),
+      (this.stall_id = stall_id),
+      (this.name = name),
+      (this.description = description),
+      (this.currency = currency),
+      (this.price = price),
+      (this.quantity = quantity);
+    this.created_at = created_at;
   }
 }
 
@@ -57,12 +57,8 @@ export class TableProductImg {
   product_id: string;
   url: string;
 
-  constructor(
-    product_id: string,
-    url: string
-  ) {
-    this.product_id = product_id,
-    this.url = url    
+  constructor(product_id: string, url: string) {
+    (this.product_id = product_id), (this.url = url);
   }
 }
 
@@ -70,12 +66,8 @@ export class TableProductTag {
   product_id: string;
   tag: string;
 
-  constructor(
-    product_id: string,
-    tag: string
-  ){
-    this.product_id = product_id,
-    this.tag = tag
+  constructor(product_id: string, tag: string) {
+    (this.product_id = product_id), (this.tag = tag);
   }
 }
 

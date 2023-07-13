@@ -28,10 +28,12 @@ export class dbService extends Dexie {
   events!: Table<IEvent>;
   eventTags!: Table<IEventTag>;
 
+
+  // TODO: update products to use multi-entry indexes for images and tags
   constructor() {
     super("StrFront");
     this.version(1).stores({
-      tags: "++tag",
+      tags: "++id, &tag",
       productTags: "++id, product_id, tag",
       productImages: "product_id, url",
       products:

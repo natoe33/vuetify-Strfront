@@ -28,7 +28,11 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
   <v-app-bar color="teal-darken-4" flat>
     <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     <v-container class="fill-height d-flex mx-2 align-left">
-    <v-img src="@/assets/logo-no-background.svg" height="32" @click="goHome"/>
+      <v-img
+        src="@/assets/logo-no-background.svg"
+        height="32"
+        @click="goHome"
+      />
     </v-container>
     <!-- <v-container class="fill-height d-flex mx-2">
       <v-img src="@/assets/logo-no-background.svg" height="64" width="30" class="float-left"/>

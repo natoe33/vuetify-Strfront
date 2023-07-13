@@ -23,13 +23,21 @@ export class Utils {
     const ndkEvent: NDKEvent = new NDKEvent(this.ndk, event);
     if (event.kind === 30018) {
       this.parseProduct(ndkEvent);
-    } else if (event.kind === 30017){
+    } else if (event.kind === 30017) {
       this.parseMerchant(ndkEvent);
     }
-  }
+  };
 
   parseProduct = (event: NDKEvent): Product => {
-    this.worker.postMessage({type: 'parseProduct', data: {id: event.id, created_at: event.created_at, content: event.content, tags: event.tags}})
+    this.worker.postMessage({
+      type: "parseProduct",
+      data: {
+        id: event.id,
+        created_at: event.created_at,
+        content: event.content,
+        tags: event.tags,
+      },
+    });
     const tags: string[] = [];
     event.tags.forEach((t) => {
       if (t[0] === "t") tags.push(t[1]);
@@ -51,7 +59,7 @@ export class Utils {
     return product;
   };
 
-  parseMerchant = (event: NDKEvent) => {}
+  parseMerchant = (event: NDKEvent) => {};
   // parseMerchant = (event: NDKEvent): Stall => {
   //   const content: IContent = JSON.parse(event.content);
   //   const shipping: string[][]

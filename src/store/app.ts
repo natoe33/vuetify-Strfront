@@ -2,8 +2,9 @@
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay } from "@/models";
-import { Utils, NostrProviderService } from "@/utils";
+import { Utils, NostrProviderService, RelayHelper } from "@/utils";
 import NDK, { NDKEvent, NDKKind } from "@/ndk";
+import { type Filter } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
 
@@ -16,12 +17,14 @@ type ProductTags = {
 
 type State = {
   relay: NDK;
+  helper: RelayHelper;
   nostrProvider: NostrProviderService;
   utils: Utils;
   page: number;
   tag: string;
   tagLoading: boolean;
   loading: boolean;
+  newProduct: boolean;
   npub: RemovableRef<string>;
   pkey: RemovableRef<string>;
   pubKey: RemovableRef<string>;
@@ -36,12 +39,14 @@ export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
     relay: new NDK({ explicitRelayUrls: relayUrls }),
+    helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     page: 0,
     tag: "",
     tagLoading: false,
     loading: false,
+    newProduct: false,
     npub: useLocalStorage("npub", ""),
     pkey: useLocalStorage("pkey", ""),
     pubKey: useLocalStorage("pubkey", ""),
@@ -66,8 +71,12 @@ export const useAppStore = defineStore({
       );
     },
     getNumOfPages: (state) => {
-      const numPages: number = state.products.length / ITEMS_PER_PAGE;
-      console.log(`products: ${state.products.length}, items per page: ${ITEMS_PER_PAGE}, num of pages: ${numPages}`)
+      const numPages: number = Math.ceil(
+        state.products.length / ITEMS_PER_PAGE
+      );
+      console.log(
+        `products: ${state.products.length}, items per page: ${ITEMS_PER_PAGE}, num of pages: ${numPages}`
+      );
       return numPages;
     },
     getNpub: (state) => {
@@ -101,6 +110,9 @@ export const useAppStore = defineStore({
     },
   },
   actions: {
+    createSub(filters: Filter) {
+      this.helper.createSub(this.helper.getPool(), filters);
+    },
     addEvent(event: NDKEvent) {
       // console.log(`AppStore: event added ${event.content}`);
       this.saveEvent(event);

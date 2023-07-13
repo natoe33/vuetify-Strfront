@@ -10,7 +10,7 @@ import { computed } from "vue";
 const appStore = useAppStore();
 const router = useRouter();
 
-const { tagLoading, loading, tag, page } = storeToRefs(appStore);
+const { tagLoading, loading, newProduct, tag, page } = storeToRefs(appStore);
 const events = ref([] as Product[]);
 const pages = ref(0);
 
@@ -36,22 +36,14 @@ async function loadProductsWithTags() {
   tagLoading.value = false;
 }
 
-watch(tagLoading, (newLoading, oldLoading) => {
-  if (newLoading) {
-    console.log(
-      `from watch: newLoading: ${newLoading} oldLoading: ${oldLoading}`
-    );
-    console.log(`tag: ${tag.value}`);
-    loadProductsWithTags();
-  } else {
-    console.log(
-      `from watch else: newLoading: ${newLoading} oldLoading: ${oldLoading}`
-    );
-  }
+watch(tagLoading, (newLoading) => {
+  if (newLoading) loadProductsWithTags();
 });
 watch(loading, (newPage, oldPage) => {
-  console.log(`new page: ${newPage} old page: ${oldPage}`);
   loadProducts();
+});
+watch(newProduct, (newVal) => {
+  if (newVal) loadProducts();
 });
 
 onMounted(() => {
@@ -66,5 +58,10 @@ onMounted(() => {
       <ProductCard :product="(event as Product)" @click="loadProduct(event)" />
     </template>
   </v-sheet>
-  <v-pagination theme="dark" :length="pages" @next="appStore.nextPage" @prev="appStore.prevPage"></v-pagination>
+  <v-pagination
+    theme="dark"
+    :length="pages"
+    @next="appStore.nextPage"
+    @prev="appStore.prevPage"
+  ></v-pagination>
 </template>

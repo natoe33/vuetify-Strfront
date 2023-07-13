@@ -320,7 +320,7 @@ export class NostrProviderService {
   }
 
   async fetchProductEvent(id: string): Promise<NDKEvent | null | undefined> {
-    const productEvent = await this.ndk?.fetchEvent(id)
+    const productEvent = await this.ndk?.fetchEvent(id);
     return productEvent;
   }
 

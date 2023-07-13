@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const product = getProduct.value(props.id);
-// const merchant = 
+// const merchant =
 </script>
 <template>
   <v-sheet class="d-md-inline ma-2 pa-0">
