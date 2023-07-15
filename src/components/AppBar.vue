@@ -2,8 +2,10 @@
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/store";
+import { storeToRefs } from "pinia";
 const appStore = useAppStore();
 const { getSortedTags, setTagandLoading, clearTagandLoading } = appStore;
+const { loggingIn, npub } = storeToRefs(appStore);
 
 const drawer = ref(false);
 const group = ref(null);
@@ -18,21 +20,66 @@ async function goHome() {
   router.push({ name: "home" });
 }
 
+function setLoggingIn() {
+  loggingIn.value = !loggingIn.value;
+}
+
 watch(group, () => {
   drawer.value = false;
 });
+//TODO: Fix tag loading
 const items = await getSortedTags;
 const links = ["Dashboard", "Messages", "Profile", "Updates"];
 </script>
 <template>
-  <v-app-bar color="teal-darken-4" flat>
-    <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    <v-container class="fill-height d-flex mx-2 align-left">
+  <!-- color="teal-darken-4"-->
+  <v-app-bar flat density="prominent">
+    <template v-slot:prepend>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+    </template>
+    <!-- <v-container class="fill-height d-flex align-center"> -->
+    <v-container justify="start" class="align-center fill-height">
       <v-img
         src="@/assets/logo-no-background.svg"
-        height="32"
+        height="64"
+        width="25%"
         @click="goHome"
+        class="float-left"
+        justify="start"
       />
+      <!-- <template>
+        <v-btn icon>
+          <v-avatar color="brown" size="large">
+            <span class="text-h5">NF</span>
+          </v-avatar>
+        </v-btn>
+      </template> -->
+      <v-hover>
+        <template v-slot:default="{ isHovering, props }">
+          <v-avatar
+            v-bind="props"
+            :color="isHovering ? 'primary' : undefined"
+            @click="setLoggingIn"
+          >
+            <template v-if="npub === ''">
+              <v-icon icon="mdi-account-circle"></v-icon>
+            </template>
+            <template v-else>
+              <v-img
+                src="https://cdn.vuetifyjs.com/images/john.jpg"
+                alt="John"
+              ></v-img>
+            </template>
+          </v-avatar>
+        </template>
+      </v-hover>
+
+      <!-- <v-avatar color="info">
+        <v-icon icon="mdi-account-circle"></v-icon>
+      </v-avatar> -->
+      <v-btn v-for="link in links" :key="link" variant="text">
+        {{ link }}
+      </v-btn>
     </v-container>
     <!-- <v-container class="fill-height d-flex mx-2">
       <v-img src="@/assets/logo-no-background.svg" height="64" width="30" class="float-left"/>

@@ -1,7 +1,7 @@
 import { Product, Stall, type IContent } from "@/models";
 import { Event } from "@/nostr-tools";
 import NDK, { NDKEvent } from "@/ndk";
-import { StoreGeneric } from "pinia";
+import { StoreGeneric, storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import MyWorker from "@/worker?worker";
 // import { useWebWorker } from "@vueuse/core";
@@ -10,6 +10,7 @@ export class Utils {
   worker: Worker;
   appStore: StoreGeneric;
   ndk: NDK;
+
   /**
    *
    */
@@ -19,16 +20,17 @@ export class Utils {
     this.ndk = this.appStore.getNDK;
   }
 
-  parseEvent = (event: Event) => {
-    const ndkEvent: NDKEvent = new NDKEvent(this.ndk, event);
+  parseEvent = (event: NDKEvent) => {
     if (event.kind === 30018) {
-      this.parseProduct(ndkEvent);
+      this.parseProduct(event);
     } else if (event.kind === 30017) {
-      this.parseMerchant(ndkEvent);
+      this.parseMerchant(event);
     }
   };
 
   parseProduct = (event: NDKEvent) => {
+    // const { newProduct } = storeToRefs(this.appStore);
+    console.log("sending message");
     this.worker.postMessage({
       type: "parseProduct",
       data: {
@@ -38,6 +40,7 @@ export class Utils {
         tags: event.tags,
       },
     });
+    // newProduct.value = true;
   };
 
   parseMerchant = (event: NDKEvent) => {
@@ -51,6 +54,7 @@ export class Utils {
         tags: event.tags,
       },
     });
+    this.appStore.newProduct;
   };
 
   parseTags = (event: NDKEvent): string[] => {

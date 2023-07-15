@@ -17,7 +17,9 @@ interface IMerchantData {
 }
 
 onmessage = (message) => {
+  // console.log("worker message");
   if (message.data.type === "parseProduct") {
+    // console.log("Worker processing product");
     const prodData: IProductData = {
       id: message.data.data.id,
       created_at: message.data.data.created_at,
@@ -26,6 +28,7 @@ onmessage = (message) => {
     };
     parseProduct(prodData);
   } else if (message.data.type === "parseMerchant") {
+    // console.log("Worker processing stall");
     const merchData: IMerchantData = {
       id: message.data.id,
       pubkey: message.data.pubkey,
@@ -58,7 +61,7 @@ function parseProduct(data: IProductData) {
   );
 
   addProductToDb(product);
-  addTagsToDb(data.tags);
+  addTagsToDb(tags);
 }
 
 function addProductToDb(product: Product) {
@@ -92,8 +95,9 @@ function addProductToDb(product: Product) {
     );
 }
 
-async function addTagsToDb(tags: string[][]) {
+async function addTagsToDb(tags: string[]) {
   tags.forEach(async (tag) => {
+    // console.log(`Adding tag '${tag}' to db`);
     db.tags.add(tag[1]);
   });
 }
@@ -136,9 +140,9 @@ function addStallToDb(stall: Stall) {
           },
           stall.stall_id
         );
-        console.log("Stall added to merchants");
+        // console.log("Stall added to merchants");
       } else {
-        console.log("Stall already exists");
+        // console.log("Stall already exists");
       }
     });
 }

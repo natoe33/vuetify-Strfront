@@ -115,6 +115,20 @@ export class Product implements IProduct {
   }
 }
 
+export type TProduct = {
+  product_id: string;
+  event_id: string;
+  stall_id: string;
+  name: string;
+  description: string;
+  images: string[];
+  currency: string;
+  price: number;
+  quantity: number;
+  tags: string[];
+  created_at: number;
+};
+
 export interface IContent {
   id: string;
   stall_id: string;
@@ -124,4 +138,11 @@ export interface IContent {
   currency: string;
   price: number;
   quantity: number;
+}
+
+export class Test {
+  /**
+   *
+   */
+  constructor(some: string, thing: number) {}
 }

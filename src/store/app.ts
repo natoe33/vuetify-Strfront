@@ -24,22 +24,25 @@ type ProductTags = {
 type State = {
   relay: NDK;
   helper: RelayHelper;
-  // nostrProvider: NostrProviderService;
+  nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
-  page: number;
+  loggingIn: RemovableRef<boolean>;
+  page: RemovableRef<number>;
   tag: string;
   tagLoading: boolean;
   loading: boolean;
+  productsLoading: boolean;
   newProduct: boolean;
   npub: RemovableRef<string>;
   pkey: RemovableRef<string>;
   pubKey: RemovableRef<string>;
   relayList: RemovableRef<Relay[]>;
-  products: RemovableRef<Product[]>;
-  productTags: RemovableRef<ProductTags[]>;
-  events: RemovableRef<NDKEvent[]>;
-  tags: RemovableRef<string[]>;
+  products: Product[];
+  // products: RemovableRef<Product[]>;
+  // productTags: RemovableRef<ProductTags[]>;
+  // events: RemovableRef<NDKEvent[]>;
+  // tags: RemovableRef<string[]>;
 };
 
 export const useAppStore = defineStore({
@@ -47,35 +50,41 @@ export const useAppStore = defineStore({
   state: (): State => ({
     relay: new NDK({ explicitRelayUrls: relayUrls }),
     helper: new RelayHelper(relayUrls),
-    // nostrProvider: new NostrProviderService(),
+    nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
-    page: 0,
+    loggingIn: useLocalStorage("loggingIn", false),
+    page: useLocalStorage("page", 1),
     tag: "",
     tagLoading: false,
     loading: false,
+    productsLoading: false,
     newProduct: false,
     npub: useLocalStorage("npub", ""),
     pkey: useLocalStorage("pkey", ""),
     pubKey: useLocalStorage("pubkey", ""),
     relayList: useLocalStorage("relayList", [] as Relay[]),
-    products: useLocalStorage("products", [] as Product[]),
-    productTags: useLocalStorage("productTags", [] as ProductTags[]),
-    events: useLocalStorage("events", [] as NDKEvent[]),
-    tags: useLocalStorage("tags", [] as string[]),
+    products: [] as Product[],
+    // products: useLocalStorage("products", [] as Product[]),
+    // productTags: useLocalStorage("productTags", [] as ProductTags[]),
+    // events: useLocalStorage("events", [] as NDKEvent[]),
+    // tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
-    // getNDK: (state) => {
-    //   return state.relay;
-    // },
+    getNDK: (state) => {
+      return state.relay;
+    },
     getSortedTags: async (state) => {
-      return state.tags.sort();
+      const list = await state.db.tags.toArray();
+      console.log(list);
+      return ['a','b','c']
     },
     getProducts: async (state) => {
+      // TODO: detect browser and determine if Dexie or localstorage should be used
       console.log(`return products for page ${state.page}`);
       return await state.db.products
         .orderBy("created_at")
-        .offset(state.page * ITEMS_PER_PAGE)
+        .offset((state.page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE)
         .toArray();
     },
@@ -89,6 +98,9 @@ export const useAppStore = defineStore({
     },
     getNumOfPages: async (state) => {
       const numItems = await state.db.products.count();
+      console.log(
+        `${numItems} stored for ${Math.ceil(numItems / ITEMS_PER_PAGE)} pages`
+      );
       return Math.ceil(numItems / ITEMS_PER_PAGE);
     },
     getNpub: (state) => {
@@ -110,17 +122,17 @@ export const useAppStore = defineStore({
       //   state.products.find((product) => product.event_id === id);
     },
     getProductsWithTags: (state) => {
-      console.log(`getProductsWithTags tag: ${state.tag}`);
-      const taggedProds = state.productTags.filter((p) => p.tag === state.tag);
-      console.log(taggedProds);
-      const retProd = state.products.filter(
-        (p) => p.tags.indexOf(state.tag) !== -1
-      );
-      console.log(retProd);
-      return retProd;
+      // console.log(`getProductsWithTags tag: ${state.tag}`);
+      // const taggedProds = state.productTags.filter((p) => p.tag === state.tag);
+      // console.log(taggedProds);
+      // const retProd = state.products.filter(
+      //   (p) => p.tags.indexOf(state.tag) !== -1
+      // );
+      // console.log(retProd);
+      // return retProd;
     },
-    getEvents: (state) => {
-      return state.events;
+    getEvents: async (state) => {
+      return await state.db.products.count();
     },
     getRelays: (state) => {
       return state.relayList;
@@ -154,37 +166,29 @@ export const useAppStore = defineStore({
       this.page = 0;
       this.loading = false;
     },
-    // async initialEvents() {
-    //   const eventSet = await this.nostrProvider.fetchEvents(NDKKind.Product);
-    //   const merchSet = await this.nostrProvider.fetchEvents(NDKKind.Stall);
-    //   console.log(merchSet);
-    //   if (eventSet) {
-    //     eventSet.forEach((event) => {
-    //       const product: Product = this.utils.parseProduct(event);
-    //       if (
-    //         this.products.filter((prod) => prod.event_id === product.event_id).length === 0
-    //       )
-    //         this.products.push(product);
-    //       this.utils.parseTags(event).forEach((tag) => {
-    //         const prodTag: ProductTags = {
-    //           product_id: product.product_id,
-    //           tag: tag,
-    //         };
-    //         if (
-    //           this.productTags.filter(
-    //             (t) => t.product_id === product.product_id && t.tag === tag
-    //           ).length === 0
-    //         )
-    //           this.productTags.push(prodTag);
-    //         if (this.tags.filter((t) => t === tag).length === 0)
-    //           this.tags.push(tag);
-    //       });
-    //     });
-    //   }
-    // },
-    // async merchantEvent(filters: Filter) {
-    //   this.helper.createSub(this.helper.getPool(), filters);
-    // },
+    async initialEvents() {
+      this.productsLoading = true;
+      const eventSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Product);
+      console.log(eventSet);
+      const merchSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Stall);
+      console.log(merchSet);
+      if (eventSet) {
+        eventSet.forEach((event) => {
+          this.utils.parseEvent(event);
+        });
+      }
+      if (merchSet) {
+        merchSet.forEach((event) => {
+          this.utils.parseEvent(event);
+        });
+      }
+      console.log("Exiting initialEvents");
+    },
+    async merchantEvent(filters: Filter) {
+      this.helper.createSub(this.helper.getPool(), filters);
+    },
     nextPage() {
       this.page++;
       this.loading = true;
@@ -194,7 +198,7 @@ export const useAppStore = defineStore({
       this.loading = true;
     },
     saveEvent(event: NDKEvent) {
-      this.events.push(event);
+      // this.events.push(event);
     },
     clearRelays() {
       this.relayList = [];
@@ -203,20 +207,20 @@ export const useAppStore = defineStore({
       this.relayList = relays;
     },
     async loadProductsUsingTags() {
-      console.log(`getProductsWithTags tag: ${this.tag}`);
-      const taggedProds = await this.productTags.filter(
-        (p) => p.tag === this.tag
-      );
-      console.log(taggedProds);
-      const prods = taggedProds.map((x) => {
-        return x.product_id;
-      });
-      console.log(prods);
-      const filteredProds = this.products.filter((p) =>
-        prods.includes(p.product_id)
-      );
-      console.log(filteredProds);
-      return filteredProds;
+      // console.log(`getProductsWithTags tag: ${this.tag}`);
+      // const taggedProds = await this.productTags.filter(
+      //   (p) => p.tag === this.tag
+      // );
+      // console.log(taggedProds);
+      // const prods = taggedProds.map((x) => {
+      //   return x.product_id;
+      // });
+      // console.log(prods);
+      // const filteredProds = this.products.filter((p) =>
+      //   prods.includes(p.product_id)
+      // );
+      // console.log(filteredProds);
+      // return filteredProds;
     },
   },
 });

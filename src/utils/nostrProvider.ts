@@ -298,8 +298,7 @@ export class NostrProviderService {
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [kind] };
-    const events = await this.ndk?.fetchEvents(filter, {});
-    return events;
+    return await this.ndk?.fetchEvents(filter, {});
   }
 
   async fetchEventLimit(
