@@ -5,7 +5,7 @@ import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 const appStore = useAppStore();
 const { getSortedTags, setTagandLoading, clearTagandLoading } = appStore;
-const { loggingIn, npub } = storeToRefs(appStore);
+const { loggingIn, npub, user } = storeToRefs(appStore);
 
 const drawer = ref(false);
 const group = ref(null);
@@ -24,6 +24,8 @@ function setLoggingIn() {
   loggingIn.value = !loggingIn.value;
 }
 
+function goToProfile() {}
+
 watch(group, () => {
   drawer.value = false;
 });
@@ -35,9 +37,12 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
   <!-- color="teal-darken-4"-->
   <v-app-bar flat density="prominent">
     <template v-slot:prepend>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        class="me-1"
+        @click.stop="drawer = !drawer"
+      ></v-app-bar-nav-icon>
     </template>
-    <v-container class="fill-height d-flex d-sm-none">
+    <v-container class="fill-height d-flex ms-0">
       <v-img
         src="@/assets/logo-no-background.svg"
         height="64"
@@ -47,62 +52,33 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
         justify="start"
       />
     </v-container>
-    <!-- <v-container class="fill-height d-flex align-center"> -->
-    <v-container
-      justify="start"
-      class="align-center fill-height d-none d-sm-flex"
-    >
-      <v-img
-        src="@/assets/logo-no-background.svg"
-        height="64"
-        width="25%"
-        @click="goHome"
-        class="float-left"
-        justify="start"
-      />
-      <!-- <template>
-        <v-btn icon>
-          <v-avatar color="brown" size="large">
-            <span class="text-h5">NF</span>
-          </v-avatar>
-        </v-btn>
-      </template> -->
-      <!-- <v-avatar color="info">
-        <v-icon icon="mdi-account-circle"></v-icon>
-      </v-avatar> -->
-      <v-hover>
-        <template v-slot:default="{ isHovering, props }">
-          <v-avatar
-            v-bind="props"
-            :color="isHovering ? 'primary' : undefined"
-            @click="setLoggingIn"
-          >
+  </v-app-bar>
+  <v-navigation-drawer v-model="drawer" temporary>
+    <v-list>
+      <v-list-item
+        title="Profile"
+        @click="npub === '' ? setLoggingIn : goToProfile"
+      >
+        <template v-slot:prepend>
+          <v-avatar>
             <template v-if="npub === ''">
               <v-icon icon="mdi-account-circle"></v-icon>
             </template>
             <template v-else>
               <v-img
-                src="https://cdn.vuetifyjs.com/images/john.jpg"
-                alt="John"
+                :src="user.profile?.image"
+                :alt="user.profile?.nip05"
               ></v-img>
             </template>
           </v-avatar>
         </template>
-      </v-hover>
-      <v-btn v-for="link in links" :key="link" variant="text">
-        {{ link }}
-      </v-btn>
-    </v-container>
-  </v-app-bar>
-  <v-navigation-drawer v-model="drawer" temporary>
-    <v-list class="d-block d-sm-none">
+      </v-list-item>
       <v-list-item
         v-for="(link, i) in links"
         :key="i"
         :title="link"
         :value="link"
-        ></v-list-item
-      >
+      ></v-list-item>
     </v-list>
     <v-list>
       <v-list-group value="Tags">
@@ -120,3 +96,12 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
     </v-list>
   </v-navigation-drawer>
 </template>
+<style scoped>
+.logo {
+  position: relative;
+  left: 0;
+  flex-grow: unset;
+  flex-shrink: unset;
+  flex-basis: unset;
+}
+</style>

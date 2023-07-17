@@ -60,7 +60,7 @@ watch(page, () => {
 });
 watch(events, () => {
   loadProducts();
-})
+});
 
 onMounted(() => {
   console.log(`ProductsList mounted. Page: ${page.value}`);

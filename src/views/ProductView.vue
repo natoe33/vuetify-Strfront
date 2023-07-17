@@ -6,9 +6,10 @@ import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import { Product, Stall } from "@/models";
+import { NDKEvent } from "@/ndk";
 
 const appStore = useAppStore();
-const { getProduct, getMerchant } = storeToRefs(appStore);
+const { getProduct, getMerchant, getMerchantProfile } = storeToRefs(appStore);
 
 const props = defineProps({
   id: {
@@ -19,6 +20,7 @@ const props = defineProps({
 
 const product = ref<Product>();
 const merchant = ref<Stall>();
+const profile = ref<NDKEvent>();
 
 onMounted(async () => {
   const tempProduct = await getProduct.value(props.id);
@@ -28,6 +30,12 @@ onMounted(async () => {
   const tempMerch = await getMerchant.value(product.value.stall_id);
   merchant.value = tempMerch[0];
   console.log(merchant.value);
+  if (merchant.value) {
+  const tempProfile = await getMerchantProfile.value(merchant.value.pubkey);
+  if (tempProfile)
+    profile.value = tempProfile?.values().next().value
+  console.log(profile.value);
+  }
 });
 </script>
 <template>
@@ -72,13 +80,13 @@ onMounted(async () => {
         </v-row>
         <v-row class="d-flex d-md-none">
           <v-col>
-              <v-sheet rounded="lg">
-                <div v-if="merchant">
-                  <p>{{ merchant?.name }}</p>
-                  <p>{{ merchant?.description }}</p>
-                </div>
-              </v-sheet>
-            </v-col>
+            <v-sheet rounded="lg">
+              <div v-if="merchant">
+                <p>{{ merchant?.name }}</p>
+                <p>{{ merchant?.description }}</p>
+              </div>
+            </v-sheet>
+          </v-col>
         </v-row>
       </v-container>
     </v-main>

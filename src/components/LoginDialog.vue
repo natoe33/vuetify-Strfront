@@ -4,15 +4,22 @@ import { useAppStore } from "@/store";
 import { watch, ref } from "vue";
 
 const appStore = useAppStore();
-const { loggingIn, npub, nostrProvider } = storeToRefs(appStore);
+const { loggingIn, npub } = storeToRefs(appStore);
 const dialog = ref(false);
+const key = ref("");
 
 function closeDialog() {
   loggingIn.value = !loggingIn.value;
 }
 
 function attemptNip07Login() {
-  nostrProvider.value.attemptLoginWithNip07();
+  console.log("Attempting NIP-07 Login");
+  appStore.nostrProvider.attemptLoginWithNip07();
+}
+
+function attemptKeyLogin() {
+  console.log("Attempting login with key");
+  appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
 }
 
 watch(loggingIn, (newVal) => {
@@ -67,10 +74,13 @@ watch(loggingIn, (newVal) => {
                         type="password"
                         variant="underlined"
                         prepend-inner-icon="mdi-form-textbox-password"
+                        v-model="key"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="1">
-                      <v-btn variant="text">Log In</v-btn>
+                      <v-btn variant="text" @click="attemptKeyLogin"
+                        >Log In</v-btn
+                      >
                     </v-col>
                   </v-row>
                 </v-card>

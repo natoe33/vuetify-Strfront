@@ -9,7 +9,13 @@ import {
   db,
   dbService,
 } from "@/utils";
-import NDK, { NDKEvent, NDKKind, NDKFilter } from "@/ndk";
+import NDK, {
+  NDKEvent,
+  NDKKind,
+  NDKFilter,
+  NDKUser,
+  type NDKUserProfile,
+} from "@/ndk";
 import { type Filter } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
@@ -28,15 +34,18 @@ type State = {
   utils: Utils;
   db: dbService;
   loggingIn: RemovableRef<boolean>;
+  loggedIn: RemovableRef<boolean>;
   page: RemovableRef<number>;
   tag: string;
   tagLoading: boolean;
   loading: boolean;
   productsLoading: boolean;
   newProduct: boolean;
+  user: NDKUser;
   npub: RemovableRef<string>;
   pkey: RemovableRef<string>;
   pubKey: RemovableRef<string>;
+  pubkeyLogin: RemovableRef<boolean>;
   relayList: RemovableRef<Relay[]>;
   relayUrls: string[];
   products: Product[];
@@ -55,17 +64,20 @@ export const useAppStore = defineStore({
     utils: new Utils(),
     db: db,
     loggingIn: useLocalStorage("loggingIn", false),
+    loggedIn: useLocalStorage("loggedIn", false),
     page: useLocalStorage("page", 1),
     tag: "",
     tagLoading: false,
     loading: false,
     productsLoading: false,
     newProduct: false,
+    user: new NDKUser({}),
     npub: useLocalStorage("npub", ""),
     pkey: useLocalStorage("pkey", ""),
     pubKey: useLocalStorage("pubkey", ""),
+    pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     relayList: useLocalStorage("relayList", [] as Relay[]),
-    relayUrls: [],
+    relayUrls: relayUrls,
     products: [] as Product[],
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
@@ -80,6 +92,9 @@ export const useAppStore = defineStore({
       const list = await state.db.tags.toArray();
       console.log(list);
       return ["a", "b", "c"];
+    },
+    getLoggedIn: (state) => {
+      return state.loggedIn;
     },
     getProducts: async (state) => {
       // TODO: detect browser and determine if Dexie or localstorage should be used
@@ -108,7 +123,8 @@ export const useAppStore = defineStore({
           .toArray();
     },
     getMerchantProfile: (state) => {
-
+      return async (pubkey: string) =>
+        await state.nostrProvider.fetchProfileEvent(pubkey);
     },
     getNumOfPages: async (state) => {
       const numItems = await state.db.products.count();

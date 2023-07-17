@@ -21,6 +21,7 @@ import NDK, {
 // import { bech32 } from "@scure/base";
 // import { type Event, Kind } from "@/nostr-tools";
 import { Product, type IContent, Relay } from "@/models";
+import { LoginUtil } from "./login";
 // import { NostrFetcher } from "nostr-fetch";
 // import { db, dbService } from "@/utils";
 import { useAppStore } from "@/store";
@@ -51,21 +52,23 @@ export class NostrProviderService {
   isLoggedInUsingPubKey$ = new BehaviorSubject<boolean>(false);
   isLoggedInUsingNsec: boolean = false;
   appStore: StoreGeneric;
-  relayUrls: Ref<string[]>;
-  npub: Ref<string>;
+  relayUrls: string[];
+  // npub: Ref<string>;
 
   constructor() {
     // this.fetcher = NostrFetcher.init();
     this.appStore = useAppStore();
-    const { getNpub, getPKey, getPubKey } = this.appStore;
+    const { getNpub, getPKey, getPubKey, getLoggedIn } = this.appStore;
     const { relayUrls, npub } = storeToRefs(this.appStore);
     this.explicitRelayUrls = explicitUrls;
-    this.relayUrls = ref([] as string[]);
-    this.relayUrls = relayUrls;
+    this.relayUrls = explicitUrls;
     const npubFromLocal = getNpub;
     const privKey = getPKey;
     const loggedInPubKey = getPubKey;
-    this.npub = npub;
+    this.loggedIn = getLoggedIn;
+
+    // this.npub = npub.value;
+    // this.loggedIn = this.npub.value !== '';
     if (!this.loggedIn) {
       this.startWithUnauthSession();
     } else {
@@ -101,11 +104,53 @@ export class NostrProviderService {
       displayName: "Prospective Purchaser",
     };
     this.ndk = new NDK({
-      explicitRelayUrls: this.relayUrls.value,
+      explicitRelayUrls: this.relayUrls,
     });
     await this.ndk.connect(1000);
     this.loggedIn = true;
     this.loggingIn = false;
+  }
+
+  validateAndGetHexKey(enteredKey: string): string {
+    if (!enteredKey || enteredKey === "" || enteredKey == null) {
+      throw new Error("Key to login is required");
+    }
+    return LoginUtil.getHexFromPrivateOrPubKey(enteredKey);
+  }
+
+  attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
+    try {
+      this.loggingIn = true;
+      this.loginError = undefined;
+      const { pkey, npub, pubkeyLogin, loggingIn } = storeToRefs(this.appStore);
+      const hexPrivateKey = this.validateAndGetHexKey(enteredKey);
+      if (enteredKey.startsWith("nsec")) {
+        this.signer = new NDKPrivateKeySigner(hexPrivateKey);
+        this.signer.user().then((user) => {
+          // localStorage.setItem(Constants.PRIVATEKEY, hexPrivateKey);
+          pkey.value = hexPrivateKey;
+          // localStorage.setItem(Constants.NPUB, user.npub);
+          npub.value = user.npub;
+          this.isLoggedInUsingNsec = true;
+          this.canWriteToNostr = true;
+          this.tryLoginUsingNpub(user.npub);
+        });
+      } else if (enteredKey.startsWith("npub")) {
+        // localStorage.setItem(Constants.NPUB, enteredKey);
+        npub.value = enteredKey;
+        // localStorage.setItem(Constants.LOGGEDINUSINGPUBKEY, 'true');
+        pubkeyLogin.value = true;
+        this.isLoggedInUsingPubKey$.next(true);
+        this.tryLoginUsingNpub(enteredKey);
+      } else {
+        this.loginError = "Invalid input. Enter either nsec or npub id";
+      }
+      loggingIn.value = false;
+    } catch (e: any) {
+      console.error(e);
+      this.loginError = e.message;
+      this.loggingIn = false;
+    }
   }
 
   async tryLoginUsingNpub(npubFromLocal: string) {
@@ -122,7 +167,7 @@ export class NostrProviderService {
 
     const params: NDKConstructorParams = {
       signer: this.signer,
-      explicitRelayUrls: this.relayUrls.value,
+      explicitRelayUrls: this.relayUrls,
     };
     this.ndk = new NDK(params);
 
@@ -155,11 +200,11 @@ export class NostrProviderService {
   }
 
   private resolveNip07Extension() {
+    console.log("waiting for window.nostr");
     async () => {
-      console.log("waiting for window.nostr");
-      while (!Object.prototype.hasOwnProperty.call(window, "nostr")) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
+      // while (!Object.prototype.hasOwnProperty.call(window, "nostr")) {
+      //   await new Promise((resolve) => setTimeout(resolve, 1000));
+      // }
       this.signer = new NDKNip07Signer();
       this.initializeClientWithSigner();
     };
@@ -169,8 +214,8 @@ export class NostrProviderService {
     try {
       this.signer?.user().then(async (user) => {
         let relayUrls: string[] | undefined = [];
-        if (this.relayUrls.value !== undefined) {
-          relayUrls = this.relayUrls.value;
+        if (this.relayUrls !== undefined) {
+          relayUrls = this.relayUrls;
         }
         const params: NDKConstructorParams = {
           signer: this.signer,
@@ -227,6 +272,7 @@ export class NostrProviderService {
   }
 
   private async initializeUsingNpub(npub: string) {
+    const { user } = storeToRefs(this.appStore);
     this.currentUserNpub = npub;
     this.currentUserProfile = await this.getProfileFromNpub(npub);
     this.currentUser = await this.getNdkUserFromNpub(npub);
@@ -254,6 +300,8 @@ export class NostrProviderService {
     }
     this.loggingIn = false;
     this.loggedIn = true;
+    console.log(this.currentUser);
+    user.value = this.currentUser;
 
     await this.checkIfNIP05Verified(
       this.currentUserProfile?.nip05,
@@ -285,7 +333,7 @@ export class NostrProviderService {
   }
 
   async getSuggestedRelays(): Promise<NDKTag[]> {
-    const relayTags = this.relayUrls.value.map((val) => ["r", val]);
+    const relayTags = this.relayUrls.map((val) => ["r", val]);
     return relayTags;
   }
 
@@ -339,6 +387,11 @@ export class NostrProviderService {
   //   });
   //   if (productEvent) return parseProduct(productEvent);
   // }
+
+  async fetchProfileEvent(pubkey: string): Promise<Set<NDKEvent> | undefined> {
+    const filter: NDKFilter = { authors: [pubkey], kinds: [0] };
+    return await this.ndk?.fetchEvents(filter, {});
+  }
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [kind] };
