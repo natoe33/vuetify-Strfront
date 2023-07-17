@@ -37,8 +37,21 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
+    <v-container class="fill-height d-flex d-sm-none">
+      <v-img
+        src="@/assets/logo-no-background.svg"
+        height="64"
+        width="25%"
+        @click="goHome"
+        class="float-left"
+        justify="start"
+      />
+    </v-container>
     <!-- <v-container class="fill-height d-flex align-center"> -->
-    <v-container justify="start" class="align-center fill-height">
+    <v-container
+      justify="start"
+      class="align-center fill-height d-none d-sm-flex"
+    >
       <v-img
         src="@/assets/logo-no-background.svg"
         height="64"
@@ -54,6 +67,9 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
           </v-avatar>
         </v-btn>
       </template> -->
+      <!-- <v-avatar color="info">
+        <v-icon icon="mdi-account-circle"></v-icon>
+      </v-avatar> -->
       <v-hover>
         <template v-slot:default="{ isHovering, props }">
           <v-avatar
@@ -73,24 +89,21 @@ const links = ["Dashboard", "Messages", "Profile", "Updates"];
           </v-avatar>
         </template>
       </v-hover>
-
-      <!-- <v-avatar color="info">
-        <v-icon icon="mdi-account-circle"></v-icon>
-      </v-avatar> -->
       <v-btn v-for="link in links" :key="link" variant="text">
         {{ link }}
       </v-btn>
     </v-container>
-    <!-- <v-container class="fill-height d-flex mx-2">
-      <v-img src="@/assets/logo-no-background.svg" height="64" width="30" class="float-left"/>
-      <v-avatar class="me-10 ms-4" color="grey-darken-1" size="32"></v-avatar>
-      <v-btn @click="goHome">Home</v-btn>
-      <v-btn v-for="link in links" :key="link" variant="text">
-        {{ link }}
-      </v-btn>
-    </v-container> -->
   </v-app-bar>
   <v-navigation-drawer v-model="drawer" temporary>
+    <v-list class="d-block d-sm-none">
+      <v-list-item
+        v-for="(link, i) in links"
+        :key="i"
+        :title="link"
+        :value="link"
+        ></v-list-item
+      >
+    </v-list>
     <v-list>
       <v-list-group value="Tags">
         <template v-slot:activator="{ props }">

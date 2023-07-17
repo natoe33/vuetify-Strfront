@@ -58,6 +58,9 @@ watch(newProduct, (newVal) => {
 watch(page, () => {
   loadProducts();
 });
+watch(events, () => {
+  loadProducts();
+})
 
 onMounted(() => {
   console.log(`ProductsList mounted. Page: ${page.value}`);
@@ -66,11 +69,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- @next="appStore.nextPage"
-    @prev="appStore.prevPage" -->
-  <v-container>
+  <v-container class="mx-auto px-0">
     <v-sheet
-      class="d-flex flex-wrap align-content-center mx-auto pa-3"
+      class="d-flex flex-wrap align-content-center mx-auto pa-2"
       rounded="lg"
     >
       <template v-for="event of eventList" :key="event.id">

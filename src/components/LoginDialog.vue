@@ -4,11 +4,15 @@ import { useAppStore } from "@/store";
 import { watch, ref } from "vue";
 
 const appStore = useAppStore();
-const { loggingIn, npub } = storeToRefs(appStore);
+const { loggingIn, npub, nostrProvider } = storeToRefs(appStore);
 const dialog = ref(false);
 
 function closeDialog() {
   loggingIn.value = !loggingIn.value;
+}
+
+function attemptNip07Login() {
+  nostrProvider.value.attemptLoginWithNip07();
 }
 
 watch(loggingIn, (newVal) => {
@@ -43,7 +47,9 @@ watch(loggingIn, (newVal) => {
                     >
                   </v-card-subtitle>
                   <v-card-actions>
-                    <v-btn variant="text"> Log In </v-btn>
+                    <v-btn variant="text" @click="attemptNip07Login">
+                      Log In
+                    </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-col>

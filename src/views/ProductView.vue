@@ -35,7 +35,7 @@ onMounted(async () => {
     <v-main class="bg-grey-lighten-3">
       <v-container class="mx-2">
         <v-row>
-          <v-col cols="2">
+          <v-col cols="2" class="d-none d-md-flex">
             <v-sheet rounded="lg">
               <div v-if="merchant">
                 <p>{{ merchant?.name }}</p>
@@ -69,6 +69,16 @@ onMounted(async () => {
               </v-card>
             </v-sheet>
           </v-col>
+        </v-row>
+        <v-row class="d-flex d-md-none">
+          <v-col>
+              <v-sheet rounded="lg">
+                <div v-if="merchant">
+                  <p>{{ merchant?.name }}</p>
+                  <p>{{ merchant?.description }}</p>
+                </div>
+              </v-sheet>
+            </v-col>
         </v-row>
       </v-container>
     </v-main>

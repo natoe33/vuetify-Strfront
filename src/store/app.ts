@@ -9,7 +9,7 @@ import {
   db,
   dbService,
 } from "@/utils";
-import NDK, { NDKEvent, NDKKind } from "@/ndk";
+import NDK, { NDKEvent, NDKKind, NDKFilter } from "@/ndk";
 import { type Filter } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
@@ -38,6 +38,7 @@ type State = {
   pkey: RemovableRef<string>;
   pubKey: RemovableRef<string>;
   relayList: RemovableRef<Relay[]>;
+  relayUrls: string[];
   products: Product[];
   // products: RemovableRef<Product[]>;
   // productTags: RemovableRef<ProductTags[]>;
@@ -64,6 +65,7 @@ export const useAppStore = defineStore({
     pkey: useLocalStorage("pkey", ""),
     pubKey: useLocalStorage("pubkey", ""),
     relayList: useLocalStorage("relayList", [] as Relay[]),
+    relayUrls: [],
     products: [] as Product[],
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
@@ -77,7 +79,7 @@ export const useAppStore = defineStore({
     getSortedTags: async (state) => {
       const list = await state.db.tags.toArray();
       console.log(list);
-      return ['a','b','c']
+      return ["a", "b", "c"];
     },
     getProducts: async (state) => {
       // TODO: detect browser and determine if Dexie or localstorage should be used
@@ -88,6 +90,15 @@ export const useAppStore = defineStore({
         .limit(ITEMS_PER_PAGE)
         .toArray();
     },
+    getProduct: (state) => {
+      return async (id: string) =>
+        await state.db.products
+          .where("event_id")
+          .equalsIgnoreCase(id)
+          .toArray();
+      // return (id: string) =>
+      //   state.products.find((product) => product.event_id === id);
+    },
     getMerchant: (state) => {
       return async (stall_id: string) =>
         await state.db.merchants
@@ -95,6 +106,9 @@ export const useAppStore = defineStore({
           .equalsIgnoreCase(stall_id)
           .limit(1)
           .toArray();
+    },
+    getMerchantProfile: (state) => {
+
     },
     getNumOfPages: async (state) => {
       const numItems = await state.db.products.count();
@@ -111,15 +125,6 @@ export const useAppStore = defineStore({
     },
     getPubKey: (state) => {
       return state.pubKey;
-    },
-    getProduct: (state) => {
-      return async (id: string) =>
-        await state.db.products
-          .where("event_id")
-          .equalsIgnoreCase(id)
-          .toArray();
-      // return (id: string) =>
-      //   state.products.find((product) => product.event_id === id);
     },
     getProductsWithTags: (state) => {
       // console.log(`getProductsWithTags tag: ${state.tag}`);
@@ -186,7 +191,8 @@ export const useAppStore = defineStore({
       }
       console.log("Exiting initialEvents");
     },
-    async merchantEvent(filters: Filter) {
+    async subEvent(filters: NDKFilter) {
+      // TODO: Replace with NDK implementation
       this.helper.createSub(this.helper.getPool(), filters);
     },
     nextPage() {

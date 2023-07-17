@@ -1,6 +1,8 @@
 // import { NostrFetcher, eventKind, type NostrEvent } from "nostr-fetch";
 
 import { IndexableType, Table } from "dexie";
+import { StoreGeneric, storeToRefs } from "pinia";
+import { ref, Ref } from "vue";
 import NDK, {
   type NDKConstructorParams,
   NDKNip07Signer,
@@ -24,7 +26,10 @@ import { Product, type IContent, Relay } from "@/models";
 import { useAppStore } from "@/store";
 import { BehaviorSubject, retry } from "rxjs";
 
-const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
+const explicitUrls: string[] = [
+  "wss://relay.damus.io",
+  "wss://eden.nostr.land",
+];
 const nHoursAgo = (hrs: number): number =>
   Math.floor((Date.now() - hrs * 60 * 60 * 1000) / 1000);
 
@@ -36,6 +41,7 @@ export class NostrProviderService {
   currentUserNpub: string | undefined;
   isNip05Verified$ = new BehaviorSubject<boolean>(false);
   peopleIFollowEmitter: NDKSubscription | undefined;
+  explicitRelayUrls: string[];
   private signer: NDKSigner | undefined = undefined;
   loggedIn: boolean = false;
   loggingIn: boolean = false;
@@ -44,15 +50,22 @@ export class NostrProviderService {
   isNip07 = false;
   isLoggedInUsingPubKey$ = new BehaviorSubject<boolean>(false);
   isLoggedInUsingNsec: boolean = false;
-  appStore;
+  appStore: StoreGeneric;
+  relayUrls: Ref<string[]>;
+  npub: Ref<string>;
 
   constructor() {
     // this.fetcher = NostrFetcher.init();
     this.appStore = useAppStore();
     const { getNpub, getPKey, getPubKey } = this.appStore;
+    const { relayUrls, npub } = storeToRefs(this.appStore);
+    this.explicitRelayUrls = explicitUrls;
+    this.relayUrls = ref([] as string[]);
+    this.relayUrls = relayUrls;
     const npubFromLocal = getNpub;
     const privKey = getPKey;
     const loggedInPubKey = getPubKey;
+    this.npub = npub;
     if (!this.loggedIn) {
       this.startWithUnauthSession();
     } else {
@@ -88,7 +101,7 @@ export class NostrProviderService {
       displayName: "Prospective Purchaser",
     };
     this.ndk = new NDK({
-      explicitRelayUrls: relayUrls,
+      explicitRelayUrls: this.relayUrls.value,
     });
     await this.ndk.connect(1000);
     this.loggedIn = true;
@@ -109,7 +122,7 @@ export class NostrProviderService {
 
     const params: NDKConstructorParams = {
       signer: this.signer,
-      explicitRelayUrls: relayUrls,
+      explicitRelayUrls: this.relayUrls.value,
     };
     this.ndk = new NDK(params);
 
@@ -144,11 +157,42 @@ export class NostrProviderService {
   private resolveNip07Extension() {
     async () => {
       console.log("waiting for window.nostr");
-      while (!window.hasOwnProperty("nostr")) {
+      while (!Object.prototype.hasOwnProperty.call(window, "nostr")) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
       this.signer = new NDKNip07Signer();
+      this.initializeClientWithSigner();
     };
+  }
+
+  private async initializeClientWithSigner() {
+    try {
+      this.signer?.user().then(async (user) => {
+        let relayUrls: string[] | undefined = [];
+        if (this.relayUrls.value !== undefined) {
+          relayUrls = this.relayUrls.value;
+        }
+        const params: NDKConstructorParams = {
+          signer: this.signer,
+          explicitRelayUrls: relayUrls ? relayUrls : this.explicitRelayUrls,
+        };
+        this.ndk = new NDK(params);
+        await this.ndk.assertSigner();
+        await this.ndk.connect(1000);
+        if (user.npub) {
+          console.log(
+            "Permission granted to read their public key:",
+            user.npub
+          );
+          this.appStore;
+          await this.initializeUsingNpub(user.npub);
+        } else {
+          console.log("Permission not granted");
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async checkIfNIP05Verified(
@@ -241,7 +285,7 @@ export class NostrProviderService {
   }
 
   async getSuggestedRelays(): Promise<NDKTag[]> {
-    const relayTags = relayUrls.map((val) => ["r", val]);
+    const relayTags = this.relayUrls.value.map((val) => ["r", val]);
     return relayTags;
   }
 
