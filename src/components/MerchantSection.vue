@@ -52,8 +52,10 @@ onMounted(() => {
               Seller's Website
             </v-btn>
           </template>
-          <template v-if="props.merchant?.pubkey || props.profile?.nip05" >
-            <v-btn class="ms-2" variant="outlined" size="small" >Contact Seller</v-btn>
+          <template v-if="props.merchant?.pubkey || props.profile?.nip05">
+            <v-btn class="ms-2" variant="outlined" size="small"
+              >Contact Seller</v-btn
+            >
           </template>
         </v-card-actions>
       </div>

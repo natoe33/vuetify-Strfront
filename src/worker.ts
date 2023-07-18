@@ -45,7 +45,7 @@ onmessage = (message) => {
 function parseProduct(data: IProductData) {
   const tags: string[] = [];
   data.tags.forEach((t) => {
-    tags.push(t[1]);
+    if (t[0] === "t") tags.push(t[1]);
   });
   const content: IContent = JSON.parse(data.content);
   const product: Product = new Product(

@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { Product } from "@/models";
 
 const props = defineProps({
   product: {
     type: Product,
   },
+});
+
+onMounted(() => {
+  console.log(props.product?.tags);
 });
 </script>
 <template>
@@ -25,11 +30,22 @@ const props = defineProps({
       <v-card-item>
         <v-card-title>{{ props.product?.name }}</v-card-title>
         <v-card-subtitle>{{ props.product?.description }}</v-card-subtitle>
+        <v-card-text>{{ props.product?.quantity }} Available</v-card-text>
         <v-card-actions>
           <v-btn class="ms-2" variant="outlined" size="small">
             {{ props.product?.price }} {{ props.product?.currency }}
           </v-btn>
         </v-card-actions>
+      </v-card-item>
+      <v-card-item>
+        <v-chip-group>
+          <v-chip
+            v-for="(tag, i) in props.product?.tags"
+            :key="i"
+            prepend-icon="mdi-pound"
+            >{{ tag }}</v-chip
+          >
+        </v-chip-group>
       </v-card-item>
     </v-card>
   </v-sheet>
