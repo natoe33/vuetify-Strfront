@@ -35,6 +35,7 @@ export class Utils {
       type: "parseProduct",
       data: {
         id: event.id,
+        pubkey: event.pubkey,
         created_at: event.created_at,
         content: event.content,
         tags: event.tags,

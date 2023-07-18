@@ -30,6 +30,7 @@ import { BehaviorSubject, retry } from "rxjs";
 const explicitUrls: string[] = [
   "wss://relay.damus.io",
   "wss://eden.nostr.land",
+  "wss://relay.nostr.band",
 ];
 const nHoursAgo = (hrs: number): number =>
   Math.floor((Date.now() - hrs * 60 * 60 * 1000) / 1000);
@@ -272,7 +273,7 @@ export class NostrProviderService {
   }
 
   private async initializeUsingNpub(npub: string) {
-    const { user } = storeToRefs(this.appStore);
+    const { user, loggedIn } = storeToRefs(this.appStore);
     this.currentUserNpub = npub;
     this.currentUserProfile = await this.getProfileFromNpub(npub);
     this.currentUser = await this.getNdkUserFromNpub(npub);
@@ -300,6 +301,7 @@ export class NostrProviderService {
     }
     this.loggingIn = false;
     this.loggedIn = true;
+    loggedIn.value = true;
     console.log(this.currentUser);
     user.value = this.currentUser;
 

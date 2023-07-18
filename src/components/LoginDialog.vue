@@ -53,6 +53,7 @@ watch(loggingIn, (newVal) => {
                       >this page</a
                     >
                   </v-card-subtitle>
+                  <v-card-text>Not working yet</v-card-text>
                   <v-card-actions>
                     <v-btn variant="text" @click="attemptNip07Login">
                       Log In

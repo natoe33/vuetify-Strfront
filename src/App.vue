@@ -2,6 +2,7 @@
 import { RouterView } from "vue-router";
 import { onMounted } from "vue";
 import AppBar from "@/components/AppBar.vue";
+import NavDrawer from "@/components/NavDrawer.vue";
 import LoginDialog from "@/components/LoginDialog.vue";
 import { type Filter, Kind } from "@/nostr-tools";
 import { useAppStore } from "@/store";
@@ -28,6 +29,7 @@ onMounted(async () => {
       <Suspense>
         <AppBar />
       </Suspense>
+      <Suspense><NavDrawer /></Suspense>
       <RouterView />
       <LoginDialog />
     </v-main>

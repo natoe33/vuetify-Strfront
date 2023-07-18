@@ -3,6 +3,7 @@ import { Product, Stall, type IContent, type IMerchContent } from "@/models";
 
 interface IProductData {
   id: string;
+  pubkey: string;
   created_at: number;
   content: string;
   tags: string[][];
@@ -22,6 +23,7 @@ onmessage = (message) => {
     // console.log("Worker processing product");
     const prodData: IProductData = {
       id: message.data.data.id,
+      pubkey: message.data.data.pubkey,
       created_at: message.data.data.created_at,
       content: message.data.data.content,
       tags: message.data.data.tags,
@@ -57,7 +59,8 @@ function parseProduct(data: IProductData) {
     content.price,
     content.quantity,
     tags,
-    data.created_at
+    data.created_at,
+    data.pubkey
   );
 
   addProductToDb(product);
@@ -85,6 +88,7 @@ function addProductToDb(product: Product) {
             quantity: product.quantity,
             tags: product.tags,
             created_at: product.created_at,
+            pubkey: product.pubkey,
           },
           product.product_id
         );

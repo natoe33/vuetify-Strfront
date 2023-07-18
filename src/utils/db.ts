@@ -52,6 +52,10 @@ export class dbService extends Dexie {
         "++stall_id, event_id, pubkey, created_at, name, description, currency",
       shipping: "++shipping_id, stall_id, name, currency, cost, &countries",
     });
+    this.version(2).stores({
+      products:
+        "++product_id, event_id, stall_id, name, description, &images, currency, price, quantity, &tags, created_at, pubkey",
+    });
   }
 }
 export const db = new dbService();

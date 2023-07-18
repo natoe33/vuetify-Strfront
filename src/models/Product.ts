@@ -10,6 +10,7 @@ interface IProduct {
   quantity: number;
   tags: string[];
   created_at: number;
+  pubkey: string;
 }
 
 interface ITags {
@@ -84,6 +85,7 @@ export class Product implements IProduct {
   quantity: number;
   tags: string[];
   created_at: number;
+  pubkey: string;
 
   /**
    *
@@ -99,7 +101,8 @@ export class Product implements IProduct {
     price: number,
     quantity: number,
     tags: string[],
-    created_at: number
+    created_at: number,
+    pubkey: string
   ) {
     this.event_id = event_id;
     this.product_id = product_id;
@@ -112,6 +115,7 @@ export class Product implements IProduct {
     this.quantity = quantity;
     this.tags = tags;
     this.created_at = created_at;
+    this.pubkey = pubkey;
   }
 }
 

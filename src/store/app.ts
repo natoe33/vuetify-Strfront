@@ -35,6 +35,7 @@ type State = {
   db: dbService;
   loggingIn: RemovableRef<boolean>;
   loggedIn: RemovableRef<boolean>;
+  drawer: boolean;
   page: RemovableRef<number>;
   tag: string;
   tagLoading: boolean;
@@ -65,6 +66,7 @@ export const useAppStore = defineStore({
     db: db,
     loggingIn: useLocalStorage("loggingIn", false),
     loggedIn: useLocalStorage("loggedIn", false),
+    drawer: false,
     page: useLocalStorage("page", 1),
     tag: "",
     tagLoading: false,
@@ -197,6 +199,7 @@ export const useAppStore = defineStore({
       console.log(merchSet);
       if (eventSet) {
         eventSet.forEach((event) => {
+          // console.log(event);
           this.utils.parseEvent(event);
         });
       }
