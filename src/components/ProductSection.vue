@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { Product } from "@/models";
+import { IProduct } from "@/models";
 
 const props = defineProps({
   product: {
-    type: Product,
+    type: IProduct,
   },
 });
 

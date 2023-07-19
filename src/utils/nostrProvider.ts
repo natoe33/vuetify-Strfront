@@ -158,7 +158,7 @@ export class NostrProviderService {
     this.loggingIn = true;
     this.loginError = undefined;
     if (this.isNip07) {
-      while (!window.hasOwnProperty("nostr")) {
+      while (!window.nostr) {
         // define the condition as you like
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
@@ -202,10 +202,15 @@ export class NostrProviderService {
 
   private resolveNip07Extension() {
     console.log("waiting for window.nostr");
+    if(window.nostr){
+      console.log('Found window.nostr')
+      this.signer = new NDKNip07Signer();
+      this.initializeClientWithSigner();
+    }
     async () => {
-      // while (!Object.prototype.hasOwnProperty.call(window, "nostr")) {
-      //   await new Promise((resolve) => setTimeout(resolve, 1000));
-      // }
+      while (!window.nostr) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
       this.signer = new NDKNip07Signer();
       this.initializeClientWithSigner();
     };
@@ -213,6 +218,7 @@ export class NostrProviderService {
 
   private async initializeClientWithSigner() {
     try {
+      console.log(`initialize with signer`);
       this.signer?.user().then(async (user) => {
         let relayUrls: string[] | undefined = [];
         if (this.relayUrls !== undefined) {
@@ -272,11 +278,11 @@ export class NostrProviderService {
     return verified;
   }
 
-  private async initializeUsingNpub(npub: string) {
-    const { user, loggedIn } = storeToRefs(this.appStore);
-    this.currentUserNpub = npub;
-    this.currentUserProfile = await this.getProfileFromNpub(npub);
-    this.currentUser = await this.getNdkUserFromNpub(npub);
+  private async initializeUsingNpub(pubkey: string) {
+    const { user, loggedIn, loggingIn, npub } = storeToRefs(this.appStore);
+    npub.value = pubkey;
+    this.currentUserProfile = await this.getProfileFromNpub(pubkey);
+    this.currentUser = await this.getNdkUserFromNpub(pubkey);
     const userRelays = await this.fetchSubscribedRelaysFromCache();
     const relayUrls: string[] = [];
     userRelays.forEach((x) => {
@@ -299,7 +305,7 @@ export class NostrProviderService {
         console.log(`Error connecting NDK: ${e}`);
       }
     }
-    this.loggingIn = false;
+    loggingIn.value = false;
     this.loggedIn = true;
     loggedIn.value = true;
     console.log(this.currentUser);
