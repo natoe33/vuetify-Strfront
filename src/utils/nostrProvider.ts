@@ -202,8 +202,8 @@ export class NostrProviderService {
 
   private resolveNip07Extension() {
     console.log("waiting for window.nostr");
-    if(window.nostr){
-      console.log('Found window.nostr')
+    if (window.nostr) {
+      console.log("Found window.nostr");
       this.signer = new NDKNip07Signer();
       this.initializeClientWithSigner();
     }

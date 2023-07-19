@@ -190,7 +190,6 @@ export const useAppStore = defineStore({
       this.loading = false;
     },
     async initialEvents() {
-      this.productsLoading = true;
       const eventSet: Set<NDKEvent> | undefined =
         await this.nostrProvider.fetchEvents(NDKKind.Product);
       console.log(eventSet);

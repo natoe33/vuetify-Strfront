@@ -41,7 +41,6 @@ export class Utils {
         tags: event.tags,
       },
     });
-    // newProduct.value = true;
   };
 
   parseMerchant = (event: NDKEvent) => {

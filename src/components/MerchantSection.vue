@@ -46,7 +46,11 @@ onMounted(() => {
               class="ms-2"
               variant="outlined"
               size="small"
-              :href="props.profile.website"
+              :href="
+                props.profile.website.includes('http')
+                  ? props.profile.website
+                  : 'https://' + props.profile.website
+              "
               target="_blank"
             >
               Seller's Website

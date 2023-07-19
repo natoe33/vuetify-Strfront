@@ -1,5 +1,7 @@
 import { db } from "@/utils/db";
+import { useAppStore } from "@/store";
 import { Product, Stall, type IContent, type IMerchContent } from "@/models";
+import { storeToRefs } from "pinia";
 
 interface IProductData {
   id: string;
@@ -39,6 +41,11 @@ onmessage = (message) => {
       tags: message.data.data.tags,
     };
     parseMerchant(merchData);
+  } else if (message.data.type === 'getEvents'){
+    const appStore = useAppStore();
+    const { productsLoading } = storeToRefs(appStore);
+    appStore.initialEvents();
+    productsLoading.value = false;
   }
 };
 
