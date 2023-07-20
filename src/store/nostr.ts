@@ -29,7 +29,7 @@ type State = {
   helper: RelayHelper;
   nostrProvider: NostrProviderService;
   utils: Utils;
-  user: NDKUser;
+  user: RemovableRef<NDKUser>;
   npub: RemovableRef<string>;
   pkey: RemovableRef<string>;
   pubKey: RemovableRef<string>;
@@ -49,7 +49,7 @@ export const useNostrStore = defineStore({
     helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
-    user: new NDKUser({}),
+    user: useLocalStorage("user", new NDKUser({})),
     npub: useLocalStorage("npub", ""),
     pkey: useLocalStorage("pkey", ""),
     pubKey: useLocalStorage("pubkey", ""),
@@ -57,4 +57,53 @@ export const useNostrStore = defineStore({
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
   }),
+  getters: {
+    getRelay: (state) => {
+      return state.relay
+    },
+    getNostr: (state) => {
+      return state.nostrProvider
+    },
+    getUtils: (state) => {
+      return state.utils
+    },
+    getUser: (state) => {
+      return state.user
+    },
+    getNpub: (state) => {
+      return state.npub
+    },
+    getPrivKey: (state) => {
+      return state.pkey
+    },
+    getPubKey: (state) => {
+      return state.pubKey
+    },
+    getPubKeyLogin: (state) => {
+      return state.pubkeyLogin
+    },
+    getRelays: (state) => {
+      return state.relayUrls
+    },
+  },
+  actions: {
+    setUser(user: NDKUser) {
+      this.user = user
+    },
+    setNpub(npub: string) {
+      this.npub = npub
+    },
+    setPrivKey(pkey: string) {
+      this.pkey = pkey
+    },
+    setPubKey(pubkey: string) {
+      this.pubKey = pubkey
+    },
+    setPubkeyLogin(pubkeyLogin: boolean) {
+      this.pubkeyLogin = pubkeyLogin
+    },
+    setRelays(relays: string[]) {
+      this.relayUrls = relays
+    }
+  },
 });

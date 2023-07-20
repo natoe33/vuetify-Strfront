@@ -42,11 +42,6 @@ type State = {
   loading: boolean;
   productsLoading: boolean;
   newProduct: boolean;
-  user: NDKUser;
-  npub: RemovableRef<string>;
-  pkey: RemovableRef<string>;
-  pubKey: RemovableRef<string>;
-  pubkeyLogin: RemovableRef<boolean>;
   relayList: RemovableRef<Relay[]>;
   relayUrls: string[];
   products: Product[];
@@ -73,11 +68,6 @@ export const useAppStore = defineStore({
     loading: false,
     productsLoading: false,
     newProduct: false,
-    user: new NDKUser({}),
-    npub: useLocalStorage("npub", ""),
-    pkey: useLocalStorage("pkey", ""),
-    pubKey: useLocalStorage("pubkey", ""),
-    pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
     products: [] as Product[],
@@ -97,6 +87,9 @@ export const useAppStore = defineStore({
     },
     getLoggedIn: (state) => {
       return state.loggedIn;
+    },
+    getLoggingIn: (state) => {
+      return state.loggingIn;
     },
     getProducts: async (state) => {
       // TODO: detect browser and determine if Dexie or localstorage should be used
@@ -135,15 +128,6 @@ export const useAppStore = defineStore({
       );
       return Math.ceil(numItems / ITEMS_PER_PAGE);
     },
-    getNpub: (state) => {
-      return state.npub;
-    },
-    getPKey: (state) => {
-      return state.pkey;
-    },
-    getPubKey: (state) => {
-      return state.pubKey;
-    },
     getProductsWithTags: (state) => {
       // console.log(`getProductsWithTags tag: ${state.tag}`);
       // const taggedProds = state.productTags.filter((p) => p.tag === state.tag);
@@ -162,6 +146,12 @@ export const useAppStore = defineStore({
     },
   },
   actions: {
+    setLoggedIn(loggedIn: boolean) {
+      this.loggedIn = loggedIn;
+    },
+    setLoggingIn(loggingIn: boolean) {
+      this.loggingIn = loggingIn;
+    },
     createSub(filters: Filter) {
       this.helper.createSub(this.helper.getPool(), filters);
     },

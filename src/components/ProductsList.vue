@@ -48,6 +48,10 @@ function itemClicked(event: number) {
   page.value = event;
 }
 
+watch(productsLoading, (newLoading) => {
+  if (!newLoading) loadProducts();
+})
+
 watch(tagLoading, (newLoading) => {
   if (newLoading) loadProductsWithTags();
 });
