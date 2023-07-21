@@ -40,7 +40,7 @@ onmessage = (message) => {
       tags: message.data.data.tags,
     };
     parseMerchant(merchData);
-  } 
+  }
 };
 
 function parseProduct(data: IProductData) {

@@ -1,2 +1,2 @@
 export { useAppStore } from "./app";
-export { useNostrStore } from "./nostr"
+export { useNostrStore } from "./nostr";

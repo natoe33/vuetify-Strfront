@@ -103,7 +103,7 @@ export class NostrProviderService {
   private async startWithUnauthSession() {
     const appStore = useAppStore();
     const { setLoggedIn, setLoggingIn } = appStore;
-    setLoggingIn(true);
+    // setLoggingIn(true);
     // setLoggingIn(true)
     this.canWriteToNostr = false;
     this.currentUserProfile = {
@@ -113,8 +113,8 @@ export class NostrProviderService {
       explicitRelayUrls: this.relayUrls,
     });
     await this.ndk.connect(1000);
-    setLoggedIn(true);
-    setLoggingIn(false);
+    // setLoggedIn(true);
+    // setLoggingIn(false);
     // this.appStore.setLoggingIn(false);
   }
 
@@ -301,14 +301,14 @@ export class NostrProviderService {
     // npub.value = pubkey;
     this.currentUserProfile = await this.getProfileFromNpub(pubkey);
     this.currentUser = await this.getNdkUserFromNpub(pubkey);
-    const relayUrls: string[] = explicitUrls;
-    // const userRelays = await this.fetchSubscribedRelaysFromCache();
-    // const relayUrls: string[] = [];
-    // userRelays.forEach((x) => {
-    //   relayUrls.push(x.url);
-    // });
-    console.log(relayUrls);
-    console.log(this.signer);
+    // const relayUrls: string[] = explicitUrls;
+    const userRelays = await this.fetchSubscribedRelaysFromCache();
+    const relayUrls: string[] = [];
+    userRelays.forEach((x) => {
+      relayUrls.push(x.url);
+    });
+    // console.log(relayUrls);
+    // console.log(this.signer);
     if (relayUrls && relayUrls.length > 0) {
       const newNDKParams: NDKConstructorParams = {
         signer: this.signer,
@@ -327,7 +327,7 @@ export class NostrProviderService {
     }
     setLoggingIn(false);
     setLoggedIn(true);
-    console.log(this.currentUser);
+    // console.log(this.currentUser);
     if (this.currentUser) {
       setUser(this.currentUser);
     }
@@ -423,11 +423,11 @@ export class NostrProviderService {
   }
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
-    console.log('Fetching events')
+    console.log("Fetching events");
     while (!this.ndk) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    console.log(this.ndk)
+    console.log(this.ndk);
     const filter: NDKFilter = { kinds: [kind] };
     return await this.ndk?.fetchEvents(filter, {});
   }
@@ -530,7 +530,7 @@ export class NostrProviderService {
   }
 
   async getUserSubscribedRelays(): Promise<Relay[]> {
-    console.log('Getting user relays');
+    console.log("Getting user relays");
     const relays: Relay[] = [];
     let author: string = "";
     if (this.currentUser?.hexpubkey()) {

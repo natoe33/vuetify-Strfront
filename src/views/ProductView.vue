@@ -29,7 +29,6 @@ const profile = ref<IProfile>();
 
 function parseProfile(content: string): IProfile {
   const tempProfile: IProfile = JSON.parse(content);
-  console.log(tempProfile);
   return tempProfile;
 }
 
@@ -39,7 +38,6 @@ onMounted(async () => {
    * If the merchant event doesn't include the pubkey, get it from the product
    * If it's not in the product ???
    */
-  console.log(lgAndDown.value);
   const tempProduct = await getProduct.value(props.id);
   product.value = tempProduct[0];
   // console.log(product.value);

@@ -82,7 +82,7 @@ export const useAppStore = defineStore({
     },
     getSortedTags: async (state) => {
       const list = await state.db.tags.toArray();
-      console.log(list);
+      // console.log(list);
       return ["a", "b", "c"];
     },
     getLoggedIn: (state) => {

@@ -12,8 +12,8 @@ const { getNpub, setNpub, getUser, setUser } = nostrStore;
 const { npub, user } = storeToRefs(nostrStore);
 
 const group = ref(null);
-const lnpub = ref('');
-const image = ref('');
+const lnpub = ref("");
+const image = ref("");
 
 function loadWithTags(tag: string) {
   setTagandLoading(tag);
@@ -29,24 +29,20 @@ function profileHandler() {
 function goToProfile() {}
 
 watch(npub, (newval) => {
-  lnpub.value = newval
-})
+  lnpub.value = newval;
+});
 
 watch(user, (newval) => {
-  if (newval.profile?.image)
-  image.value = newval.profile?.image
-})
+  if (newval.profile?.image) image.value = newval.profile?.image;
+});
 
 watch(group, () => {
-  console.log(group);
   drawer.value = false;
 });
 
 onMounted(() => {
-  if (user.value.profile?.image)
-  image.value = user.value.profile?.image
-  console.log(image.value)
-})
+  if (user.value.profile?.image) image.value = user.value.profile?.image;
+});
 //TODO: Fix tag loading
 const items = await getSortedTags;
 const links = ["Dashboard", "Messages", "Updates"];
@@ -61,10 +57,7 @@ const links = ["Dashboard", "Messages", "Updates"];
               <v-icon icon="mdi-account-circle"></v-icon>
             </template>
             <template v-else>
-              <v-img
-                :src="image"
-                :alt="user.profile?.nip05"
-              ></v-img>
+              <v-img :src="image" :alt="user.profile?.nip05"></v-img>
             </template>
           </v-avatar>
         </template>

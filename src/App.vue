@@ -14,7 +14,7 @@ onMounted(async () => {
   const count: number = await appStore.getEvents;
   if (count === 0) {
     productsLoading.value = true;
-    appStore.initialEvents()
+    appStore.initialEvents();
   }
 });
 </script>

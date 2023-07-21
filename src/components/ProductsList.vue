@@ -12,7 +12,8 @@ import { computed } from "vue";
 const appStore = useAppStore();
 const router = useRouter();
 
-const { tagLoading, loading, newProduct, productsLoading, tag, page } = storeToRefs(appStore);
+const { tagLoading, loading, newProduct, productsLoading, tag, page } =
+  storeToRefs(appStore);
 const events = ref([] as Product[]);
 const pages = ref(0);
 
@@ -24,8 +25,8 @@ async function loadProducts() {
   pages.value = await appStore.getNumOfPages;
   console.log(`Product list: ${events.value.length} loaded`);
   loading.value = false;
-  if (!productsLoading.value){
-  appStore.initialEvents();
+  if (!productsLoading.value) {
+    appStore.initialEvents();
   }
 }
 
@@ -50,7 +51,7 @@ function itemClicked(event: number) {
 
 watch(productsLoading, (newLoading) => {
   if (!newLoading) loadProducts();
-})
+});
 
 watch(tagLoading, (newLoading) => {
   if (newLoading) loadProductsWithTags();

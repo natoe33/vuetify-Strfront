@@ -12,8 +12,8 @@ const props = defineProps({
 });
 
 onMounted(() => {
-  console.log(props.merchant);
-  console.log(props.profile);
+  // console.log(props.merchant);
+  // console.log(props.profile);
 });
 </script>
 <template>

@@ -59,51 +59,51 @@ export const useNostrStore = defineStore({
   }),
   getters: {
     getRelay: (state) => {
-      return state.relay
+      return state.relay;
     },
     getNostr: (state) => {
-      return state.nostrProvider
+      return state.nostrProvider;
     },
     getUtils: (state) => {
-      return state.utils
+      return state.utils;
     },
     getUser: (state) => {
-      return state.user
+      return state.user;
     },
     getNpub: (state) => {
-      return state.npub
+      return state.npub;
     },
     getPrivKey: (state) => {
-      return state.pkey
+      return state.pkey;
     },
     getPubKey: (state) => {
-      return state.pubKey
+      return state.pubKey;
     },
     getPubKeyLogin: (state) => {
-      return state.pubkeyLogin
+      return state.pubkeyLogin;
     },
     getRelays: (state) => {
-      return state.relayUrls
+      return state.relayUrls;
     },
   },
   actions: {
     setUser(user: NDKUser) {
-      this.user = user
+      this.user = user;
     },
     setNpub(npub: string) {
-      this.npub = npub
+      this.npub = npub;
     },
     setPrivKey(pkey: string) {
-      this.pkey = pkey
+      this.pkey = pkey;
     },
     setPubKey(pubkey: string) {
-      this.pubKey = pubkey
+      this.pubKey = pubkey;
     },
     setPubkeyLogin(pubkeyLogin: boolean) {
-      this.pubkeyLogin = pubkeyLogin
+      this.pubkeyLogin = pubkeyLogin;
     },
     setRelays(relays: string[]) {
-      this.relayUrls = relays
-    }
+      this.relayUrls = relays;
+    },
   },
 });

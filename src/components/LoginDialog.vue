@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useAppStore, useNostrStore } from "@/store";
-import { watch, ref } from "vue";
+import { watch, ref, onMounted } from "vue";
 
 const appStore = useAppStore();
 const { loggingIn } = storeToRefs(appStore);
 const nostrStore = useNostrStore();
 const { getNpub } = nostrStore;
-const {npub} = storeToRefs(nostrStore);
+const { npub } = storeToRefs(nostrStore);
 const dialog = ref(false);
 const key = ref("");
-const lnpub = ref('');
+const lnpub = ref("");
+const winnostr = ref(false);
 
 function closeDialog() {
   loggingIn.value = !loggingIn.value;
@@ -26,9 +27,7 @@ function attemptKeyLogin() {
   appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
 }
 
-watch(npub, (newval) => {
-  
-});
+watch(npub, (newval) => {});
 
 watch(loggingIn, (newVal) => {
   console.log(`LoginDialog watch triggered: ${newVal}, ${getNpub}`);
@@ -36,6 +35,12 @@ watch(loggingIn, (newVal) => {
     dialog.value = newVal;
   } else {
     dialog.value = newVal;
+  }
+});
+
+onMounted(() => {
+  if (window.nostr) {
+    winnostr.value = true;
   }
 });
 </script>
@@ -61,11 +66,12 @@ watch(loggingIn, (newVal) => {
                       >this page</a
                     >
                   </v-card-subtitle>
-                  <v-card-text>Not working yet</v-card-text>
                   <v-card-actions>
-                    <v-btn variant="text" @click="attemptNip07Login">
-                      Log In
-                    </v-btn>
+                    <template v-if="winnostr">
+                      <v-btn variant="text" @click="attemptNip07Login">
+                        Log In
+                      </v-btn>
+                    </template>
                   </v-card-actions>
                 </v-card>
               </v-col>
