@@ -1,10 +1,12 @@
 import { Product, Stall, type IContent } from "@/models";
 import { Event } from "@/nostr-tools";
+import { v4 as uuidv4 } from "uuid";
 import NDK, { NDKEvent } from "@/ndk";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import MyWorker from "@/worker?worker";
 // import { useWebWorker } from "@vueuse/core";
+
 
 export class Utils {
   worker: Worker;
@@ -65,4 +67,9 @@ export class Utils {
     });
     return returnTags;
   };
+
+  generateUUID = (): string => {
+    console.log(uuidv4());
+    return uuidv4();
+  }
 }

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import { storeToRefs } from "pinia";
-import { onMounted } from "vue";
+import { onMounted, defineAsyncComponent } from "vue";
 import AppBar from "@/components/AppBar.vue";
 import NavDrawer from "@/components/NavDrawer.vue";
-import LoginDialog from "@/components/LoginDialog.vue";
+const LoginDialog = defineAsyncComponent(
+  () => import("@/components/LoginDialog.vue")
+);
+// import LoginDialog from "@/components/LoginDialog.vue";
 import { useAppStore } from "@/store";
 
 const appStore = useAppStore();

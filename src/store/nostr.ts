@@ -36,6 +36,7 @@ type State = {
   pubkeyLogin: RemovableRef<boolean>;
   relayList: RemovableRef<Relay[]>;
   relayUrls: string[];
+  store: NDKEvent;
   // products: RemovableRef<Product[]>;
   // productTags: RemovableRef<ProductTags[]>;
   // events: RemovableRef<NDKEvent[]>;
@@ -56,6 +57,7 @@ export const useNostrStore = defineStore({
     pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
+    store: new NDKEvent(),
   }),
   getters: {
     getRelay: (state) => {
@@ -84,6 +86,12 @@ export const useNostrStore = defineStore({
     },
     getRelays: (state) => {
       return state.relayUrls;
+    },
+    getUserMerchantEvent: async (state) => {
+      console.log('Fetching my stall');
+      return await state.nostrProvider.fetchMerchantEvents([
+        state.user.hexpubkey(),
+      ]);
     },
   },
   actions: {

@@ -4,6 +4,7 @@ import { useAppStore, useNostrStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { NDKUser } from "@/ndk";
 import { onMounted } from "vue";
+import { useRouter } from "vue-router";
 const appStore = useAppStore();
 const nostrStore = useNostrStore();
 const { getSortedTags, setTagandLoading } = appStore;
@@ -11,6 +12,7 @@ const { drawer, loggingIn, loggedIn } = storeToRefs(appStore);
 const { getNpub, setNpub, getUser, setUser } = nostrStore;
 const { npub, user } = storeToRefs(nostrStore);
 
+const router = useRouter();
 const group = ref(null);
 const lnpub = ref("");
 const image = ref("");
@@ -26,7 +28,9 @@ function profileHandler() {
   }
 }
 
-function goToProfile() {}
+function goToProfile() {
+  router.push({ name: "profile" });
+}
 
 watch(npub, (newval) => {
   lnpub.value = newval;

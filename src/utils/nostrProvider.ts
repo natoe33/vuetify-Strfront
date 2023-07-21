@@ -174,7 +174,7 @@ export class NostrProviderService {
         // define the condition as you like
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-      console.log("Found window nostr");
+      // console.log("Found window nostr");
       this.signer = new NDKNip07Signer();
     }
 
@@ -209,15 +209,15 @@ export class NostrProviderService {
       await user?.fetchProfile();
       return user;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return undefined;
     }
   }
 
   private resolveNip07Extension() {
-    console.log("waiting for window.nostr");
+    // console.log("waiting for window.nostr");
     if (window.nostr) {
-      console.log("Found window.nostr");
+      // console.log("Found window.nostr");
       this.signer = new NDKNip07Signer();
       this.initializeClientWithSigner();
     }
@@ -232,7 +232,7 @@ export class NostrProviderService {
 
   private async initializeClientWithSigner() {
     try {
-      console.log(`initialize with signer`);
+      // console.log(`initialize with signer`);
       this.signer?.user().then(async (user) => {
         let relayUrls: string[] | undefined = [];
         if (this.relayUrls !== undefined) {
@@ -423,11 +423,11 @@ export class NostrProviderService {
   }
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
-    console.log("Fetching events");
+    // console.log("Fetching events");
     while (!this.ndk) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    console.log(this.ndk);
+    // console.log(this.ndk);
     const filter: NDKFilter = { kinds: [kind] };
     return await this.ndk?.fetchEvents(filter, {});
   }

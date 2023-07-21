@@ -33,9 +33,10 @@ type State = {
   nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
-  loggingIn: RemovableRef<boolean>;
+  loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
   drawer: boolean;
+  openStore: boolean;
   page: RemovableRef<number>;
   tag: string;
   tagLoading: boolean;
@@ -59,9 +60,10 @@ export const useAppStore = defineStore({
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
-    loggingIn: useLocalStorage("loggingIn", false),
+    loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
     drawer: false,
+    openStore: false,
     page: useLocalStorage("page", 1),
     tag: "",
     tagLoading: false,

@@ -2,14 +2,20 @@
 // TODO: Figure out why data isn't loading
 // TODO: Figure out the right way to retrieve merchant data
 
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineAsyncComponent } from "vue";
 import { useDisplay } from "vuetify";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import { Product, Stall, IProfile } from "@/models";
 import { NDKEvent } from "@/ndk";
-import ProductSection from "@/components/ProductSection.vue";
-import MerchantSection from "@/components/MerchantSection.vue";
+// import ProductSection from "@/components/ProductSection.vue";
+const ProductSection = defineAsyncComponent(
+  () => import("@/components/ProductSection.vue")
+);
+// import MerchantSection from "@/components/MerchantSection.vue";
+const MerchantSection = defineAsyncComponent(
+  () => import("@/components/MerchantSection.vue")
+);
 
 const appStore = useAppStore();
 const { getProduct, getMerchant, getMerchantProfile } = storeToRefs(appStore);
