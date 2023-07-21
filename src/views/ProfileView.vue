@@ -5,7 +5,6 @@ import { onMounted, ref, defineAsyncComponent } from "vue";
 const ProfileMain = defineAsyncComponent(
   () => import("@/components/ProfileMain.vue")
 );
-const OpenStore = defineAsyncComponent(() => import('@/components/OpenStore.vue'))
 
 const nostrStore = useNostrStore();
 const { getUser } = nostrStore;
@@ -19,7 +18,6 @@ onMounted(() => {
   <Suspense>
     <v-container>
       <ProfileMain />
-      <OpenStore />
     </v-container>
   </Suspense>
 </template>

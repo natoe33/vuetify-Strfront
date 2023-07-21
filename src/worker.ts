@@ -1,6 +1,5 @@
 import { db } from "@/utils/db";
 import { Product, Stall, type IContent, type IMerchContent } from "@/models";
-import { storeToRefs } from "pinia";
 
 interface IProductData {
   id: string;

@@ -7,6 +7,7 @@ import NavDrawer from "@/components/NavDrawer.vue";
 const LoginDialog = defineAsyncComponent(
   () => import("@/components/LoginDialog.vue")
 );
+const OpenStore = defineAsyncComponent(() => import('@/components/OpenStore.vue'));
 // import LoginDialog from "@/components/LoginDialog.vue";
 import { useAppStore } from "@/store";
 
@@ -32,6 +33,7 @@ onMounted(async () => {
       </Suspense>
       <RouterView />
       <LoginDialog />
+      <OpenStore />
     </v-main>
   </v-app>
 </template>
