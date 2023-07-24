@@ -5,15 +5,18 @@ import ProductCard from "./ProductCard.vue";
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Product } from "@/models";
-import { useAppStore } from "@/store";
+import { useAppStore, useNostrStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
 const appStore = useAppStore();
+const nostrStore = useNostrStore();
+
 const router = useRouter();
 
-const { tagLoading, loading, newProduct, productsLoading, tag, page } =
+const { tagLoading, loading, newProduct, tag, page } =
   storeToRefs(appStore);
+const { productsLoading } = storeToRefs(nostrStore);
 const events = ref([] as Product[]);
 const pages = ref(0);
 

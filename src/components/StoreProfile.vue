@@ -10,13 +10,13 @@ const { store } = storeToRefs(nostrStore);
 const appStore = useAppStore();
 const { openStore } = storeToRefs(appStore);
 
-function showOpenStore(){
-  openStore.value = !openStore.value
+function showOpenStore() {
+  openStore.value = !openStore.value;
 }
 
 onMounted(async () => {
   console.log(store.value.content);
-  if (store.value.content !== '') {
+  if (store.value.content !== "") {
     const tempStore = await getUserMerchantEvent;
     console.log("tempStore");
     console.log(tempStore?.values().next().value);

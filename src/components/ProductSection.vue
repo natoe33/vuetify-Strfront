@@ -6,7 +6,6 @@ const props = defineProps({
     type: Product,
   },
 });
-
 </script>
 <template>
   <!-- <v-sheet min-height="70vh" rounded="lg"> -->

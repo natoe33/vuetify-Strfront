@@ -2,9 +2,10 @@
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
+import OverFlow from "@/components/OverFlow.vue";
 const appStore = useAppStore();
 const { clearTagandLoading } = appStore;
-const { drawer } = storeToRefs(appStore);
+const { drawer, overflow } = storeToRefs(appStore);
 
 const router = useRouter();
 
@@ -32,6 +33,9 @@ async function goHome() {
         justify="start"
       />
     </v-container>
+    <template v-slot:append>
+      <OverFlow />
+    </template>
   </v-app-bar>
 </template>
 <style scoped>

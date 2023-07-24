@@ -4,10 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import NDK, { NDKEvent } from "@/ndk";
 import { StoreGeneric, storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
-import json from './currencies.json';
+import json from "./currencies.json";
 import MyWorker from "@/worker?worker";
 // import { useWebWorker } from "@vueuse/core";
-
 
 export class Utils {
   worker: Worker;
@@ -72,13 +71,13 @@ export class Utils {
   generateUUID = (): string => {
     console.log(uuidv4());
     return uuidv4();
-  }
+  };
 
   /**
    * fetch world currencies as json
    */
-   getWorldCurrencies = async () => {
+  getWorldCurrencies = async () => {
     const currencies = json;
-    return currencies
-  }
+    return currencies;
+  };
 }

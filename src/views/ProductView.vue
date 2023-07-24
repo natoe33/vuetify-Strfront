@@ -5,7 +5,7 @@
 import { ref, onMounted, defineAsyncComponent } from "vue";
 import { useDisplay } from "vuetify";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore, useNostrStore } from "@/store";
 import { Product, Stall, IProfile, IStall, TProduct } from "@/models";
 import { NDKEvent } from "@/ndk";
 // import ProductSection from "@/components/ProductSection.vue";
@@ -18,7 +18,9 @@ const MerchantSection = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-const { getProduct, getMerchant, getMerchantProfile } = storeToRefs(appStore);
+const nostrStore = useNostrStore();
+const { getProduct, getMerchant } = storeToRefs(appStore);
+const { getMerchantProfile } = storeToRefs(nostrStore);
 
 const { mobile, name, lgAndDown, mdAndDown } = useDisplay();
 
@@ -38,7 +40,7 @@ function parseProfile(content: string): IProfile {
   return tempProfile;
 }
 
-function objectToProduct(product: TProduct): Product{
+function objectToProduct(product: TProduct): Product {
   const prod = new Product(
     product.product_id,
     product.event_id,
@@ -52,11 +54,11 @@ function objectToProduct(product: TProduct): Product{
     product.tags,
     product.created_at,
     product.pubkey
-  )
+  );
   return prod;
 }
 
-function objectToStall(merchant: IStall): Stall{
+function objectToStall(merchant: IStall): Stall {
   const stall = new Stall(
     merchant.stall_id,
     merchant.event_id,
@@ -65,23 +67,25 @@ function objectToStall(merchant: IStall): Stall{
     merchant.name,
     merchant.description,
     merchant.currency
-  )
-  return stall
+  );
+  return stall;
 }
 
 onMounted(async () => {
-  
   const tempProduct = await getProduct.value(props.id);
   product.value = objectToProduct(tempProduct[0]);
 
   const tempMerch = await getMerchant.value(product.value.stall_id);
-  merchant.value = objectToStall(tempMerch[0]);
+  if (tempMerch[0]){
+    console.log(tempMerch[0]);
+    merchant.value = objectToStall(tempMerch[0]);
+  }
 
   if (merchant.value && merchant.value.pubkey !== undefined) {
     const tempProfile = await getMerchantProfile.value(merchant.value.pubkey);
     if (tempProfile && tempProfile.size > 0) {
       const tmp: NDKEvent = tempProfile.values().next().value;
-      profile.value = parseProfile(tmp.content)
+      profile.value = parseProfile(tmp.content);
     }
   } else if (product.value.pubkey !== undefined) {
     const tempProfile = await getMerchantProfile.value(product.value.pubkey);

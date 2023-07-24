@@ -25,10 +25,12 @@ const relayUrls: string[] = [
 ];
 
 type State = {
+  db: dbService;
   relay: NDK;
   helper: RelayHelper;
   nostrProvider: NostrProviderService;
   utils: Utils;
+  productsLoading: boolean;
   user: RemovableRef<NDKUser>;
   npub: RemovableRef<string>;
   pkey: RemovableRef<string>;
@@ -46,10 +48,12 @@ type State = {
 export const useNostrStore = defineStore({
   id: "nostr",
   state: (): State => ({
+    db: db,
     relay: new NDK({ explicitRelayUrls: relayUrls }),
     helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
+    productsLoading: false,
     user: useLocalStorage("user", new NDKUser({})),
     npub: useLocalStorage("npub", ""),
     pkey: useLocalStorage("pkey", ""),
@@ -87,12 +91,17 @@ export const useNostrStore = defineStore({
     getRelays: (state) => {
       return state.relayUrls;
     },
+    getEvents: async (state) => {
+      return await state.db.products.count();
+    },
+    getMerchantProfile: (state) => {
+      return async (pubkey: string) =>
+        await state.nostrProvider.fetchProfileEvent(pubkey);
+    },
     getUserMerchantEvent: async (state) => {
       const userPubKey = state.user.hexpubkey();
       console.log(`Fetching stall for ${userPubKey}`);
-      return await state.nostrProvider.fetchMerchantEvents([
-        userPubKey,
-      ]);
+      return await state.nostrProvider.fetchMerchantEvents([userPubKey]);
     },
   },
   actions: {
@@ -113,6 +122,33 @@ export const useNostrStore = defineStore({
     },
     setRelays(relays: string[]) {
       this.relayUrls = relays;
+    },
+    createSub(filters: Filter) {
+      this.helper.createSub(this.helper.getPool(), filters);
+    },
+    async initialEvents() {
+      const eventSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Product);
+      console.log(eventSet);
+      const merchSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Stall);
+      console.log(merchSet);
+      if (eventSet) {
+        eventSet.forEach((event) => {
+          // console.log(event);
+          this.utils.parseEvent(event);
+        });
+      }
+      if (merchSet) {
+        merchSet.forEach((event) => {
+          this.utils.parseEvent(event);
+        });
+      }
+      console.log("Exiting initialEvents");
+    },
+    async subEvent(filters: NDKFilter) {
+      // TODO: Replace with NDK implementation
+      this.helper.createSub(this.helper.getPool(), filters);
     },
   },
 });

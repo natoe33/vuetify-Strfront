@@ -21,7 +21,7 @@ import NDK, {
 // import { bech32 } from "@scure/base";
 // import { type Event, Kind } from "@/nostr-tools";
 import { Product, type IContent, Relay } from "@/models";
-import { LoginUtil } from "./login";
+import { LoginUtil, NewCredential } from "./login";
 // import { NostrFetcher } from "nostr-fetch";
 // import { db, dbService } from "@/utils";
 import { useAppStore, useNostrStore } from "@/store";
@@ -116,6 +116,16 @@ export class NostrProviderService {
     // setLoggedIn(true);
     // setLoggingIn(false);
     // this.appStore.setLoggingIn(false);
+  }
+
+  createNewNostrUser(): NewCredential {
+    const newUser: NewCredential = LoginUtil.generateNewCredential();
+    return newUser;
+    // this.attemptLoginUsingPrivateOrPubKey(newUser.privateKey);
+  }
+
+  loginNewUser(newUser: NewCredential) {
+    this.attemptLoginUsingPrivateOrPubKey(newUser.privateKey);
   }
 
   validateAndGetHexKey(enteredKey: string): string {

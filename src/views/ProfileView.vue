@@ -3,7 +3,6 @@ import { defineAsyncComponent } from "vue";
 const ProfileMain = defineAsyncComponent(
   () => import("@/components/ProfileMain.vue")
 );
-
 </script>
 <template>
   <Suspense>

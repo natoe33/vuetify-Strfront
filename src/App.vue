@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import { storeToRefs } from "pinia";
+import { useNostrStore } from "@/store";
 import { onMounted, defineAsyncComponent } from "vue";
 import AppBar from "@/components/AppBar.vue";
 import NavDrawer from "@/components/NavDrawer.vue";
+import OverFlow from "@/components/OverFlow.vue";
+
 const LoginDialog = defineAsyncComponent(
   () => import("@/components/LoginDialog.vue")
 );
-const OpenStore = defineAsyncComponent(() => import('@/components/OpenStore.vue'));
+const OpenStore = defineAsyncComponent(
+  () => import("@/components/OpenStore.vue")
+);
 // import LoginDialog from "@/components/LoginDialog.vue";
-import { useAppStore } from "@/store";
 
-const appStore = useAppStore();
-const { productsLoading } = storeToRefs(appStore);
+const nostrStore = useNostrStore();
+const { productsLoading } = storeToRefs(nostrStore);
 
 onMounted(async () => {
-  const count: number = await appStore.getEvents;
+  // console.log(window)
+  const count: number = await nostrStore.getEvents;
+  console.log(count);
+  nostrStore.initialEvents();
   if (count === 0) {
     productsLoading.value = true;
-    appStore.initialEvents();
+    nostrStore.initialEvents();
   }
 });
 </script>
