@@ -88,9 +88,10 @@ export const useNostrStore = defineStore({
       return state.relayUrls;
     },
     getUserMerchantEvent: async (state) => {
-      console.log(`Fetching stall for ${state.user.hexpubkey()}`);
+      const userPubKey = state.user.hexpubkey();
+      console.log(`Fetching stall for ${userPubKey}`);
       return await state.nostrProvider.fetchMerchantEvents([
-        state.user.hexpubkey(),
+        userPubKey,
       ]);
     },
   },

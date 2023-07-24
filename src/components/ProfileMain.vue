@@ -12,8 +12,6 @@ const StoreProfile = defineAsyncComponent(
   () => import("@/components/StoreProfile.vue")
 );
 
-const theme = useTheme();
-
 const nostrStore = useNostrStore();
 const { user } = storeToRefs(nostrStore);
 const tab = ref(null);
@@ -36,7 +34,7 @@ const tab = ref(null);
       }}</v-card-title>
     </v-img>
 
-    <v-card-subtitle>{{ user.profile?.about }}</v-card-subtitle>
+    <v-card-subtitle>{{ user.profile?.nip05 }}</v-card-subtitle>
     <v-tabs v-model="tab">
       <v-tab value="details">Details</v-tab>
       <v-tab value="settings">Settings</v-tab>

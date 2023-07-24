@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { Product } from "@/models";
 
 const props = defineProps({
@@ -8,9 +7,6 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  console.log(props.product?.tags);
-});
 </script>
 <template>
   <!-- <v-sheet min-height="70vh" rounded="lg"> -->

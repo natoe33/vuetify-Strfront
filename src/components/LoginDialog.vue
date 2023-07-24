@@ -55,6 +55,11 @@ onMounted(() => {
           <v-container>
             <v-row dense>
               <v-col cols="12">
+                
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="12">
                 <v-card color="#385F73" theme="dark">
                   <v-card-title>Nip-07 Extension (Recommended) 🔐</v-card-title>
                   <v-card-subtitle>

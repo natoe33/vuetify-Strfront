@@ -25,9 +25,9 @@ async function loadProducts() {
   pages.value = await appStore.getNumOfPages;
   console.log(`Product list: ${events.value.length} loaded`);
   loading.value = false;
-  if (!productsLoading.value) {
-    appStore.initialEvents();
-  }
+  // if (!productsLoading.value) {
+  //   appStore.initialEvents();
+  // }
 }
 
 async function loadProduct(event: Product) {

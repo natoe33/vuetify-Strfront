@@ -2,11 +2,29 @@
 import { ref, watch } from "vue";
 import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
+import { onMounted } from "vue";
+import { json } from "stream/consumers";
+
+interface currency {
+    cc: string;
+    symbol: string;
+    name: string;
+}
 
 const appStore = useAppStore();
-const { openStore } = storeToRefs(appStore);
+const { openStore, utils } = storeToRefs(appStore);
 const storeName = ref('');
 const description = ref('');
+const currencies = ref([] as currency[]);
+currencies.value.push({'cc': 'SAT', 'symbol': 'S', 'name': 'Satoshi'});
+
+
+onMounted(async () => {
+    const currencyList = await utils.value.getWorldCurrencies();
+    // currencies.value = currencyList.map(currency => currency.cc);
+    currencies.value = currencies.value.concat(currencyList);
+    
+})
 
 
 </script>
@@ -22,6 +40,9 @@ const description = ref('');
                     </v-row>
                     <v-row>
                         <v-textarea v-model="description" label="Store Description"></v-textarea>
+                    </v-row>
+                    <v-row>
+                        <v-select label="Currency" multiple chips :items="currencies" item-title="name" item-value="cc"></v-select>
                     </v-row>
                 </v-container>
             </v-form>
