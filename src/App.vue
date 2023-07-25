@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import { storeToRefs } from "pinia";
-import { useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { onMounted, defineAsyncComponent } from "vue";
 import AppBar from "@/components/AppBar.vue";
 import NavDrawer from "@/components/NavDrawer.vue";
@@ -15,17 +15,17 @@ const OpenStore = defineAsyncComponent(
 );
 // import LoginDialog from "@/components/LoginDialog.vue";
 
-const nostrStore = useNostrStore();
-const { productsLoading } = storeToRefs(nostrStore);
+const appStore = useAppStore();
+const { productsLoading } = storeToRefs(appStore);
 
 onMounted(async () => {
   // console.log(window)
-  const count: number = await nostrStore.getEvents;
+  const count: number = await appStore.getEvents;
   console.log(count);
-  nostrStore.initialEvents();
+  appStore.initialEvents();
   if (count === 0) {
     productsLoading.value = true;
-    nostrStore.initialEvents();
+    appStore.initialEvents();
   }
 });
 </script>

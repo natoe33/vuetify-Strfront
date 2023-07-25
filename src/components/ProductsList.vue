@@ -16,7 +16,7 @@ const router = useRouter();
 
 const { tagLoading, loading, newProduct, tag, page } =
   storeToRefs(appStore);
-const { productsLoading } = storeToRefs(nostrStore);
+// const { productsLoading } = storeToRefs(nostrStore);
 const events = ref([] as Product[]);
 const pages = ref(0);
 
@@ -52,9 +52,9 @@ function itemClicked(event: number) {
   page.value = event;
 }
 
-watch(productsLoading, (newLoading) => {
-  if (!newLoading) loadProducts();
-});
+// watch(productsLoading, (newLoading) => {
+//   if (!newLoading) loadProducts();
+// });
 
 watch(tagLoading, (newLoading) => {
   if (newLoading) loadProductsWithTags();

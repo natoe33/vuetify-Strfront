@@ -5,7 +5,7 @@
 import { ref, onMounted, defineAsyncComponent } from "vue";
 import { useDisplay } from "vuetify";
 import { storeToRefs } from "pinia";
-import { useAppStore, useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { Product, Stall, IProfile, IStall, TProduct } from "@/models";
 import { NDKEvent } from "@/ndk";
 // import ProductSection from "@/components/ProductSection.vue";
@@ -18,9 +18,7 @@ const MerchantSection = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-const nostrStore = useNostrStore();
-const { getProduct, getMerchant } = storeToRefs(appStore);
-const { getMerchantProfile } = storeToRefs(nostrStore);
+const { getProduct, getMerchant, getMerchantProfile } = storeToRefs(appStore);
 
 const { mobile, name, lgAndDown, mdAndDown } = useDisplay();
 

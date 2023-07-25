@@ -1,28 +1,20 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useClipboard, usePermission } from "@vueuse/core";
-import { useAppStore, useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { watch, ref, onMounted, defineAsyncComponent } from "vue";
-import { NewCredential } from "@/utils/login";
 
 const NewUser = defineAsyncComponent(() => import("@/components/NewUser.vue"));
 
 const appStore = useAppStore();
 const { loggingIn } = storeToRefs(appStore);
-const nostrStore = useNostrStore();
-const { getNpub } = nostrStore;
-const { npub } = storeToRefs(nostrStore);
-const { copy } = useClipboard();
+const { getNpub } = appStore;
 
 const dialog = ref(false);
 const key = ref("");
-const lnpub = ref("");
 const winnostr = ref(false);
 const step = ref(1);
 const pubkey = ref("");
-const pubkeyicon = ref("");
 const privkey = ref("");
-const privkeyicon = ref("");
 const newUser = ref();
 
 function closeDialog() {
@@ -31,24 +23,22 @@ function closeDialog() {
 
 function attemptNip07Login() {
   console.log("Attempting NIP-07 Login");
-  nostrStore.nostrProvider.attemptLoginWithNip07();
+  appStore.nostrProvider.attemptLoginWithNip07();
 }
 
 function attemptKeyLogin() {
   console.log("Attempting login with key");
-  nostrStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
+  appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
 }
 
 function attemptGenerateNewCredential() {
   // const newUser = appStore.nostrProvider.createNewNostrUser();
-  newUser.value = nostrStore.nostrProvider.createNewNostrUser();
+  newUser.value = appStore.nostrProvider.createNewNostrUser();
   console.log(newUser.value);
   pubkey.value = newUser.value.pubkey;
   privkey.value = newUser.value.privateKey;
   step.value++;
 }
-
-watch(npub, (newval) => {});
 
 watch(loggingIn, (newVal) => {
   console.log(`LoginDialog watch triggered: ${newVal}, ${getNpub}`);

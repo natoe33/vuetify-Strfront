@@ -28,13 +28,14 @@ type ProductTags = {
 };
 
 type State = {
-  // relay: NDK;
-  // helper: RelayHelper;
-  // nostrProvider: NostrProviderService;
+  relay: NDK;
+  helper: RelayHelper;
+  nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
   loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
+  user: RemovableRef<NDKUser>;
   drawer: boolean;
   overflow: boolean;
   openStore: boolean;
@@ -56,13 +57,14 @@ type State = {
 export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
-    // relay: new NDK({ explicitRelayUrls: relayUrls }),
-    // helper: new RelayHelper(relayUrls),
-    // nostrProvider: new NostrProviderService(),
+    relay: new NDK({ explicitRelayUrls: relayUrls }),
+    helper: new RelayHelper(relayUrls),
+    nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
+    user: useLocalStorage("user",new NDKUser({})),
     drawer: false,
     overflow: false,
     openStore: false,
@@ -83,6 +85,9 @@ export const useAppStore = defineStore({
   getters: {
     getNDK: (state) => {
       // return state.relay;
+    },
+    getNpub: (state) => {
+      return state.user.npub
     },
     getSortedTags: async (state) => {
       const list = await state.db.tags.toArray();
@@ -121,10 +126,10 @@ export const useAppStore = defineStore({
           .limit(1)
           .toArray();
     },
-    // getMerchantProfile: (state) => {
-    //   return async (pubkey: string) =>
-    //     await state.nostrProvider.fetchProfileEvent(pubkey);
-    // },
+    getMerchantProfile: (state) => {
+      return async (pubkey: string) =>
+        await state.nostrProvider.fetchProfileEvent(pubkey);
+    },
     getNumOfPages: async (state) => {
       const numItems = await state.db.products.count();
       console.log(
@@ -183,26 +188,26 @@ export const useAppStore = defineStore({
       this.page = 0;
       this.loading = false;
     },
-    // async initialEvents() {
-    //   const eventSet: Set<NDKEvent> | undefined =
-    //     await this.nostrProvider.fetchEvents(NDKKind.Product);
-    //   console.log(eventSet);
-    //   const merchSet: Set<NDKEvent> | undefined =
-    //     await this.nostrProvider.fetchEvents(NDKKind.Stall);
-    //   console.log(merchSet);
-    //   if (eventSet) {
-    //     eventSet.forEach((event) => {
-    //       // console.log(event);
-    //       this.utils.parseEvent(event);
-    //     });
-    //   }
-    //   if (merchSet) {
-    //     merchSet.forEach((event) => {
-    //       this.utils.parseEvent(event);
-    //     });
-    //   }
-    //   console.log("Exiting initialEvents");
-    // },
+    async initialEvents() {
+      const eventSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Product);
+      console.log(eventSet);
+      const merchSet: Set<NDKEvent> | undefined =
+        await this.nostrProvider.fetchEvents(NDKKind.Stall);
+      console.log(merchSet);
+      if (eventSet) {
+        eventSet.forEach((event) => {
+          // console.log(event);
+          this.utils.parseEvent(event);
+        });
+      }
+      if (merchSet) {
+        merchSet.forEach((event) => {
+          this.utils.parseEvent(event);
+        });
+      }
+      console.log("Exiting initialEvents");
+    },
     // async subEvent(filters: NDKFilter) {
     //   // TODO: Replace with NDK implementation
     //   this.helper.createSub(this.helper.getPool(), filters);
