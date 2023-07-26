@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
-const nostrStore = useNostrStore();
-const { user } = storeToRefs(nostrStore);
+const appStore = useAppStore();
+const { user } = storeToRefs(appStore);
 </script>
 <template>
   <v-sheet class="bg-accent">

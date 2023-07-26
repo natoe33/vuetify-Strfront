@@ -23,6 +23,7 @@ export class Utils {
   }
 
   parseEvent = (event: NDKEvent) => {
+    console.log('received event');
     if (event.kind === 30018) {
       this.parseProduct(event);
     } else if (event.kind === 30017) {

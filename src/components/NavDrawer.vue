@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { useAppStore, useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { NDKUser } from "@/ndk";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 const appStore = useAppStore();
-const nostrStore = useNostrStore();
+// const nostrStore = useNostrStore();
 const { getSortedTags, setTagandLoading } = appStore;
-const { drawer, loggingIn, loggedIn } = storeToRefs(appStore);
-const { getNpub, setNpub, getUser, setUser } = nostrStore;
-const { npub, user } = storeToRefs(nostrStore);
+const { drawer, loggingIn, loggedIn, user } = storeToRefs(appStore);
+// const { getNpub, setNpub, getUser, setUser } = nostrStore;
+// const { npub, user } = storeToRefs(nostrStore);
 
 const router = useRouter();
 const group = ref(null);
@@ -32,12 +32,9 @@ function goToProfile() {
   router.push({ name: "profile" });
 }
 
-watch(npub, (newval) => {
-  lnpub.value = newval;
-});
-
 watch(user, (newval) => {
   if (newval.profile?.image) image.value = newval.profile?.image;
+  if (newval.npub) lnpub.value = newval.npub
 });
 
 watch(group, () => {

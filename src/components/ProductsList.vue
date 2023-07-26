@@ -5,16 +5,16 @@ import ProductCard from "./ProductCard.vue";
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Product } from "@/models";
-import { useAppStore, useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
 const appStore = useAppStore();
-const nostrStore = useNostrStore();
+//const nostrStore = useNostrStore();
 
 const router = useRouter();
 
-const { tagLoading, loading, newProduct, tag, page } =
+const { tagLoading, loading, newProduct, tag, page, productsLoading } =
   storeToRefs(appStore);
 // const { productsLoading } = storeToRefs(nostrStore);
 const events = ref([] as Product[]);
@@ -52,9 +52,9 @@ function itemClicked(event: number) {
   page.value = event;
 }
 
-// watch(productsLoading, (newLoading) => {
-//   if (!newLoading) loadProducts();
-// });
+watch(productsLoading, (newLoading) => {
+  if (!newLoading) loadProducts();
+});
 
 watch(tagLoading, (newLoading) => {
   if (newLoading) loadProductsWithTags();

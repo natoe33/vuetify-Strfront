@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useNostrStore, useAppStore } from "@/store";
+import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 
-const nostrStore = useNostrStore();
-const { getUserMerchantEvent } = nostrStore;
-const { store } = storeToRefs(nostrStore);
+// const appStore = useAppStore();
+// const { getUserMerchantEvent } = nostrStore;
+// const { store } = storeToRefs(nostrStore);
 
 const appStore = useAppStore();
-const { openStore } = storeToRefs(appStore);
+const { getUserMerchantEvent} = appStore;
+const { openStore, store } = storeToRefs(appStore);
 
 function showOpenStore() {
   openStore.value = !openStore.value;

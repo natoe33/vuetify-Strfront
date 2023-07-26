@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useNostrStore } from "@/store";
+import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { useTheme } from "vuetify";
 import { ref, defineAsyncComponent } from "vue";
@@ -12,8 +12,8 @@ const StoreProfile = defineAsyncComponent(
   () => import("@/components/StoreProfile.vue")
 );
 
-const nostrStore = useNostrStore();
-const { user } = storeToRefs(nostrStore);
+const appStore = useAppStore();
+const { user } = storeToRefs(appStore);
 const tab = ref(null);
 </script>
 <template>
