@@ -74,27 +74,18 @@ watch(events, () => {
 
 onMounted(() => {
   console.log(`ProductsList mounted. Page: ${page.value}`);
+  // appStore.initialEvents();
   loadProducts();
 });
 </script>
 
 <template>
   <v-container class="mx-auto px-0">
-    <v-sheet
-      class="d-flex flex-wrap align-content-center mx-auto pa-2"
-      rounded="lg"
-    >
+    <v-sheet class="d-flex flex-wrap align-content-center mx-auto pa-2" rounded="lg">
       <template v-for="event of eventList" :key="event.id">
-        <ProductCard
-          :product="(event as Product)"
-          @click="loadProduct(event)"
-        />
+        <ProductCard :product="(event as Product)" @click="loadProduct(event)" />
       </template>
     </v-sheet>
-    <v-pagination
-      theme="dark"
-      :length="pages"
-      @update:model-value="itemClicked"
-    ></v-pagination>
+    <v-pagination theme="dark" :length="pages" @update:model-value="itemClicked"></v-pagination>
   </v-container>
 </template>

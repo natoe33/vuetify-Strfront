@@ -3,12 +3,12 @@ import { NDKUser } from "@/ndk";
 import { useNostrStore, useAppStore } from "@/store";
 
 const appStore = useAppStore();
-const nostrStore = useNostrStore();
-const { setLoggedIn, getLoggedIn } = appStore;
-const { setNpub, setUser } = nostrStore;
+// const nostrStore = useNostrStore();
+const { setLoggedIn, getLoggedIn, setUser } = appStore;
+// const { setNpub } = nostrStore;
 
 function Logout() {
-  setNpub("");
+  // setNpub("");
   setUser(new NDKUser({}));
   setLoggedIn(false);
 }

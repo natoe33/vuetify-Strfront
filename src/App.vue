@@ -30,13 +30,13 @@ onMounted(async () => {
   // appStore.db.products.clear();
   // appStore.db.merchants.clear();
   // console.log(window)
-  const count: number = await appStore.getEvents;
-  const sub = await appStore.nostrProvider.createSub(30018);
-  console.log(count);
-  productsLoading.value = true;
-  console.log(appStore.relay)
-  appStore.initialEvents();
-  console.log(sub);
+  // const count: number = await appStore.getEvents;
+  // // const sub = await appStore.nostrProvider.createSub(30018);
+  // console.log(count);
+  // productsLoading.value = true;
+  // console.log(appStore.relay)
+  // appStore.initialEvents();
+  // console.log(sub);
 });
 </script>
 <template>

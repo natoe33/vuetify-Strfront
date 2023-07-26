@@ -12,7 +12,7 @@ const props = defineProps({
     }
 })
 
-const nostrStore = useNostrStore();
+//const nostrStore = useNostrStore();
 const appStore = useAppStore();
 
 const { loggingIn } = storeToRefs(appStore);
@@ -34,7 +34,7 @@ function copyPrivKey(key: string) {
 }
 
 function newUserLogin() {
-    nostrStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(privkeyicon.value);
+    appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(privkeyicon.value);
     loggingIn.value = !loggingIn.value;
 }
 

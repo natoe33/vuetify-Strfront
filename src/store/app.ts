@@ -19,7 +19,7 @@ import NDK, {
 } from "@/ndk";
 import { type Filter } from "@/nostr-tools";
 
-const relayUrls: string[] = ["wss://relay.damus.io", "wss://eden.nostr.land"];
+const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
 
 const ITEMS_PER_PAGE = 40;
 
@@ -37,6 +37,7 @@ type State = {
   loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
   user: RemovableRef<NDKUser>;
+  npub: RemovableRef<string>;
   privkey: string;
   pubkeyLogin: RemovableRef<boolean>;
   drawer: boolean;
@@ -56,7 +57,7 @@ type State = {
   store: NDKEvent;
   // products: RemovableRef<Product[]>;
   // productTags: RemovableRef<ProductTags[]>;
-  // events: RemovableRef<NDKEvent[]>;
+  events: RemovableRef<Map<string, NDKEvent>>;
   // tags: RemovableRef<string[]>;
 };
 
@@ -70,8 +71,9 @@ export const useAppStore = defineStore({
     db: db,
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
-    user: useLocalStorage("user",new NDKUser({})),
-    privkey: '',
+    user: useLocalStorage("user", new NDKUser({})),
+    npub: useLocalStorage("npub", ''),
+    privkey: "",
     pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     drawer: false,
     overflow: false,
@@ -82,7 +84,6 @@ export const useAppStore = defineStore({
     loading: false,
     productsLoading: false,
     newProduct: false,
-    // eventSubscription: new NDKSubscription({}),
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
     products: [] as Product[],
@@ -90,7 +91,7 @@ export const useAppStore = defineStore({
     store: new NDKEvent(),
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
-    // events: useLocalStorage("events", [] as NDKEvent[]),
+    events: useLocalStorage('events', new Map()),
     // tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
@@ -98,16 +99,16 @@ export const useAppStore = defineStore({
       // return state.relay;
     },
     getUser: (state) => {
-        return state.user;
+      return state.user;
     },
     getPrivKey: (state) => {
-        return state.privkey;
+      return state.privkey;
     },
     getPubKey: (state) => {
-      return state.user.hexpubkey()
+      return state.user.hexpubkey();
     },
     getNpub: (state) => {
-      return state.user.npub
+      return state.npub;
     },
     getSortedTags: async (state) => {
       const list = await state.db.tags.toArray();
@@ -173,7 +174,8 @@ export const useAppStore = defineStore({
       // return retProd;
     },
     getEvents: async (state) => {
-      return await state.db.products.count();
+      return state.events.size;
+      // return await state.db.products.count();
     },
     getRelays: (state) => {
       return state.relayList;
@@ -181,7 +183,7 @@ export const useAppStore = defineStore({
   },
   actions: {
     setUser(user: NDKUser) {
-        this.user = user;
+      this.user = user;
     },
     setLoggedIn(loggedIn: boolean) {
       this.loggedIn = loggedIn;
@@ -190,11 +192,11 @@ export const useAppStore = defineStore({
       this.loggingIn = loggingIn;
     },
     setPubkeyLogin(pubkeyLogin: boolean) {
-        this.pubkeyLogin = pubkeyLogin;
-      },
+      this.pubkeyLogin = pubkeyLogin;
+    },
     setPrivKey(pkey: string) {
-        this.privkey = pkey;
-      },
+      this.privkey = pkey;
+    },
     // createSub(filters: Filter) {
     //   this.helper.createSub(this.helper.getPool(), filters);
     // },
@@ -223,7 +225,9 @@ export const useAppStore = defineStore({
       this.loading = false;
     },
     async initialEvents() {
-      console.log('loading initial events')
+      console.log("loading initial events");
+      console.log(this.nostrProvider);
+      // this.nostrProvider.createSub(NDKKind.Product, this.events);
       const eventSet: Set<NDKEvent> | undefined =
         await this.nostrProvider.fetchEvents(NDKKind.Product);
       console.log(eventSet);

@@ -62,6 +62,7 @@ function parseProduct(data: IProductData) {
     data.created_at,
     data.pubkey
   );
+  postMessage({type: 'Product', data: product})
 
   addProductToDb(product);
   addTagsToDb(tags);

@@ -20,6 +20,10 @@ export class Utils {
     this.worker = new MyWorker();
     this.appStore = useAppStore();
     this.ndk = this.appStore.getNDK;
+
+    this.worker.onmessage =(ev) => {
+      console.log(ev.data);
+    }
   }
 
   parseEvent = (event: NDKEvent) => {
