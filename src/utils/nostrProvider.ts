@@ -56,7 +56,7 @@ export class NostrProviderService {
     const { getNpub, getPrivKey, getPubKey, getUser } = appStore;
     this.explicitRelayUrls = explicitUrls;
     this.relayUrls = explicitUrls;
-    this.npub = npub.value ? npub.value : "";
+    this.npub = npub ? npub.value : "";
     // this.user = getUser;
     // console.log(this.user);
     // // private appStore = useAppStore();
