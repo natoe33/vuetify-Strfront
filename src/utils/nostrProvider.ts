@@ -16,7 +16,7 @@ import NDK, {
   NDKSigner,
   NDKPrivateKeySigner,
   NDKKind,
-} from "@nostr-dev-kit/ndk";
+} from "@/ndk";
 // import { nip57 } from "@/nostr-tools";
 // import { bech32 } from "@scure/base";
 // import { type Event, Kind } from "@/nostr-tools";
