@@ -62,7 +62,7 @@ function parseProduct(data: IProductData) {
     data.created_at,
     data.pubkey
   );
-  postMessage({type: 'Product', data: product})
+  postMessage({ type: "Product", data: product });
 
   addProductToDb(product);
   addTagsToDb(tags);
@@ -122,6 +122,7 @@ function parseMerchant(data: IMerchantData) {
     content.description,
     content.currency
   );
+  postMessage({ type: "Stall", data: stall });
   addStallToDb(stall);
 }
 

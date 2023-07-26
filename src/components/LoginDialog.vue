@@ -144,7 +144,7 @@ onMounted(() => {
           </v-card>
         </v-window-item>
         <v-window-item :value="2">
-          <NewUser :newUser="newUser"/>
+          <NewUser :newUser="newUser" />
         </v-window-item>
       </v-window>
     </v-dialog>

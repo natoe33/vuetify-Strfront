@@ -34,7 +34,7 @@ function goToProfile() {
 
 watch(user, (newval) => {
   if (newval.profile?.image) image.value = newval.profile?.image;
-  if (newval.npub) lnpub.value = newval.npub
+  if (newval.npub) lnpub.value = newval.npub;
 });
 
 watch(group, () => {

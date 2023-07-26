@@ -30,7 +30,7 @@ type ProductTags = {
 
 type State = {
   relay: NDK;
-  helper: RelayHelper;
+  // helper: RelayHelper;
   nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
@@ -52,8 +52,8 @@ type State = {
   // events: NDKSubscription;
   relayList: RemovableRef<Relay[]>;
   relayUrls: string[];
-  products: Product[];
-  stalls: Stall[];
+  products: RemovableRef<Map<string, Product>>;
+  stalls: RemovableRef<Map<string, Stall>>;
   store: NDKEvent;
   // products: RemovableRef<Product[]>;
   // productTags: RemovableRef<ProductTags[]>;
@@ -65,14 +65,14 @@ export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
     relay: new NDK({ explicitRelayUrls: relayUrls }),
-    helper: new RelayHelper(relayUrls),
+    // helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
     user: useLocalStorage("user", new NDKUser({})),
-    npub: useLocalStorage("npub", ''),
+    npub: useLocalStorage("npub", ""),
     privkey: "",
     pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     drawer: false,
@@ -86,12 +86,12 @@ export const useAppStore = defineStore({
     newProduct: false,
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
-    products: [] as Product[],
-    stalls: [] as Stall[],
+    products: useLocalStorage("products", new Map()),
+    stalls: useLocalStorage("stalls", new Map()),
     store: new NDKEvent(),
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
-    events: useLocalStorage('events', new Map()),
+    events: useLocalStorage("events", new Map()),
     // tags: useLocalStorage("tags", [] as string[]),
   }),
   getters: {
@@ -121,31 +121,32 @@ export const useAppStore = defineStore({
     getLoggingIn: (state) => {
       return state.loggingIn;
     },
-    getProducts: async (state) => {
+    getProducts: (state) => {
       // TODO: detect browser and determine if Dexie or localstorage should be used
       console.log(`return products for page ${state.page}`);
-      return await state.db.products
-        .orderBy("created_at")
-        .offset((state.page - 1) * ITEMS_PER_PAGE)
-        .limit(ITEMS_PER_PAGE)
-        .toArray();
+      return state.products;
+      // return await state.db.products
+      //   .orderBy("created_at")
+      //   .offset((state.page - 1) * ITEMS_PER_PAGE)
+      //   .limit(ITEMS_PER_PAGE)
+      //   .toArray();
     },
     getProduct: (state) => {
-      return async (id: string) =>
-        await state.db.products
-          .where("event_id")
-          .equalsIgnoreCase(id)
-          .toArray();
+      return (id: string) => state.products.get(id);
+      // await state.db.products
+      //   .where("event_id")
+      //   .equalsIgnoreCase(id)
+      //   .toArray();
       // return (id: string) =>
       //   state.products.find((product) => product.event_id === id);
     },
     getMerchant: (state) => {
-      return async (stall_id: string) =>
-        await state.db.merchants
-          .where("stall_id")
-          .equalsIgnoreCase(stall_id)
-          .limit(1)
-          .toArray();
+      return (stall_id: string) => state.stalls.get(stall_id);
+      // await state.db.merchants
+      //   .where("stall_id")
+      //   .equalsIgnoreCase(stall_id)
+      //   .limit(1)
+      //   .toArray();
     },
     getMerchantProfile: (state) => {
       return async (pubkey: string) =>
@@ -156,8 +157,9 @@ export const useAppStore = defineStore({
       console.log(`Fetching stall for ${userPubKey}`);
       return await state.nostrProvider.fetchMerchantEvents([userPubKey]);
     },
-    getNumOfPages: async (state) => {
-      const numItems = await state.db.products.count();
+    getNumOfPages: (state) => {
+      // const numItems = await state.db.products.count();
+      const numItems = state.products.size;
       console.log(
         `${numItems} stored for ${Math.ceil(numItems / ITEMS_PER_PAGE)} pages`
       );
@@ -184,6 +186,9 @@ export const useAppStore = defineStore({
   actions: {
     setUser(user: NDKUser) {
       this.user = user;
+    },
+    setNpub(npub: string) {
+      this.npub = npub;
     },
     setLoggedIn(loggedIn: boolean) {
       this.loggedIn = loggedIn;

@@ -6,7 +6,7 @@ import ProductsList from "@/components/ProductsList.vue";
 onMounted(() => {
   const appStore = useAppStore();
   appStore.initialEvents();
-})
+});
 </script>
 <template>
   <v-row>

@@ -10,24 +10,35 @@ import MyWorker from "@/worker?worker";
 
 export class Utils {
   worker: Worker;
-  appStore: StoreGeneric;
-  ndk: NDK;
+  // appStore: StoreGeneric;
+  // ndk: NDK;
+  // products: Map<string, Product>;
 
   /**
    *
    */
   constructor() {
     this.worker = new MyWorker();
-    this.appStore = useAppStore();
-    this.ndk = this.appStore.getNDK;
+    // this.appStore = useAppStore();
+    // this.ndk = this.appStore.getNDK;
+    // const { products } = storeToRefs(this.appStore);
+    // this.products = products.value;
 
-    this.worker.onmessage =(ev) => {
-      console.log(ev.data);
-    }
+    this.worker.onmessage = (ev) => {
+      // console.log(ev.data);
+      if (ev.data.type === "Product") {
+        // console.log('adding product')
+        this.addProduct(ev.data.data);
+      } else if (ev.data.type === "Stall") {
+        // console.log('adding stall');
+        console.log(`Stall: ${ev.data.data}`);
+        this.addStall(ev.data.data);
+      }
+    };
   }
 
   parseEvent = (event: NDKEvent) => {
-    console.log('received event');
+    // console.log('received event');
     if (event.kind === 30018) {
       this.parseProduct(event);
     } else if (event.kind === 30017) {
@@ -37,7 +48,7 @@ export class Utils {
 
   parseProduct = (event: NDKEvent) => {
     // const { newProduct } = storeToRefs(this.appStore);
-    console.log("sending message");
+    // console.log("sending message");
     this.worker.postMessage({
       type: "parseProduct",
       data: {
@@ -50,7 +61,43 @@ export class Utils {
     });
   };
 
+  dedup = (prod1: Product, prod2: Product) => {
+    if (prod1.created_at > prod2.created_at) {
+      return prod1;
+    }
+    return prod2;
+  };
+
+  dedupMerch = (stall1: Stall, stall2: Stall) => {
+    if (stall1.created_at > stall2.created_at) {
+      return stall1;
+    }
+    return stall2;
+  };
+
+  addProduct = (product: Product) => {
+    const appStore = useAppStore();
+    const { products } = storeToRefs(appStore);
+    const prod = products.value.get(product.event_id);
+    if (prod) {
+      product = this.dedup(product, prod);
+    }
+    products.value.set(product.event_id, product);
+    // console.log(products.value);
+  };
+
+  addStall = (stall: Stall) => {
+    const appStore = useAppStore();
+    const { stalls } = storeToRefs(appStore);
+    const merch = stalls.value.get(stall.stall_id);
+    if (merch) {
+      stall = this.dedupMerch(stall, merch);
+    }
+    stalls.value.set(stall.stall_id, stall);
+  };
+
   parseMerchant = (event: NDKEvent) => {
+    const appStore = useAppStore();
     this.worker.postMessage({
       type: "parseMerchant",
       data: {
@@ -61,7 +108,7 @@ export class Utils {
         tags: event.tags,
       },
     });
-    this.appStore.newProduct;
+    appStore.newProduct;
   };
 
   parseTags = (event: NDKEvent): string[] => {

@@ -20,8 +20,6 @@ const appStore = useAppStore();
 const { productsLoading } = storeToRefs(appStore);
 // const sub: NDKSubscription = await appStore.nostrProvider.createSub(30018);
 
-
-
 // watch(sub, (newval) => {
 //   console.log(newval)
 // })

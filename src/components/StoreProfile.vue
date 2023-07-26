@@ -8,7 +8,7 @@ import { storeToRefs } from "pinia";
 // const { store } = storeToRefs(nostrStore);
 
 const appStore = useAppStore();
-const { getUserMerchantEvent} = appStore;
+const { getUserMerchantEvent } = appStore;
 const { openStore, store } = storeToRefs(appStore);
 
 function showOpenStore() {

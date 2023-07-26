@@ -1,6 +1,6 @@
 // import { NostrFetcher, eventKind, type NostrEvent } from "nostr-fetch";
 import debug from "debug";
-import {Ref} from "vue";
+import { Ref } from "vue";
 import { storeToRefs } from "pinia";
 import NDK, {
   type NDKConstructorParams,
@@ -56,7 +56,7 @@ export class NostrProviderService {
     const { getNpub, getPrivKey, getPubKey, getUser } = appStore;
     this.explicitRelayUrls = explicitUrls;
     this.relayUrls = explicitUrls;
-    this.npub = npub ? npub.value : '';
+    this.npub = npub.value ? npub.value : "";
     // this.user = getUser;
     // console.log(this.user);
     // // private appStore = useAppStore();
@@ -64,21 +64,21 @@ export class NostrProviderService {
     // console.log(getNpub);
 
     if (this.npub || this.npub === "") {
-      console.log('unauth session');
+      console.log("unauth session");
       this.startWithUnauthSession();
     } else {
-      console.log('auth session');
+      console.log("auth session");
       console.log(npub.value);
       if (getNpub && getNpub !== "") {
         if (getPrivKey && getPrivKey !== "") {
-          console.log('privkey session')
+          console.log("privkey session");
           this.isNip07 = false;
           this.isLoggedInUsingNsec = true;
           this.signer = new NDKPrivateKeySigner(getPrivKey);
           this.canWriteToNostr = true;
           this.tryLoginUsingNpub(getNpub);
         } else {
-          console.log('pubkey session');
+          console.log("pubkey session");
           if (getPubKey && getPubKey !== "") {
             this.isNip07 = true;
             this.isLoggedInUsingPubKey$.next(true);
@@ -303,7 +303,7 @@ export class NostrProviderService {
   private async initializeUsingNpub(pubkey: string) {
     // const { user, loggedIn, loggingIn, npub } = storeToRefs(this.appStore);
     const appStore = useAppStore();
-    const { setLoggedIn, setLoggingIn, setUser } = appStore;
+    const { setLoggedIn, setLoggingIn, setUser, setNpub } = appStore;
     // const nostrStore = useNostrStore();
     // const { setNpub, setUser } = nostrStore;
     // setNpub(pubkey);
@@ -340,6 +340,7 @@ export class NostrProviderService {
     // console.log(this.currentUser);
     if (this.currentUser) {
       setUser(this.currentUser);
+      setNpub(this.currentUser.npub);
     }
 
     await this.checkIfNIP05Verified(
@@ -447,7 +448,7 @@ export class NostrProviderService {
     });
     subscription?.on("eose", () => {
       console.log(`subscription closed ${subscription}`);
-    })
+    });
   }
 
   async fetchProfileEvent(pubkey: string): Promise<Set<NDKEvent> | undefined> {

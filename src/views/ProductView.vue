@@ -70,28 +70,37 @@ function objectToStall(merchant: IStall): Stall {
 }
 
 onMounted(async () => {
-  const tempProduct = await getProduct.value(props.id);
-  product.value = objectToProduct(tempProduct[0]);
-
-  const tempMerch = await getMerchant.value(product.value.stall_id);
-  if (tempMerch[0]){
-    console.log(tempMerch[0]);
-    merchant.value = objectToStall(tempMerch[0]);
+  // const tempProduct = getProduct.value(props.id);
+  // product.value = objectToProduct(tempProduct[0]);
+  console.log(getProduct.value(props.id));
+  product.value = getProduct.value(props.id);
+  console.log(product.value);
+  if (product.value) {
+    console.log(getMerchant.value(product.value.stall_id));
+    merchant.value = getMerchant.value(product.value.stall_id);
+    console.log(merchant.value);
   }
-
+  // const tempMerch = getMerchant.value(product.value.stall_id);
+  // if (tempMerch[0]){
+  //   console.log(tempMerch[0]);
+  //   merchant.value = objectToStall(tempMerch[0]);
+  // }
+  console.log(merchant.value?.pubkey);
+  console.log(product.value?.pubkey);
   if (merchant.value && merchant.value.pubkey !== undefined) {
     const tempProfile = await getMerchantProfile.value(merchant.value.pubkey);
     if (tempProfile && tempProfile.size > 0) {
       const tmp: NDKEvent = tempProfile.values().next().value;
       profile.value = parseProfile(tmp.content);
     }
-  } else if (product.value.pubkey !== undefined) {
+  } else if (product.value?.pubkey !== undefined) {
     const tempProfile = await getMerchantProfile.value(product.value.pubkey);
     if (tempProfile && tempProfile?.size > 0) {
       const tmp: NDKEvent = tempProfile.values().next().value;
       profile.value = parseProfile(tmp.content);
     }
   }
+  console.log(profile.value);
 });
 </script>
 <template>
