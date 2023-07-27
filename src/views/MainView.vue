@@ -7,7 +7,8 @@ import { storeToRefs } from "pinia";
 onMounted(() => {
   const appStore = useAppStore();
   const { loaded } = storeToRefs(appStore);
-  if (!loaded) {
+  console.log(loaded.value);
+  if (!loaded.value || loaded.value === undefined) {
     appStore.initialEvents();
   }
 });

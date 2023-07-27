@@ -31,7 +31,6 @@ currencies.value.push({ cc: "SAT", symbol: "S", name: "Satoshi" });
 const countries = ref([] as country[]);
 const zones = ref([] as shipping[]);
 
-
 onMounted(async () => {
   const currencyList = await utils.value.getWorldCurrencies();
   const countryList = await utils.value.getCountries();

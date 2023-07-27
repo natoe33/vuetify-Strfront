@@ -1,4 +1,4 @@
-import { Product, Stall } from "@/models";
+import { Product, Stall, type IContent, type IMerchContent } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { NDKEvent } from "@/ndk";
 import { storeToRefs } from "pinia";
@@ -7,6 +7,21 @@ import json from "./currencies.json";
 import cjson from "./countries.json";
 import MyWorker from "@/worker?worker";
 
+interface IProductData {
+  id: string;
+  pubkey: string;
+  created_at: number;
+  content: string;
+  tags: string[][];
+}
+
+interface IMerchantData {
+  id: string;
+  pubkey: string;
+  created_at: number;
+  content: string;
+  tags: string[][];
+}
 export class Utils {
   worker: Worker;
 
@@ -35,16 +50,34 @@ export class Utils {
   };
 
   parseProduct = (event: NDKEvent) => {
-    this.worker.postMessage({
-      type: "parseProduct",
-      data: {
-        id: event.id,
-        pubkey: event.pubkey,
-        created_at: event.created_at,
-        content: event.content,
-        tags: event.tags,
-      },
+    const prodData: IProductData = {
+      id: event.id,
+      pubkey: event.pubkey,
+      created_at: event.created_at || 0,
+      content: event.content,
+      tags: event.tags,
+    };
+
+    const tags: string[] = [];
+    prodData.tags.forEach((t) => {
+      if (t[0] === "t") tags.push(t[1]);
     });
+    const content: IContent = JSON.parse(prodData.content);
+    const product: Product = new Product(
+      content.id,
+      prodData.id,
+      content.stall_id,
+      content.name,
+      content.description,
+      content.images,
+      content.currency,
+      content.price,
+      content.quantity,
+      tags,
+      prodData.created_at,
+      prodData.pubkey
+    );
+    this.addProduct(product);
   };
 
   dedup = (prod1: Product, prod2: Product) => {
@@ -82,16 +115,28 @@ export class Utils {
   };
 
   parseMerchant = (event: NDKEvent) => {
-    this.worker.postMessage({
-      type: "parseMerchant",
-      data: {
-        id: event.id,
-        pubkey: event.pubkey,
-        created_at: event.created_at,
-        content: event.content,
-        tags: event.tags,
-      },
+    const merchData: IMerchantData = {
+      id: event.id,
+      pubkey: event.pubkey,
+      created_at: event.created_at || 0,
+      content: event.content,
+      tags: event.tags,
+    };
+    const tags: string[] = [];
+    merchData.tags.forEach((t) => {
+      tags.push(t[1]);
     });
+    const content: IMerchContent = JSON.parse(merchData.content);
+    const stall: Stall = new Stall(
+      content.id,
+      merchData.id,
+      merchData.pubkey,
+      merchData.created_at,
+      content.name,
+      content.description,
+      content.currency
+    );
+    this.addStall(stall);
   };
 
   parseTags = (event: NDKEvent): string[] => {
