@@ -18,12 +18,12 @@ const mentionRegex =
   /\bnostr:((note|npub|naddr|nevent|nprofile)1\w+)\b|#\[(\d+)\]/g;
 
 export function parseReferences(evt: Event): Reference[] {
-  let references: Reference[] = [];
-  for (let ref of evt.content.matchAll(mentionRegex)) {
+  const references: Reference[] = [];
+  for (const ref of evt.content.matchAll(mentionRegex)) {
     if (ref[2]) {
       // it's a NIP-27 mention
       try {
-        let { type, data } = decode(ref[1]);
+        const { type, data } = decode(ref[1]);
         switch (type) {
           case "npub": {
             references.push({
@@ -66,8 +66,8 @@ export function parseReferences(evt: Event): Reference[] {
       }
     } else if (ref[3]) {
       // it's a NIP-10 mention
-      let idx = parseInt(ref[3], 10);
-      let tag = evt.tags[idx];
+      const idx = parseInt(ref[3], 10);
+      const tag = evt.tags[idx];
       if (!tag) continue;
 
       switch (tag[0]) {
@@ -87,7 +87,7 @@ export function parseReferences(evt: Event): Reference[] {
         }
         case "a": {
           try {
-            let [kind, pubkey, identifier] = tag[1].split(":");
+            const [kind, pubkey, identifier] = tag[1].split(":");
             references.push({
               text: ref[0],
               address: {

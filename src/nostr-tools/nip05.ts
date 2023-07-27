@@ -9,7 +9,7 @@ import { ProfilePointer } from "./nip19";
  */
 export const NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w.-]+)$/;
 
-var _fetch: any;
+let _fetch: any;
 
 try {
   _fetch = fetch;
@@ -24,7 +24,7 @@ export async function searchDomain(
   query = ""
 ): Promise<{ [name: string]: string }> {
   try {
-    let res = await (
+    const res = await (
       await _fetch(`https://${domain}/.well-known/nostr.json?name=${query}`)
     ).json();
 

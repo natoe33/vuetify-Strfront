@@ -25,20 +25,20 @@ export function createDelegation(
   privateKey: string,
   parameters: Parameters
 ): Delegation {
-  let conditions = [];
+  const conditions = [];
   if ((parameters.kind || -1) >= 0) conditions.push(`kind=${parameters.kind}`);
   if (parameters.until) conditions.push(`created_at<${parameters.until}`);
   if (parameters.since) conditions.push(`created_at>${parameters.since}`);
-  let cond = conditions.join("&");
+  const cond = conditions.join("&");
 
   if (cond === "")
     throw new Error("refusing to create a delegation without any conditions");
 
-  let sighash = sha256(
+  const sighash = sha256(
     utf8Encoder.encode(`nostr:delegation:${parameters.pubkey}:${cond}`)
   );
 
-  let sig = bytesToHex(schnorr.sign(sighash, privateKey));
+  const sig = bytesToHex(schnorr.sign(sighash, privateKey));
 
   return {
     from: getPublicKey(privateKey),
@@ -50,19 +50,19 @@ export function createDelegation(
 
 export function getDelegator(event: Event<number>): string | null {
   // find delegation tag
-  let tag = event.tags.find(
+  const tag = event.tags.find(
     (tag) => tag[0] === "delegation" && tag.length >= 4
   );
   if (!tag) return null;
 
-  let pubkey = tag[1];
-  let cond = tag[2];
-  let sig = tag[3];
+  const pubkey = tag[1];
+  const cond = tag[2];
+  const sig = tag[3];
 
   // check conditions
-  let conditions = cond.split("&");
+  const conditions = cond.split("&");
   for (let i = 0; i < conditions.length; i++) {
-    let [key, operator, value] = conditions[i].split(/\b/);
+    const [key, operator, value] = conditions[i].split(/\b/);
 
     // the supported conditions are just 'kind' and 'created_at' for now
     if (key === "kind" && operator === "=" && event.kind === parseInt(value))
@@ -83,7 +83,7 @@ export function getDelegator(event: Event<number>): string | null {
   }
 
   // check signature
-  let sighash = sha256(
+  const sighash = sha256(
     utf8Encoder.encode(`nostr:delegation:${event.pubkey}:${cond}`)
   );
   if (!schnorr.verify(sig, sighash, pubkey)) return null;

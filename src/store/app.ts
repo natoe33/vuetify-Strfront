@@ -2,12 +2,7 @@
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall } from "@/models";
-import {
-  Utils,
-  NostrProviderService,
-  db,
-  dbService,
-} from "@/utils";
+import { Utils, NostrProviderService, db, dbService } from "@/utils";
 import NDK, {
   NDKEvent,
   NDKKind,
@@ -33,6 +28,7 @@ type State = {
   nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
+  loaded: boolean;
   loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
   user: RemovableRef<NDKUser>;
@@ -43,6 +39,7 @@ type State = {
   overflow: boolean;
   openStore: boolean;
   page: RemovableRef<number>;
+  itemsPerPage: number;
   tag: string;
   tagLoading: boolean;
   loading: boolean;
@@ -64,6 +61,7 @@ export const useAppStore = defineStore({
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
+    loaded: false,
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
     user: useLocalStorage("user", new NDKUser({})),
@@ -74,6 +72,7 @@ export const useAppStore = defineStore({
     overflow: false,
     openStore: false,
     page: useLocalStorage("page", 1),
+    itemsPerPage: 40,
     tag: "",
     tagLoading: false,
     loading: false,
@@ -117,20 +116,18 @@ export const useAppStore = defineStore({
       return state.loggingIn;
     },
     getProducts: (state) => {
-      // TODO: detect browser and determine if Dexie or localstorage should be used
+      const startIndex: number = (state.page - 1) * state.itemsPerPage;
+      const endIndex: number = startIndex + state.itemsPerPage;
       console.log(`return products for page ${state.page}`);
-      return state.products.sort();
-      // return await state.db.products
-      //   .orderBy("created_at")
-      //   .offset((state.page - 1) * ITEMS_PER_PAGE)
-      //   .limit(ITEMS_PER_PAGE)
-      //   .toArray();
+      return state.products.slice(startIndex, endIndex);
     },
     getProduct: (state) => {
-      return (event_id: string) => state.products.find((p) => p.event_id === event_id);
+      return (event_id: string) =>
+        state.products.find((p) => p.event_id === event_id);
     },
     getMerchant: (state) => {
-      return (stall_id: string) => state.stalls.find((s) => s.stall_id === stall_id);
+      return (stall_id: string) =>
+        state.stalls.find((s) => s.stall_id === stall_id);
     },
     getMerchantProfile: (state) => {
       return async (pubkey: string) =>
@@ -210,13 +207,13 @@ export const useAppStore = defineStore({
     },
     clearTagandLoading() {
       this.tag = "";
-      this.page = 0;
       this.loading = false;
     },
     async initialEvents() {
       console.log("loading initial events");
-      console.log(this.nostrProvider);
-      // this.nostrProvider.createSub(NDKKind.Product, this.events);
+      this.loading = true;
+      this.products = [];
+      this.stalls = [];
       const eventSet: Set<NDKEvent> | undefined =
         await this.nostrProvider.fetchEvents(NDKKind.Product);
       console.log(eventSet);
@@ -225,7 +222,6 @@ export const useAppStore = defineStore({
       console.log(merchSet);
       if (eventSet) {
         eventSet.forEach((event) => {
-          // console.log(event);
           this.utils.parseEvent(event);
         });
       }
@@ -234,12 +230,9 @@ export const useAppStore = defineStore({
           this.utils.parseEvent(event);
         });
       }
+      this.loading = false;
       console.log("Exiting initialEvents");
     },
-    // async subEvent(filters: NDKFilter) {
-    //   // TODO: Replace with NDK implementation
-    //   this.helper.createSub(this.helper.getPool(), filters);
-    // },
     nextPage() {
       this.page++;
       this.loading = true;

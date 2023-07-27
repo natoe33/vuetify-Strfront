@@ -9,8 +9,8 @@ test("public key generation", () => {
 });
 
 test("public key from private key deterministic", () => {
-  let sk = generatePrivateKey();
-  let pk = getPublicKey(sk);
+  const sk = generatePrivateKey();
+  const pk = getPublicKey(sk);
 
   for (let i = 0; i < 5; i++) {
     expect(getPublicKey(sk)).toEqual(pk);

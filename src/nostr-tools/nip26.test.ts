@@ -87,16 +87,16 @@ test("parse bad delegations", async () => {
 });
 
 test("create and verify delegation", async () => {
-  let sk1 = generatePrivateKey();
-  let pk1 = getPublicKey(sk1);
-  let sk2 = generatePrivateKey();
-  let pk2 = getPublicKey(sk2);
-  let delegation = createDelegation(sk1, { pubkey: pk2, kind: 1 });
+  const sk1 = generatePrivateKey();
+  const pk1 = getPublicKey(sk1);
+  const sk2 = generatePrivateKey();
+  const pk2 = getPublicKey(sk2);
+  const delegation = createDelegation(sk1, { pubkey: pk2, kind: 1 });
   expect(delegation).toHaveProperty("from", pk1);
   expect(delegation).toHaveProperty("to", pk2);
   expect(delegation).toHaveProperty("cond", "kind=1");
 
-  let event = buildEvent({
+  const event = buildEvent({
     kind: 1,
     tags: [["delegation", delegation.from, delegation.cond, delegation.sig]],
     pubkey: pk2,

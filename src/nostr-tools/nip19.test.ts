@@ -11,32 +11,32 @@ import {
 } from "./nip19.ts";
 
 test("encode and decode nsec", () => {
-  let sk = generatePrivateKey();
-  let nsec = nsecEncode(sk);
+  const sk = generatePrivateKey();
+  const nsec = nsecEncode(sk);
   expect(nsec).toMatch(/nsec1\w+/);
-  let { type, data } = decode(nsec);
+  const { type, data } = decode(nsec);
   expect(type).toEqual("nsec");
   expect(data).toEqual(sk);
 });
 
 test("encode and decode npub", () => {
-  let pk = getPublicKey(generatePrivateKey());
-  let npub = npubEncode(pk);
+  const pk = getPublicKey(generatePrivateKey());
+  const npub = npubEncode(pk);
   expect(npub).toMatch(/npub1\w+/);
-  let { type, data } = decode(npub);
+  const { type, data } = decode(npub);
   expect(type).toEqual("npub");
   expect(data).toEqual(pk);
 });
 
 test("encode and decode nprofile", () => {
-  let pk = getPublicKey(generatePrivateKey());
-  let relays = [
+  const pk = getPublicKey(generatePrivateKey());
+  const relays = [
     "wss://relay.nostr.example.mydomain.example.com",
     "wss://nostr.banana.com",
   ];
-  let nprofile = nprofileEncode({ pubkey: pk, relays });
+  const nprofile = nprofileEncode({ pubkey: pk, relays });
   expect(nprofile).toMatch(/nprofile1\w+/);
-  let { type, data } = decode(nprofile);
+  const { type, data } = decode(nprofile);
   expect(type).toEqual("nprofile");
   const pointer = data as ProfilePointer;
   expect(pointer.pubkey).toEqual(pk);
@@ -60,19 +60,19 @@ test("decode nprofile without relays", () => {
 });
 
 test("encode and decode naddr", () => {
-  let pk = getPublicKey(generatePrivateKey());
-  let relays = [
+  const pk = getPublicKey(generatePrivateKey());
+  const relays = [
     "wss://relay.nostr.example.mydomain.example.com",
     "wss://nostr.banana.com",
   ];
-  let naddr = naddrEncode({
+  const naddr = naddrEncode({
     pubkey: pk,
     relays,
     kind: 30023,
     identifier: "banana",
   });
   expect(naddr).toMatch(/naddr1\w+/);
-  let { type, data } = decode(naddr);
+  const { type, data } = decode(naddr);
   expect(type).toEqual("naddr");
   const pointer = data as AddressPointer;
   expect(pointer.pubkey).toEqual(pk);
@@ -83,7 +83,7 @@ test("encode and decode naddr", () => {
 });
 
 test("decode naddr from habla.news", () => {
-  let { type, data } = decode(
+  const { type, data } = decode(
     "naddr1qq98yetxv4ex2mnrv4esygrl54h466tz4v0re4pyuavvxqptsejl0vxcmnhfl60z3rth2xkpjspsgqqqw4rsf34vl5"
   );
   expect(type).toEqual("naddr");
@@ -96,7 +96,7 @@ test("decode naddr from habla.news", () => {
 });
 
 test("decode naddr from go-nostr with different TLV ordering", () => {
-  let { type, data } = decode(
+  const { type, data } = decode(
     "naddr1qqrxyctwv9hxzq3q80cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsxpqqqp65wqfwwaehxw309aex2mrp0yhxummnw3ezuetcv9khqmr99ekhjer0d4skjm3wv4uxzmtsd3jjucm0d5q3vamnwvaz7tmwdaehgu3wvfskuctwvyhxxmmd0zfmwx"
   );
 
@@ -114,10 +114,10 @@ test("decode naddr from go-nostr with different TLV ordering", () => {
 });
 
 test("encode and decode nrelay", () => {
-  let url = "wss://relay.nostr.example";
-  let nrelay = nrelayEncode(url);
+  const url = "wss://relay.nostr.example";
+  const nrelay = nrelayEncode(url);
   expect(nrelay).toMatch(/nrelay1\w+/);
-  let { type, data } = decode(nrelay);
+  const { type, data } = decode(nrelay);
   expect(type).toEqual("nrelay");
   expect(data).toEqual(url);
 });

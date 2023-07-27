@@ -64,8 +64,8 @@ function parseProduct(data: IProductData) {
   );
   postMessage({ type: "Product", data: product });
 
-  addProductToDb(product);
-  addTagsToDb(tags);
+  // addProductToDb(product);
+  // addTagsToDb(tags);
 }
 
 function addProductToDb(product: Product) {
@@ -123,7 +123,7 @@ function parseMerchant(data: IMerchantData) {
     content.currency
   );
   postMessage({ type: "Stall", data: stall });
-  addStallToDb(stall);
+  // addStallToDb(stall);
 }
 
 function addStallToDb(stall: Stall) {

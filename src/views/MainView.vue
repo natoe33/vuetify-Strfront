@@ -2,10 +2,14 @@
 import { onMounted } from "vue";
 import { useAppStore } from "@/store";
 import ProductsList from "@/components/ProductsList.vue";
+import { storeToRefs } from "pinia";
 
 onMounted(() => {
   const appStore = useAppStore();
-  appStore.initialEvents();
+  const { loaded } = storeToRefs(appStore);
+  if (!loaded) {
+    appStore.initialEvents();
+  }
 });
 </script>
 <template>

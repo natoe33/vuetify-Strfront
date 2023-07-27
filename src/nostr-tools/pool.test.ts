@@ -4,9 +4,9 @@ import { finishEvent, type Event } from "./event.ts";
 import { generatePrivateKey, getPublicKey } from "./keys.ts";
 import { SimplePool } from "./pool.ts";
 
-let pool = new SimplePool();
+const pool = new SimplePool();
 
-let relays = [
+const relays = [
   "wss://relay.damus.io/",
   "wss://relay.nostr.bg/",
   "wss://nostr.fmt.wiz.biz/",
@@ -24,11 +24,11 @@ afterAll(() => {
 });
 
 test("removing duplicates when querying", async () => {
-  let priv = generatePrivateKey();
-  let pub = getPublicKey(priv);
+  const priv = generatePrivateKey();
+  const pub = getPublicKey(priv);
 
-  let sub = pool.sub(relays, [{ authors: [pub] }]);
-  let received: Event[] = [];
+  const sub = pool.sub(relays, [{ authors: [pub] }]);
+  const received: Event[] = [];
 
   sub.on("event", (event) => {
     // this should be called only once even though we're listening
@@ -37,7 +37,7 @@ test("removing duplicates when querying", async () => {
     received.push(event);
   });
 
-  let event = finishEvent(
+  const event = finishEvent(
     {
       created_at: Math.round(Date.now() / 1000),
       content: "test",
@@ -55,13 +55,13 @@ test("removing duplicates when querying", async () => {
 });
 
 test("same with double querying", async () => {
-  let priv = generatePrivateKey();
-  let pub = getPublicKey(priv);
+  const priv = generatePrivateKey();
+  const pub = getPublicKey(priv);
 
-  let sub1 = pool.sub(relays, [{ authors: [pub] }]);
-  let sub2 = pool.sub(relays, [{ authors: [pub] }]);
+  const sub1 = pool.sub(relays, [{ authors: [pub] }]);
+  const sub2 = pool.sub(relays, [{ authors: [pub] }]);
 
-  let received: Event[] = [];
+  const received: Event[] = [];
 
   sub1.on("event", (event) => {
     received.push(event);
@@ -71,7 +71,7 @@ test("same with double querying", async () => {
     received.push(event);
   });
 
-  let event = finishEvent(
+  const event = finishEvent(
     {
       created_at: Math.round(Date.now() / 1000),
       content: "test2",
@@ -89,7 +89,7 @@ test("same with double querying", async () => {
 });
 
 test("get()", async () => {
-  let event = await pool.get(relays, {
+  const event = await pool.get(relays, {
     ids: ["d7dd5eb3ab747e16f8d0212d53032ea2a7cadef53837e5a6c66d42849fcb9027"],
   });
 
@@ -100,7 +100,7 @@ test("get()", async () => {
 });
 
 test("list()", async () => {
-  let events = await pool.list(
+  const events = await pool.list(
     [...relays, "wss://offchain.pub", "wss://eden.nostr.land"],
     [
       {
@@ -122,7 +122,7 @@ test("list()", async () => {
       .length
   );
 
-  let relaysForAllEvents = events
+  const relaysForAllEvents = events
     .map((event) => pool.seenOn(event.id))
     .reduce((acc, n) => acc.concat(n), []);
   expect(relaysForAllEvents.length).toBeGreaterThanOrEqual(events.length);

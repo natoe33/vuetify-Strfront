@@ -9,7 +9,7 @@ import {
 } from "./event";
 import { utf8Decoder } from "./utils";
 
-var _fetch: any;
+let _fetch: any;
 
 try {
   _fetch = fetch;
@@ -24,20 +24,20 @@ export async function getZapEndpoint(
 ): Promise<null | string> {
   try {
     let lnurl: string = "";
-    let { lud06, lud16 } = JSON.parse(metadata.content);
+    const { lud06, lud16 } = JSON.parse(metadata.content);
     if (lud06) {
-      let { words } = bech32.decode(lud06, 1000);
-      let data = bech32.fromWords(words);
+      const { words } = bech32.decode(lud06, 1000);
+      const data = bech32.fromWords(words);
       lnurl = utf8Decoder.decode(data);
     } else if (lud16) {
-      let [name, domain] = lud16.split("@");
+      const [name, domain] = lud16.split("@");
       lnurl = `https://${domain}/.well-known/lnurlp/${name}`;
     } else {
       return null;
     }
 
-    let res = await _fetch(lnurl);
-    let body = await res.json();
+    const res = await _fetch(lnurl);
+    const body = await res.json();
 
     if (body.allowsNostr && body.nostrPubkey) {
       return body.callback;
@@ -65,7 +65,7 @@ export function makeZapRequest({
   if (!amount) throw new Error("amount not given");
   if (!profile) throw new Error("profile not given");
 
-  let zr: EventTemplate<Kind.ZapRequest> = {
+  const zr: EventTemplate<Kind.ZapRequest> = {
     kind: 9734,
     created_at: Math.round(Date.now() / 1000),
     content: comment,
@@ -97,16 +97,16 @@ export function validateZapRequest(zapRequestString: string): string | null {
 
   if (!verifySignature(zapRequest)) return "Invalid signature on zap request.";
 
-  let p = zapRequest.tags.find(([t, v]) => t === "p" && v);
+  const p = zapRequest.tags.find(([t, v]) => t === "p" && v);
   if (!p) return "Zap request doesn't have a 'p' tag.";
   if (!p[1].match(/^[a-f0-9]{64}$/))
     return "Zap request 'p' tag is not valid hex.";
 
-  let e = zapRequest.tags.find(([t, v]) => t === "e" && v);
+  const e = zapRequest.tags.find(([t, v]) => t === "e" && v);
   if (e && !e[1].match(/^[a-f0-9]{64}$/))
     return "Zap request 'e' tag is not valid hex.";
 
-  let relays = zapRequest.tags.find(([t, v]) => t === "relays" && v);
+  const relays = zapRequest.tags.find(([t, v]) => t === "relays" && v);
   if (!relays) return "Zap request doesn't have a 'relays' tag.";
 
   return null;
@@ -123,12 +123,12 @@ export function makeZapReceipt({
   bolt11: string;
   paidAt: Date;
 }): EventTemplate<Kind.Zap> {
-  let zr: Event<Kind.ZapRequest> = JSON.parse(zapRequest);
-  let tagsFromZapRequest = zr.tags.filter(
+  const zr: Event<Kind.ZapRequest> = JSON.parse(zapRequest);
+  const tagsFromZapRequest = zr.tags.filter(
     ([t]) => t === "e" || t === "p" || t === "a"
   );
 
-  let zap: EventTemplate<Kind.Zap> = {
+  const zap: EventTemplate<Kind.Zap> = {
     kind: 9735,
     created_at: Math.round(paidAt.getTime() / 1000),
     content: "",

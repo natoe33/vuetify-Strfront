@@ -4,6 +4,7 @@ import { NDKEvent } from "@/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import json from "./currencies.json";
+import cjson from "./countries.json";
 import MyWorker from "@/worker?worker";
 
 export class Utils {
@@ -113,5 +114,10 @@ export class Utils {
   getWorldCurrencies = async () => {
     const currencies = json;
     return currencies;
+  };
+
+  getCountries = async () => {
+    const countries = cjson;
+    return countries;
   };
 }

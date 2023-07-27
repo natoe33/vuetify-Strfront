@@ -4,14 +4,14 @@
 
 ## What's been implemented
 - [x] Load Marketplace Items
-- [x] View Items By Tag
+- [x] View Merchant's Stall Information
+- [x] Login With npub/nsec
+- [x] Nip07 Login
 
 ## What's planned
-- [ ] View Merchant's Stall Information
 - [ ] View Merchant's Other Items
-- [ ] Login With npub/nsec
+- [ ] View Items By Tag
 - [ ] Set Up a Marketplace Stall
-- [ ] Nip07 Login
 - [ ] LN Wallet Connect
 - [ ] LN Payments
 - [ ] Other Things I Can Think Of

@@ -27,10 +27,10 @@ export function matchFilter(
     }
   }
 
-  for (let f in filter) {
+  for (const f in filter) {
     if (f[0] === "#") {
-      let tagName = f.slice(1);
-      let values = filter[`#${tagName}`];
+      const tagName = f.slice(1);
+      const values = filter[`#${tagName}`];
       if (
         values &&
         !event.tags.find(
@@ -58,9 +58,9 @@ export function matchFilters(
 }
 
 export function mergeFilters(...filters: Filter<number>[]): Filter<number> {
-  let result: Filter<number> = {};
+  const result: Filter<number> = {};
   for (let i = 0; i < filters.length; i++) {
-    let filter = filters[i];
+    const filter = filters[i];
     Object.entries(filter).forEach(([property, values]) => {
       if (
         property === "kinds" ||
@@ -73,7 +73,7 @@ export function mergeFilters(...filters: Filter<number>[]): Filter<number> {
         // @ts-ignore
         for (let v = 0; v < values.length; v++) {
           // @ts-ignore
-          let value = values[v];
+          const value = values[v];
           // @ts-ignore
           if (!result[property].includes(value)) result[property].push(value);
         }

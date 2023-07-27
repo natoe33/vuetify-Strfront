@@ -1,4 +1,4 @@
-var _fetch: any;
+let _fetch: any;
 
 try {
   _fetch = fetch;
@@ -14,7 +14,7 @@ export async function validateGithub(
   proof: string
 ): Promise<boolean> {
   try {
-    let res = await (
+    const res = await (
       await _fetch(`https://gist.github.com/${username}/${proof}/raw`)
     ).text();
     return (

@@ -2,7 +2,7 @@ import { parse } from "./nip10.ts";
 
 describe("parse NIP10-referenced events", () => {
   test("legacy + a lot of events", () => {
-    let event = {
+    const event = {
       tags: [
         [
           "e",
@@ -99,7 +99,7 @@ describe("parse NIP10-referenced events", () => {
   });
 
   test("legacy + 3 events", () => {
-    let event = {
+    const event = {
       tags: [
         [
           "e",
@@ -164,7 +164,7 @@ describe("parse NIP10-referenced events", () => {
   });
 
   test("legacy + 2 events", () => {
-    let event = {
+    const event = {
       tags: [
         [
           "e",
@@ -220,7 +220,7 @@ describe("parse NIP10-referenced events", () => {
   });
 
   test("legacy + 1 event", () => {
-    let event = {
+    const event = {
       tags: [
         [
           "e",
@@ -255,7 +255,7 @@ describe("parse NIP10-referenced events", () => {
   test.todo("recommended + 2 events");
 
   test("recommended + 1 event", () => {
-    let event = {
+    const event = {
       tags: [
         [
           "p",

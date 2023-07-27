@@ -4,7 +4,7 @@ import { finishEvent } from "./event.ts";
 import { generatePrivateKey, getPublicKey } from "./keys.ts";
 import { relayInit } from "./relay.ts";
 
-let relay = relayInit("wss://relay.damus.io/");
+const relay = relayInit("wss://relay.damus.io/");
 
 beforeAll(() => {
   relay.connect();
@@ -28,10 +28,10 @@ test("connectivity", () => {
 });
 
 test("querying", async () => {
-  var resolve1: (value: boolean) => void;
-  var resolve2: (value: boolean) => void;
+  let resolve1: (value: boolean) => void;
+  let resolve2: (value: boolean) => void;
 
-  let sub = relay.sub([
+  const sub = relay.sub([
     {
       ids: ["d7dd5eb3ab747e16f8d0212d53032ea2a7cadef53837e5a6c66d42849fcb9027"],
     },
@@ -47,7 +47,7 @@ test("querying", async () => {
     resolve2(true);
   });
 
-  let [t1, t2] = await Promise.all([
+  const [t1, t2] = await Promise.all([
     new Promise<boolean>((resolve) => {
       resolve1 = resolve;
     }),
@@ -61,7 +61,7 @@ test("querying", async () => {
 });
 
 test("get()", async () => {
-  let event = await relay.get({
+  const event = await relay.get({
     ids: ["d7dd5eb3ab747e16f8d0212d53032ea2a7cadef53837e5a6c66d42849fcb9027"],
   });
 
@@ -72,7 +72,7 @@ test("get()", async () => {
 });
 
 test("list()", async () => {
-  let events = await relay.list([
+  const events = await relay.list([
     {
       authors: [
         "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
@@ -86,12 +86,12 @@ test("list()", async () => {
 });
 
 test("listening (twice) and publishing", async () => {
-  let sk = generatePrivateKey();
-  let pk = getPublicKey(sk);
-  var resolve1: (value: boolean) => void;
-  var resolve2: (value: boolean) => void;
+  const sk = generatePrivateKey();
+  const pk = getPublicKey(sk);
+  let resolve1: (value: boolean) => void;
+  let resolve2: (value: boolean) => void;
 
-  let sub = relay.sub([
+  const sub = relay.sub([
     {
       kinds: [27572],
       authors: [pk],
@@ -111,7 +111,7 @@ test("listening (twice) and publishing", async () => {
     resolve2(true);
   });
 
-  let event = finishEvent(
+  const event = finishEvent(
     {
       kind: 27572,
       created_at: Math.floor(Date.now() / 1000),

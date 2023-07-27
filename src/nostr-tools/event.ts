@@ -65,7 +65,7 @@ export function finishEvent<K extends number = Kind>(
   t: EventTemplate<K>,
   privateKey: string
 ): Event<K> {
-  let event = t as Event<K>;
+  const event = t as Event<K>;
   event.pubkey = getPublicKey(privateKey);
   event.id = getEventHash(event);
   event.sig = getSignature(event, privateKey);
@@ -87,7 +87,7 @@ export function serializeEvent(evt: UnsignedEvent<number>): string {
 }
 
 export function getEventHash(event: UnsignedEvent<number>): string {
-  let eventHash = sha256(utf8Encoder.encode(serializeEvent(event)));
+  const eventHash = sha256(utf8Encoder.encode(serializeEvent(event)));
   return bytesToHex(eventHash);
 }
 
@@ -104,7 +104,7 @@ export function validateEvent<T>(event: T): event is T & UnsignedEvent<number> {
 
   if (!Array.isArray(event.tags)) return false;
   for (let i = 0; i < event.tags.length; i++) {
-    let tag = event.tags[i];
+    const tag = event.tags[i];
     if (!Array.isArray(tag)) return false;
     for (let j = 0; j < tag.length; j++) {
       if (typeof tag[j] === "object") return false;

@@ -54,12 +54,12 @@ export function decode<Prefix extends keyof Prefixes>(
 ): DecodeValue<Prefix>;
 export function decode(nip19: string): DecodeResult;
 export function decode(nip19: string): DecodeResult {
-  let { prefix, words } = bech32.decode(nip19, Bech32MaxSize);
-  let data = new Uint8Array(bech32.fromWords(words));
+  const { prefix, words } = bech32.decode(nip19, Bech32MaxSize);
+  const data = new Uint8Array(bech32.fromWords(words));
 
   switch (prefix) {
     case "nprofile": {
-      let tlv = parseTLV(data);
+      const tlv = parseTLV(data);
       if (!tlv[0]?.[0]) throw new Error("missing TLV 0 for nprofile");
       if (tlv[0][0].length !== 32) throw new Error("TLV 0 should be 32 bytes");
 
@@ -72,7 +72,7 @@ export function decode(nip19: string): DecodeResult {
       };
     }
     case "nevent": {
-      let tlv = parseTLV(data);
+      const tlv = parseTLV(data);
       if (!tlv[0]?.[0]) throw new Error("missing TLV 0 for nevent");
       if (tlv[0][0].length !== 32) throw new Error("TLV 0 should be 32 bytes");
       if (tlv[2] && tlv[2][0].length !== 32)
@@ -89,7 +89,7 @@ export function decode(nip19: string): DecodeResult {
     }
 
     case "naddr": {
-      let tlv = parseTLV(data);
+      const tlv = parseTLV(data);
       if (!tlv[0]?.[0]) throw new Error("missing TLV 0 for naddr");
       if (!tlv[2]?.[0]) throw new Error("missing TLV 2 for naddr");
       if (tlv[2][0].length !== 32) throw new Error("TLV 2 should be 32 bytes");
@@ -108,7 +108,7 @@ export function decode(nip19: string): DecodeResult {
     }
 
     case "nrelay": {
-      let tlv = parseTLV(data);
+      const tlv = parseTLV(data);
       if (!tlv[0]?.[0]) throw new Error("missing TLV 0 for nrelay");
 
       return {
@@ -130,13 +130,13 @@ export function decode(nip19: string): DecodeResult {
 type TLV = { [t: number]: Uint8Array[] };
 
 function parseTLV(data: Uint8Array): TLV {
-  let result: TLV = {};
+  const result: TLV = {};
   let rest = data;
   while (rest.length > 0) {
-    let t = rest[0];
-    let l = rest[1];
+    const t = rest[0];
+    const l = rest[1];
     if (!l) throw new Error(`malformed TLV ${t}`);
-    let v = rest.slice(2, 2 + l);
+    const v = rest.slice(2, 2 + l);
     rest = rest.slice(2 + l);
     if (v.length < l) throw new Error(`not enough data to read on TLV ${t}`);
     result[t] = result[t] || [];
@@ -161,7 +161,7 @@ function encodeBech32<Prefix extends string>(
   prefix: Prefix,
   data: Uint8Array
 ): `${Prefix}1${string}` {
-  let words = bech32.toWords(data);
+  const words = bech32.toWords(data);
   return bech32.encode(prefix, words, Bech32MaxSize) as `${Prefix}1${string}`;
 }
 
@@ -169,12 +169,12 @@ function encodeBytes<Prefix extends string>(
   prefix: Prefix,
   hex: string
 ): `${Prefix}1${string}` {
-  let data = hexToBytes(hex);
+  const data = hexToBytes(hex);
   return encodeBech32(prefix, data);
 }
 
 export function nprofileEncode(profile: ProfilePointer): `nprofile1${string}` {
-  let data = encodeTLV({
+  const data = encodeTLV({
     0: [hexToBytes(profile.pubkey)],
     1: (profile.relays || []).map((url) => utf8Encoder.encode(url)),
   });
@@ -182,7 +182,7 @@ export function nprofileEncode(profile: ProfilePointer): `nprofile1${string}` {
 }
 
 export function neventEncode(event: EventPointer): `nevent1${string}` {
-  let data = encodeTLV({
+  const data = encodeTLV({
     0: [hexToBytes(event.id)],
     1: (event.relays || []).map((url) => utf8Encoder.encode(url)),
     2: event.author ? [hexToBytes(event.author)] : [],
@@ -191,10 +191,10 @@ export function neventEncode(event: EventPointer): `nevent1${string}` {
 }
 
 export function naddrEncode(addr: AddressPointer): `naddr1${string}` {
-  let kind = new ArrayBuffer(4);
+  const kind = new ArrayBuffer(4);
   new DataView(kind).setUint32(0, addr.kind, false);
 
-  let data = encodeTLV({
+  const data = encodeTLV({
     0: [utf8Encoder.encode(addr.identifier)],
     1: (addr.relays || []).map((url) => utf8Encoder.encode(url)),
     2: [hexToBytes(addr.pubkey)],
@@ -204,18 +204,18 @@ export function naddrEncode(addr: AddressPointer): `naddr1${string}` {
 }
 
 export function nrelayEncode(url: string): `nrelay1${string}` {
-  let data = encodeTLV({
+  const data = encodeTLV({
     0: [utf8Encoder.encode(url)],
   });
   return encodeBech32("nrelay", data);
 }
 
 function encodeTLV(tlv: TLV): Uint8Array {
-  let entries: Uint8Array[] = [];
+  const entries: Uint8Array[] = [];
 
   Object.entries(tlv).forEach(([t, vs]) => {
     vs.forEach((v) => {
-      let entry = new Uint8Array(v.length + 2);
+      const entry = new Uint8Array(v.length + 2);
       entry.set([parseInt(t)], 0);
       entry.set([v.length], 1);
       entry.set(v, 2);
