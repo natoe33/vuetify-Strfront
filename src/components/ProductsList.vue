@@ -27,7 +27,7 @@ const {
   nostrProvider
 } = storeToRefs(appStore);
 // const { productsLoading } = storeToRefs(nostrStore);
-const events = ref(new Map());
+const events = ref([] as Product[]);
 const pages = ref(0);
 
 const eventList = computed(() => products.value);
@@ -36,7 +36,7 @@ async function loadProducts() {
   console.log("ProductList loading products");
   events.value = appStore.getProducts;
   pages.value = await appStore.getNumOfPages;
-  console.log(`Product list: ${events.value.size} loaded`);
+  console.log(`Product list: ${events.value.length} loaded`);
   loading.value = false;
   // if (!productsLoading.value) {
   //   appStore.initialEvents();
@@ -100,10 +100,10 @@ onMounted(() => {
       class="d-flex flex-wrap align-content-center mx-auto pa-2"
       rounded="lg"
     >
-      <template v-for="event of eventList" :key="event[0]">
+      <template v-for="event of eventList" :key="event.event_id">
         <ProductCard
-          :product="(event[1] as Product)"
-          @click="loadProduct(event[1])"
+          :product="(event as Product)"
+          @click="loadProduct(event)"
         />
       </template>
     </v-sheet>

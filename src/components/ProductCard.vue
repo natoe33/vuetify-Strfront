@@ -12,7 +12,7 @@ const props = defineProps({
 
 <template>
   <v-card class="mx-auto my-1" width="175" height="250" variant="tonal">
-    <template v-if="props.product.images[0]">
+    <template v-if="props.product.images">
       <v-img
         :src="props.product?.images[0]"
         height="150px"

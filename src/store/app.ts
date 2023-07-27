@@ -5,7 +5,6 @@ import { Product, Relay, Stall } from "@/models";
 import {
   Utils,
   NostrProviderService,
-  RelayHelper,
   db,
   dbService,
 } from "@/utils";
@@ -49,16 +48,12 @@ type State = {
   loading: boolean;
   productsLoading: boolean;
   newProduct: boolean;
-  // events: NDKSubscription;
   relayList: RemovableRef<Relay[]>;
   relayUrls: string[];
-  products: RemovableRef<Map<string, Product>>;
-  stalls: RemovableRef<Map<string, Stall>>;
+  products: RemovableRef<Product[]>;
+  stalls: RemovableRef<Stall[]>;
   store: NDKEvent;
-  // products: RemovableRef<Product[]>;
-  // productTags: RemovableRef<ProductTags[]>;
   events: RemovableRef<Map<string, NDKEvent>>;
-  // tags: RemovableRef<string[]>;
 };
 
 export const useAppStore = defineStore({
@@ -86,8 +81,8 @@ export const useAppStore = defineStore({
     newProduct: false,
     relayList: useLocalStorage("relayList", [] as Relay[]),
     relayUrls: relayUrls,
-    products: useLocalStorage("products", new Map()),
-    stalls: useLocalStorage("stalls", new Map()),
+    products: useLocalStorage("products", [] as Product[]),
+    stalls: useLocalStorage("stalls", [] as Stall[]),
     store: new NDKEvent(),
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
@@ -124,7 +119,7 @@ export const useAppStore = defineStore({
     getProducts: (state) => {
       // TODO: detect browser and determine if Dexie or localstorage should be used
       console.log(`return products for page ${state.page}`);
-      return state.products;
+      return state.products.sort();
       // return await state.db.products
       //   .orderBy("created_at")
       //   .offset((state.page - 1) * ITEMS_PER_PAGE)
@@ -132,21 +127,10 @@ export const useAppStore = defineStore({
       //   .toArray();
     },
     getProduct: (state) => {
-      return (id: string) => state.products.get(id);
-      // await state.db.products
-      //   .where("event_id")
-      //   .equalsIgnoreCase(id)
-      //   .toArray();
-      // return (id: string) =>
-      //   state.products.find((product) => product.event_id === id);
+      return (event_id: string) => state.products.find((p) => p.event_id === event_id);
     },
     getMerchant: (state) => {
-      return (stall_id: string) => state.stalls.get(stall_id);
-      // await state.db.merchants
-      //   .where("stall_id")
-      //   .equalsIgnoreCase(stall_id)
-      //   .limit(1)
-      //   .toArray();
+      return (stall_id: string) => state.stalls.find((s) => s.stall_id === stall_id);
     },
     getMerchantProfile: (state) => {
       return async (pubkey: string) =>
@@ -159,7 +143,7 @@ export const useAppStore = defineStore({
     },
     getNumOfPages: (state) => {
       // const numItems = await state.db.products.count();
-      const numItems = state.products.size;
+      const numItems = state.products.length;
       console.log(
         `${numItems} stored for ${Math.ceil(numItems / ITEMS_PER_PAGE)} pages`
       );

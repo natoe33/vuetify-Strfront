@@ -63,13 +63,13 @@ export class NostrProviderService {
     // // this.nostrStore = useNostrStore();
     // console.log(getNpub);
 
-    if (this.npub || this.npub === "") {
+    if (!npub || npub.value === "") {
       console.log("unauth session");
       this.startWithUnauthSession();
     } else {
       console.log("auth session");
       console.log(npub.value);
-      if (getNpub && getNpub !== "") {
+      if (npub && npub.value !== "") {
         if (getPrivKey && getPrivKey !== "") {
           console.log("privkey session");
           this.isNip07 = false;
@@ -321,7 +321,7 @@ export class NostrProviderService {
     if (relayUrls && relayUrls.length > 0) {
       const newNDKParams: NDKConstructorParams = {
         signer: this.signer,
-        explicitRelayUrls: explicitUrls,
+        explicitRelayUrls: relayUrls,
         debug: this.debug,
       };
       const newNDK: NDK = new NDK(newNDKParams);
