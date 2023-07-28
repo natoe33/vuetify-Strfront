@@ -35,10 +35,8 @@ const eventList = computed(() => products.value);
 const showEvents = computed(() => events.value);
 
 async function loadProducts() {
-  console.log("ProductList loading products");
   events.value = appStore.getProducts;
   pages.value = appStore.getNumOfPages;
-  console.log(`Product list: ${events.value.length} loaded`);
 }
 
 async function loadProduct(event: Product) {
@@ -56,7 +54,6 @@ async function loadProductsWithTags() {
 }
 
 function itemClicked(event: number) {
-  console.log(`pagination item clicked - ${event}`);
   page.value = event;
 }
 
@@ -76,8 +73,6 @@ watch(page, () => {
 });
 
 onMounted(() => {
-  console.log(`ProductsList mounted. Page: ${page.value}`);
-  // appStore.initialEvents();
   loadProducts();
 });
 </script>
@@ -97,6 +92,7 @@ onMounted(() => {
     </v-sheet>
     <v-pagination
       theme="dark"
+      v-model="page"
       :length="pages"
       @update:model-value="itemClicked"
     ></v-pagination>

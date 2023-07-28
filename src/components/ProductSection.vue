@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Product } from "@/models";
+import { PropType } from "vue";
 
 const props = defineProps({
   product: {
-    type: Product,
+    type: Object as PropType<Product>,
   },
 });
 </script>

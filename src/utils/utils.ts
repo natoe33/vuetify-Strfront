@@ -1,4 +1,4 @@
-import { Product, Stall, type IContent, type IMerchContent } from "@/models";
+import { Product, Stall, type IContent, type IMerchContent, Shipping } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { NDKEvent } from "@/ndk";
 import { storeToRefs } from "pinia";
@@ -23,22 +23,12 @@ interface IMerchantData {
   tags: string[][];
 }
 export class Utils {
-  worker: Worker;
 
   /**
    *
    */
   constructor() {
-    this.worker = new MyWorker();
 
-    this.worker.onmessage = (ev) => {
-      if (ev.data.type === "Product") {
-        this.addProduct(ev.data.data);
-      } else if (ev.data.type === "Stall") {
-        console.log(`Stall: ${ev.data.data}`);
-        this.addStall(ev.data.data);
-      }
-    };
   }
 
   parseEvent = (event: NDKEvent) => {
@@ -127,6 +117,18 @@ export class Utils {
       tags.push(t[1]);
     });
     const content: IMerchContent = JSON.parse(merchData.content);
+    console.log(content.shipping);
+    const ship: Shipping[] = [];
+    content.shipping.forEach((s) => {
+      const shipping: Shipping = {
+        id: s.id,
+        name: s.name,
+        currency: s.currency,
+        cost: s.cost,
+        countries: s.countries
+      }
+      ship.push(shipping);
+    })
     const stall: Stall = new Stall(
       content.id,
       merchData.id,
@@ -134,7 +136,8 @@ export class Utils {
       merchData.created_at,
       content.name,
       content.description,
-      content.currency
+      content.currency,
+      ship
     );
     this.addStall(stall);
   };

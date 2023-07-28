@@ -28,7 +28,7 @@ type State = {
   nostrProvider: NostrProviderService;
   utils: Utils;
   db: dbService;
-  loaded: boolean;
+  loaded: RemovableRef<boolean>;
   loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
   user: RemovableRef<NDKUser>;
@@ -61,7 +61,7 @@ export const useAppStore = defineStore({
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
-    loaded: false,
+    loaded: useLocalStorage('loaded', false),
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
     user: useLocalStorage("user", new NDKUser({})),
@@ -231,6 +231,7 @@ export const useAppStore = defineStore({
         });
       }
       this.loading = false;
+      this.loaded = true;
       console.log("Exiting initialEvents");
     },
     nextPage() {

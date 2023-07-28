@@ -4,7 +4,7 @@ import { type PropType, onMounted } from "vue";
 
 const props = defineProps({
   merchant: {
-    type: Stall,
+    type: Object as PropType<Stall>,
   },
   profile: {
     type: Object as PropType<IProfile>,
@@ -62,6 +62,15 @@ onMounted(() => {
             >
           </template>
         </v-card-actions>
+        <v-spacer></v-spacer>
+        <v-card-subtitle>Ships to</v-card-subtitle>
+        <v-card-item>
+          <v-chip-group>
+            <template v-for="(item, i) in props.merchant?.shipping" :key="i">
+              <v-chip v-for="(country, i) in item.countries" :key="i">{{ country }}</v-chip>
+            </template>
+          </v-chip-group>
+        </v-card-item>
       </div>
     </v-card>
   </v-sheet>

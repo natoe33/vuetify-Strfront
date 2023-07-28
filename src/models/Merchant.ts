@@ -8,7 +8,6 @@ export interface IShipping {
 
 export class Shipping implements IShipping {
   id: string;
-  stall_id: string;
   name: string;
   currency: string;
   cost: number;
@@ -26,7 +25,6 @@ export class Shipping implements IShipping {
     countries: string[]
   ) {
     this.id = id;
-    this.stall_id = stall_id;
     this.name = name;
     this.currency = currency;
     this.cost = cost;
@@ -42,6 +40,7 @@ export interface IStall {
   name: string;
   description: string;
   currency: string;
+  shipping: Shipping[];
 }
 
 export class Stall implements IStall {
@@ -52,6 +51,7 @@ export class Stall implements IStall {
   name: string;
   description: string;
   currency: string;
+  shipping: Shipping[];
 
   /**
    *
@@ -63,7 +63,8 @@ export class Stall implements IStall {
     created_at: number,
     name: string,
     description: string,
-    currency: string
+    currency: string,
+    shipping: Shipping[]
   ) {
     this.stall_id = stall_id;
     this.event_id = event_id;
@@ -72,6 +73,7 @@ export class Stall implements IStall {
     this.name = name;
     this.description = description;
     this.currency = currency;
+    this.shipping = shipping;
   }
 }
 
