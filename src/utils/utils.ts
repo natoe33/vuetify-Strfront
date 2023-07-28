@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import json from "./currencies.json";
 import cjson from "./countries.json";
-import MyWorker from "@/worker?worker";
+// import MyWorker from "@/worker?worker";
 
 interface IProductData {
   id: string;
