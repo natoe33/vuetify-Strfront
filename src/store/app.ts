@@ -11,7 +11,7 @@ import NDK, {
   NDKUser,
   type NDKUserProfile,
 } from "@/ndk";
-import { type Filter } from "@/nostr-tools";
+import { nip19 } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
 
@@ -61,7 +61,7 @@ export const useAppStore = defineStore({
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
     db: db,
-    loaded: useLocalStorage('loaded', false),
+    loaded: useLocalStorage("loaded", false),
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
     user: useLocalStorage("user", new NDKUser({})),
@@ -99,7 +99,8 @@ export const useAppStore = defineStore({
       return state.privkey;
     },
     getPubKey: (state) => {
-      return state.user.hexpubkey();
+      const { type, data } = nip19.decode(state.npub);
+      return data.toString();
     },
     getNpub: (state) => {
       return state.npub;
@@ -134,9 +135,15 @@ export const useAppStore = defineStore({
         await state.nostrProvider.fetchProfileEvent(pubkey);
     },
     getUserMerchantEvent: async (state) => {
-      const userPubKey = state.user.hexpubkey();
-      console.log(`Fetching stall for ${userPubKey}`);
-      return await state.nostrProvider.fetchMerchantEvents([userPubKey]);
+      const { type, data } = nip19.decode(state.npub);
+      console.log(type);
+      console.log(data);
+      if (type === "npub") {
+        const userPubKey = data;
+        console.log(`Fetching stall for ${userPubKey}`);
+        console.log(state.nostrProvider.ndk?.pool.relays);
+        return await state.nostrProvider.fetchSingleMerchantEvent(data.toString());
+      }
     },
     getNumOfPages: (state) => {
       // const numItems = await state.db.products.count();

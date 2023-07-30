@@ -44,11 +44,16 @@ async function setProductObjects() {
     merchant.value = getMerchant.value(product.value.stall_id);
     console.log(merchant.value?.shipping);
   }
-  
-  const merchKey: string = merchant.value && merchant.value.pubkey ? merchant.value.pubkey : product.value && product.value.pubkey ? product.value.pubkey : ''
+
+  const merchKey: string =
+    merchant.value && merchant.value.pubkey
+      ? merchant.value.pubkey
+      : product.value && product.value.pubkey
+      ? product.value.pubkey
+      : "";
   const tempProfile = await getMerchantProfile.value(merchKey);
-  if(tempProfile && tempProfile.size > 0){
-    const tmp: NDKEvent = tempProfile.values().next().value
+  if (tempProfile && tempProfile.size > 0) {
+    const tmp: NDKEvent = tempProfile.values().next().value;
     profile.value = parseProfile(tmp.content);
   }
 }

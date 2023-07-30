@@ -16,10 +16,11 @@ import NDK, {
   NDKPrivateKeySigner,
   NDKKind,
 } from "@/ndk";
-import { Product, type IContent, Relay } from "@/models";
+import { nip19 } from "@/nostr-tools";
+import { Relay, newStall } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
 import { useAppStore } from "@/store";
-import { BehaviorSubject, retry } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 const explicitUrls: string[] = [
   "wss://relay.damus.io",
@@ -304,6 +305,7 @@ export class NostrProviderService {
     // const { user, loggedIn, loggingIn, npub } = storeToRefs(this.appStore);
     const appStore = useAppStore();
     const { setLoggedIn, setLoggingIn, setUser, setNpub } = appStore;
+    const {relay} = storeToRefs(appStore);
     // const nostrStore = useNostrStore();
     // const { setNpub, setUser } = nostrStore;
     // setNpub(pubkey);
@@ -331,6 +333,7 @@ export class NostrProviderService {
       try {
         await newNDK.connect(1000).catch((e) => console.log(e));
         this.ndk = newNDK;
+        relay.value = newNDK;
       } catch (e) {
         console.log(`Error connecting NDK: ${e}`);
       }
@@ -350,6 +353,8 @@ export class NostrProviderService {
   }
 
   async createNewUserOnNostr(displayName: string) {
+    const appStore = useAppStore();
+    const { relay } = storeToRefs(appStore);
     if (this.canWriteToNostr) {
       //create a relay follow list event and send it across
       const relayEvent: NDKEvent = new NDKEvent(this.ndk);
@@ -428,6 +433,30 @@ export class NostrProviderService {
   //   if (productEvent) return parseProduct(productEvent);
   // }
 
+  async createStall(stall: newStall): Promise<NDKEvent>{
+    const appStore = useAppStore();
+    const { npub, user, relay } = storeToRefs(appStore);
+    const {type, data} = nip19.decode(npub.value);
+    console.log(type);
+    console.log(data);
+    console.log(relay.value);
+    const ndkEvent = new NDKEvent(this.ndk);
+    const tags: NDKTag[] = [];
+    tags.push(['d', stall.id]);
+    ndkEvent.kind = 30017;
+    ndkEvent.content = JSON.stringify(stall);
+    ndkEvent.tags = tags;
+    ndkEvent.pubkey = data.toString();
+    console.log(ndkEvent);
+    await ndkEvent.publish();
+    return ndkEvent;
+  }
+
+  async fetchSingleMerchantEvent(pubkey: string): Promise<NDKEvent | null | undefined>{
+    const filter: NDKFilter = { authors: [pubkey], kinds: [30017]}
+    return await this.ndk?.fetchEvent(filter, {});
+  }
+
   async createSub(kind: number, events: Map<string, NDKEvent>) {
     // const appStore = useAppStore();
     // const { events } = storeToRefs(appStore);
@@ -481,6 +510,7 @@ export class NostrProviderService {
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30017], authors: authors };
     const stallEvents = await this.ndk?.fetchEvents(filter, {});
+    console.log(stallEvents?.values());
     return stallEvents;
   }
 

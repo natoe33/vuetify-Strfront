@@ -67,7 +67,9 @@ onMounted(() => {
         <v-card-item>
           <v-chip-group>
             <template v-for="(item, i) in props.merchant?.shipping" :key="i">
-              <v-chip v-for="(country, i) in item.countries" :key="i">{{ country }}</v-chip>
+              <v-chip v-for="(country, i) in item.countries" :key="i">{{
+                country
+              }}</v-chip>
             </template>
           </v-chip-group>
         </v-card-item>

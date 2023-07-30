@@ -32,6 +32,21 @@ export class Shipping implements IShipping {
   }
 }
 
+export interface newShipping {
+  id: string;
+  name: string;
+  cost: number;
+  country: string[];
+}
+
+export interface newStall {
+  id: string;
+  name: string;
+  description: string;
+  currency: string;
+  shipping: newShipping[];
+}
+
 export interface IStall {
   stall_id: string;
   event_id: string;

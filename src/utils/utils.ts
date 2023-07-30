@@ -1,4 +1,10 @@
-import { Product, Stall, type IContent, type IMerchContent, Shipping } from "@/models";
+import {
+  Product,
+  Stall,
+  type IContent,
+  type IMerchContent,
+  Shipping,
+} from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { NDKEvent } from "@/ndk";
 import { storeToRefs } from "pinia";
@@ -23,13 +29,10 @@ interface IMerchantData {
   tags: string[][];
 }
 export class Utils {
-
   /**
    *
    */
-  constructor() {
-
-  }
+  constructor() {}
 
   parseEvent = (event: NDKEvent) => {
     if (event.kind === 30018) {
@@ -117,18 +120,20 @@ export class Utils {
       tags.push(t[1]);
     });
     const content: IMerchContent = JSON.parse(merchData.content);
-    console.log(content.shipping);
+    // console.log(content.shipping);
     const ship: Shipping[] = [];
-    content.shipping.forEach((s) => {
-      const shipping: Shipping = {
-        id: s.id,
-        name: s.name,
-        currency: s.currency,
-        cost: s.cost,
-        countries: s.countries
-      }
-      ship.push(shipping);
-    })
+    if (content.shipping) {
+      content.shipping.forEach((s) => {
+        const shipping: Shipping = {
+          id: s.id,
+          name: s.name,
+          currency: s.currency,
+          cost: s.cost,
+          countries: s.countries,
+        };
+        ship.push(shipping);
+      });
+    }
     const stall: Stall = new Stall(
       content.id,
       merchData.id,
