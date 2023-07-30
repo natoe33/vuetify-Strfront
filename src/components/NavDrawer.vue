@@ -33,6 +33,7 @@ function goToProfile() {
 }
 
 watch(user, (newval) => {
+  // TODO: Update ndk here instead of MainView
   if (newval.profile?.image) image.value = newval.profile?.image;
   if (newval.npub) lnpub.value = newval.npub;
 });
