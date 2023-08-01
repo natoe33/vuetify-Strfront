@@ -14,11 +14,11 @@ import { createVuetify, ThemeDefinition } from "vuetify";
 const lightTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    primary: "#1867c0",
-    secondary: "#5CBBF6",
-    tertiary: "#E57373",
-    accent: "#005CAF",
-    quarternary: "#B0D1E8",
+    primary: "#9163cb",
+    secondary: "#c19ee0",
+    tertiary: "#dec9e9",
+    accent: "#e7c6ff",
+    quarternary: "#e7d8f7",
   },
 };
 

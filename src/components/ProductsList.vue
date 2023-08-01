@@ -15,12 +15,7 @@ const appStore = useAppStore();
 
 const router = useRouter();
 
-const {
-  itemsPerPage,
-  loading,
-  page,
-  products,
-} = storeToRefs(appStore);
+const { itemsPerPage, loading, page, products } = storeToRefs(appStore);
 
 const events = ref([] as Product[]);
 const pages = ref(0);
@@ -69,7 +64,7 @@ watch(page, () => {
 
 watch(loading, (newval) => {
   showLoading.value = newval;
-})
+});
 
 onMounted(() => {
   loadProducts();

@@ -31,9 +31,7 @@ onMounted(async () => {
     if (storeList && storeList.size > 0) {
       storeList.forEach((store) => {
         const newStore: IEvent = store;
-        stores.value.push(
-          new Event(newStore)
-        );
+        stores.value.push(new Event(newStore));
       });
       console.log(stores.value);
       // store.value = storeList;
@@ -60,7 +58,9 @@ onMounted(async () => {
         </v-container>
       </template>
       <v-card-actions>
-        <v-btn color="primary" elevation="4" @click="showOpenStore">Open Store</v-btn>
+        <v-btn color="primary" elevation="4" @click="showOpenStore"
+          >Open Store</v-btn
+        >
       </v-card-actions>
     </v-card>
     <v-divider inset></v-divider>

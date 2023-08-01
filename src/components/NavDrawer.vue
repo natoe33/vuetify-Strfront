@@ -40,10 +40,10 @@ function goToProfile() {
 }
 
 watch(npub, (newval) => {
-  if (newval !== ''){
+  if (newval !== "") {
     nostrProvider.value = new NostrProviderService();
   }
-})
+});
 
 watch(user, (newval) => {
   // TODO: Update ndk here instead of MainView
@@ -80,7 +80,7 @@ const items = await getSortedTags;
           </v-avatar>
         </template>
       </v-list-item>
-      <template v-if="getLoggedIn">
+      <template v-if="loggedIn">
         <v-list-item title="Sign Out" @click="Logout">
           <template v-slot:prepend>
             <v-icon icon="mdi-location-exit"></v-icon>

@@ -3,11 +3,7 @@ import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
-import NDK, {
-  NDKEvent,
-  NDKKind,
-  NDKUser
-} from "@/ndk";
+import NDK, { NDKEvent, NDKKind, NDKUser } from "@/ndk";
 import { nip19 } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
@@ -35,6 +31,7 @@ type State = {
   drawer: boolean;
   overflow: boolean;
   openStore: boolean;
+  editStore: boolean;
   page: RemovableRef<number>;
   itemsPerPage: number;
   tag: string;
@@ -68,6 +65,7 @@ export const useAppStore = defineStore({
     drawer: false,
     overflow: false,
     openStore: false,
+    editStore: false,
     page: useLocalStorage("page", 1),
     itemsPerPage: 40,
     tag: "",
@@ -144,11 +142,13 @@ export const useAppStore = defineStore({
       }
     },
     getUserProductEvents: async (state) => {
-      const { type, data} = nip19.decode(state.npub);
-      if (type === 'npub') {
+      const { type, data } = nip19.decode(state.npub);
+      if (type === "npub") {
         const userPubKey = data;
         console.log(`Fetching products for ${userPubKey}`);
-        return await state.nostrProvider.fetchMerchantProducts([data.toString()]);
+        return await state.nostrProvider.fetchMerchantProducts([
+          data.toString(),
+        ]);
       }
     },
     getNumOfPages: (state) => {

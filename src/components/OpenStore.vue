@@ -119,6 +119,7 @@ watch(zones.value, (newval) => {
             ></v-checkbox>
           </v-row>
           <template v-for="(zone, index) in zones" :key="index">
+            <v-sheet class="mt-4" elevation="12">
             <v-row>
               <template v-if="!agsi">
                 <v-col cols="12" sm="6">
@@ -159,6 +160,7 @@ watch(zones.value, (newval) => {
                 ></v-text-field>
               </v-col>
             </v-row>
+          </v-sheet>
           </template>
           <v-row>
             <v-btn density="compact" icon="mdi-plus" @click="addZone"></v-btn>

@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, defineAsyncComponent } from "vue";
 import { newStall, newShipping, Event } from "@/models";
-const EditStore = defineAsyncComponent(() => import('@/components/EditStore.vue'))
+import { useAppStore } from "@/store";
+import { storeToRefs } from "pinia";
+const EditStore = defineAsyncComponent(
+  () => import("@/components/EditStore.vue")
+);
+
+const appStore = useAppStore();
+const { store, editStore } = storeToRefs(appStore);
 
 const props = defineProps({
   storeEvent: {
@@ -9,6 +16,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+function openEditStore() {
+  store.value = props.storeEvent;
+  editStore.value = !editStore.value;
+}
 
 const storeProfile = ref({
   id: "",
@@ -49,7 +61,13 @@ onMounted(() => {
       </v-row>
     </v-card-item>
     <v-card-actions>
-      <v-btn variant="tonal" color="primary" elevation="4">Edit</v-btn>
+      <v-btn
+        variant="tonal"
+        color="primary"
+        elevation="4"
+        @click="openEditStore"
+        >Edit</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
