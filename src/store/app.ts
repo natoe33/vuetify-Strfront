@@ -1,15 +1,12 @@
 // Utilities
 import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
-import { Product, Relay, Stall } from "@/models";
+import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
 import NDK, {
   NDKEvent,
   NDKKind,
-  NDKFilter,
-  NDKSubscription,
-  NDKUser,
-  type NDKUserProfile,
+  NDKUser
 } from "@/ndk";
 import { nip19 } from "@/nostr-tools";
 
@@ -49,7 +46,7 @@ type State = {
   relayUrls: string[];
   products: RemovableRef<Product[]>;
   stalls: RemovableRef<Stall[]>;
-  store: NDKEvent;
+  store: Event;
   events: RemovableRef<Map<string, NDKEvent>>;
 };
 
@@ -82,7 +79,7 @@ export const useAppStore = defineStore({
     relayUrls: relayUrls,
     products: useLocalStorage("products", [] as Product[]),
     stalls: useLocalStorage("stalls", [] as Stall[]),
-    store: new NDKEvent(),
+    store: new Event(),
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
     events: useLocalStorage("events", new Map()),
@@ -134,15 +131,24 @@ export const useAppStore = defineStore({
       return async (pubkey: string) =>
         await state.nostrProvider.fetchProfileEvent(pubkey);
     },
-    getUserMerchantEvent: async (state) => {
+    getUserMerchantEvents: async (state) => {
       const { type, data } = nip19.decode(state.npub);
       console.log(type);
       console.log(data);
       if (type === "npub") {
         const userPubKey = data;
         console.log(`Fetching stall for ${userPubKey}`);
-        console.log(state.nostrProvider.ndk?.pool.relays);
-        return await state.nostrProvider.fetchSingleMerchantEvent(data.toString());
+        // console.log(state.nostrProvider.ndk?.pool.relays);
+        //return await state.nostrProvider.fetchSingleMerchantEvent(data.toString());
+        return await state.nostrProvider.fetchMerchantEvents([data.toString()]);
+      }
+    },
+    getUserProductEvents: async (state) => {
+      const { type, data} = nip19.decode(state.npub);
+      if (type === 'npub') {
+        const userPubKey = data;
+        console.log(`Fetching products for ${userPubKey}`);
+        return await state.nostrProvider.fetchMerchantProducts([data.toString()]);
       }
     },
     getNumOfPages: (state) => {

@@ -305,7 +305,7 @@ export class NostrProviderService {
     // const { user, loggedIn, loggingIn, npub } = storeToRefs(this.appStore);
     const appStore = useAppStore();
     const { setLoggedIn, setLoggingIn, setUser, setNpub } = appStore;
-    const {relay} = storeToRefs(appStore);
+    const { relay } = storeToRefs(appStore);
     // const nostrStore = useNostrStore();
     // const { setNpub, setUser } = nostrStore;
     // setNpub(pubkey);
@@ -433,16 +433,17 @@ export class NostrProviderService {
   //   if (productEvent) return parseProduct(productEvent);
   // }
 
-  async createStall(stall: newStall): Promise<NDKEvent>{
+  async createStall(stall: newStall): Promise<NDKEvent> {
     const appStore = useAppStore();
     const { npub, user, relay } = storeToRefs(appStore);
-    const {type, data} = nip19.decode(npub.value);
+    const { type, data } = nip19.decode(npub.value);
     console.log(type);
     console.log(data);
     console.log(relay.value);
+    console.log(this.ndk);
     const ndkEvent = new NDKEvent(this.ndk);
     const tags: NDKTag[] = [];
-    tags.push(['d', stall.id]);
+    tags.push(["d", stall.id]);
     ndkEvent.kind = 30017;
     ndkEvent.content = JSON.stringify(stall);
     ndkEvent.tags = tags;
@@ -452,8 +453,10 @@ export class NostrProviderService {
     return ndkEvent;
   }
 
-  async fetchSingleMerchantEvent(pubkey: string): Promise<NDKEvent | null | undefined>{
-    const filter: NDKFilter = { authors: [pubkey], kinds: [30017]}
+  async fetchSingleMerchantEvent(
+    pubkey: string
+  ): Promise<NDKEvent | null | undefined> {
+    const filter: NDKFilter = { authors: [pubkey], kinds: [30017] };
     return await this.ndk?.fetchEvent(filter, {});
   }
 
@@ -505,12 +508,21 @@ export class NostrProviderService {
     return productEvents;
   }
 
+  async fetchMerchantProducts(
+    authors: string[]
+  ): Promise<Set<NDKEvent> | undefined> {
+    const filter: NDKFilter = { kinds: [30018], authors: authors };
+    const prodEvents = await this.ndk?.fetchEvents(filter, {});
+    console.log(prodEvents?.values());
+    return prodEvents;
+  }
+
   async fetchMerchantEvents(
     authors: string[]
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30017], authors: authors };
     const stallEvents = await this.ndk?.fetchEvents(filter, {});
-    console.log(stallEvents?.values());
+    // console.log(stallEvents?.values());
     return stallEvents;
   }
 

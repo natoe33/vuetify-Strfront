@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { NDKUser } from "@/ndk";
 import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
-import { NDKUser } from "@/ndk";
-import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { NostrProviderService } from "@/utils";
+
 const appStore = useAppStore();
-// const nostrStore = useNostrStore();
-const { getSortedTags, setTagandLoading } = appStore;
-const { drawer, loggingIn, loggedIn, user } = storeToRefs(appStore);
-// const { getNpub, setNpub, getUser, setUser } = nostrStore;
-// const { npub, user } = storeToRefs(nostrStore);
+const { getSortedTags, setTagandLoading, setLoggedIn, getLoggedIn, setUser } =
+  appStore;
+const { drawer, loggingIn, loggedIn, user, nostrProvider, npub } =
+  storeToRefs(appStore);
 
 const router = useRouter();
 const group = ref(null);
@@ -20,6 +20,13 @@ const image = ref("");
 function loadWithTags(tag: string) {
   setTagandLoading(tag);
 }
+
+function Logout() {
+  // setNpub("");
+  setUser(new NDKUser({}));
+  setLoggedIn(false);
+}
+
 function profileHandler() {
   if (!loggedIn.value) {
     loggingIn.value = !loggingIn.value;
@@ -32,10 +39,19 @@ function goToProfile() {
   router.push({ name: "profile" });
 }
 
+watch(npub, (newval) => {
+  if (newval !== ''){
+    nostrProvider.value = new NostrProviderService();
+  }
+})
+
 watch(user, (newval) => {
   // TODO: Update ndk here instead of MainView
   if (newval.profile?.image) image.value = newval.profile?.image;
-  if (newval.npub) lnpub.value = newval.npub;
+  if (newval.npub) {
+    console.log("user updated");
+    lnpub.value = newval.npub;
+  }
 });
 
 watch(group, () => {
@@ -47,7 +63,7 @@ onMounted(() => {
 });
 //TODO: Fix tag loading
 const items = await getSortedTags;
-const links = ["Dashboard", "Messages", "Updates"];
+// const links = ["Dashboard", "Messages", "Updates"];
 </script>
 <template>
   <v-navigation-drawer v-model="drawer" temporary>
@@ -64,6 +80,13 @@ const links = ["Dashboard", "Messages", "Updates"];
           </v-avatar>
         </template>
       </v-list-item>
+      <template v-if="getLoggedIn">
+        <v-list-item title="Sign Out" @click="Logout">
+          <template v-slot:prepend>
+            <v-icon icon="mdi-location-exit"></v-icon>
+          </template>
+        </v-list-item>
+      </template>
       <!-- <v-list-item
         v-for="(link, i) in links"
         :key="i"

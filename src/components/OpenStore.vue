@@ -4,6 +4,7 @@ import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import { newShipping, newStall } from "@/models";
+import { NostrProviderService } from "@/utils";
 
 interface currency {
   cc: string;
@@ -16,9 +17,8 @@ interface country {
   code: string;
 }
 
-
 const appStore = useAppStore();
-const { openStore, utils } = storeToRefs(appStore);
+const { openStore, utils, nostrProvider } = storeToRefs(appStore);
 const storeName = ref("");
 const description = ref("");
 const selectedCurrency = ref("");
@@ -39,19 +39,22 @@ function popZone() {
 }
 
 async function createStore() {
-  if(agsi.value){
-    zones.value.forEach(zone => {
-      zone.id = appStore.utils.generateUUID().replaceAll('-', '');
-    })
+  if (nostrProvider.value.ndk?.signer === undefined) {
+    nostrProvider.value = await new NostrProviderService();
+  }
+  if (agsi.value) {
+    zones.value.forEach((zone) => {
+      zone.id = appStore.utils.generateUUID().replaceAll("-", "");
+    });
   }
 
   const stall: newStall = {
-    id: appStore.utils.generateUUID().replaceAll('-',''),
+    id: appStore.utils.generateUUID().replaceAll("-", ""),
     name: storeName.value,
     description: description.value,
     currency: selectedCurrency.value,
-    shipping: zones.value
-  }
+    shipping: zones.value,
+  };
   // console.log(stall);
   const retEvent = await appStore.nostrProvider.createStall(stall);
   console.log(retEvent);
@@ -116,46 +119,46 @@ watch(zones.value, (newval) => {
             ></v-checkbox>
           </v-row>
           <template v-for="(zone, index) in zones" :key="index">
-              <v-row>
-                <template v-if="!agsi">
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="zone.id"
-                      label="ID"
-                      hint="Create a unique ID for this shipping option"
-                    ></v-text-field>
-                  </v-col>
-                </template>
-                <v-col>
-                  <v-text-field
-                    v-model="zone.name"
-                    label="Name"
-                    hint="Unique to this store"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
+            <v-row>
+              <template v-if="!agsi">
                 <v-col cols="12" sm="6">
-                  <v-select
-                    v-model="zone.country"
-                    label="Countries"
-                    multiple
-                    chips
-                    :items="countries"
-                    item-title="name"
-                    item-value="name"
-                    hint="Select the countries you're willing to ship to"
-                  ></v-select>
-                </v-col>
-                <v-col>
                   <v-text-field
-                    v-model="zone.cost"
-                    type="number"
-                    label="Cost"
-                    hint="Cost in your accepted currencies you will charge for shipping"
+                    v-model="zone.id"
+                    label="ID"
+                    hint="Create a unique ID for this shipping option"
                   ></v-text-field>
                 </v-col>
-              </v-row>
+              </template>
+              <v-col>
+                <v-text-field
+                  v-model="zone.name"
+                  label="Name"
+                  hint="Unique to this store"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="zone.country"
+                  label="Countries"
+                  multiple
+                  chips
+                  :items="countries"
+                  item-title="name"
+                  item-value="name"
+                  hint="Select the countries you're willing to ship to"
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="zone.cost"
+                  type="number"
+                  label="Cost"
+                  hint="Cost in your accepted currencies you will charge for shipping"
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </template>
           <v-row>
             <v-btn density="compact" icon="mdi-plus" @click="addZone"></v-btn>

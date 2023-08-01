@@ -12,24 +12,19 @@ const LoadingOverlay = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-//const nostrStore = useNostrStore();
 
 const router = useRouter();
 
 const {
-  tagLoading,
   itemsPerPage,
-  newProduct,
-  tag,
+  loading,
   page,
-  productsLoading,
   products,
-  npub,
-  nostrProvider,
 } = storeToRefs(appStore);
-// const { productsLoading } = storeToRefs(nostrStore);
+
 const events = ref([] as Product[]);
 const pages = ref(0);
+const showLoading = ref(false);
 
 const eventList = computed(() => products.value);
 const showEvents = computed(() => events.value);
@@ -72,6 +67,10 @@ watch(page, () => {
   loadProducts();
 });
 
+watch(loading, (newval) => {
+  showLoading.value = newval;
+})
+
 onMounted(() => {
   loadProducts();
 });
@@ -96,8 +95,8 @@ onMounted(() => {
       :length="pages"
       @update:model-value="itemClicked"
     ></v-pagination>
-    <!-- <template v-if="loading">
+    <template v-if="showLoading">
       <LoadingOverlay />
-    </template> -->
+    </template>
   </v-container>
 </template>

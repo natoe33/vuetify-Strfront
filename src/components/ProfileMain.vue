@@ -38,7 +38,7 @@ const tab = ref(null);
     <v-tabs v-model="tab">
       <v-tab value="details">Details</v-tab>
       <v-tab value="settings">Settings</v-tab>
-      <v-tab value="store">My Store</v-tab>
+      <v-tab value="store">My Stores</v-tab>
       <v-tab value="purchases">My Purchases</v-tab>
     </v-tabs>
     <v-window v-model="tab">
