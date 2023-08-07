@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
-import NDK, { NDKEvent, NDKKind, NDKUser } from "@/ndk";
+import NDK, { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
 import { nip19 } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
@@ -32,6 +32,7 @@ type State = {
   overflow: boolean;
   openStore: boolean;
   editStore: boolean;
+  addItem: boolean;
   page: RemovableRef<number>;
   itemsPerPage: number;
   tag: string;
@@ -66,6 +67,7 @@ export const useAppStore = defineStore({
     overflow: false,
     openStore: false,
     editStore: false,
+    addItem: false,
     page: useLocalStorage("page", 1),
     itemsPerPage: 40,
     tag: "",
@@ -140,6 +142,7 @@ export const useAppStore = defineStore({
         //return await state.nostrProvider.fetchSingleMerchantEvent(data.toString());
         return await state.nostrProvider.fetchMerchantEvents([data.toString()]);
       }
+      return new Set<NDKEvent>();
     },
     getUserProductEvents: async (state) => {
       const { type, data } = nip19.decode(state.npub);
@@ -228,11 +231,11 @@ export const useAppStore = defineStore({
       this.products = [];
       this.stalls = [];
       const eventSet: Set<NDKEvent> | undefined =
-        await this.nostrProvider.fetchEvents(NDKKind.Product);
-      console.log(eventSet);
+        await this.nostrProvider.fetchEvents(NDKKind.MarketProduct);
+      // console.log(eventSet);
       const merchSet: Set<NDKEvent> | undefined =
-        await this.nostrProvider.fetchEvents(NDKKind.Stall);
-      console.log(merchSet);
+        await this.nostrProvider.fetchEvents(NDKKind.MarketStall);
+      // console.log(merchSet);
       if (eventSet) {
         eventSet.forEach((event) => {
           this.utils.parseEvent(event);

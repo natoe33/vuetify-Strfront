@@ -18,6 +18,8 @@ const OpenStore = defineAsyncComponent(
 const EditStore = defineAsyncComponent(
   () => import("@/components/EditStore.vue")
 );
+
+const AddItem = defineAsyncComponent(() => import("@/components/AddItem.vue"));
 // import LoginDialog from "@/components/LoginDialog.vue";
 
 const appStore = useAppStore();
@@ -54,6 +56,7 @@ onMounted(async () => {
       <LoginDialog />
       <OpenStore />
       <EditStore />
+      <AddItem />
     </v-main>
   </v-app>
 </template>

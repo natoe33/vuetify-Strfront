@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import { Event, newShipping, newStall } from "@/models";
-import { storeToRefs } from "pinia";
+import { NostrProviderService } from "@/utils";
 
 interface currency {
   cc: string;
@@ -16,7 +17,7 @@ interface country {
 }
 
 const appStore = useAppStore();
-const { store, editStore, utils } = storeToRefs(appStore);
+const { store, editStore, utils, nostrProvider } = storeToRefs(appStore);
 
 const storeProfile = ref({
   id: "",
@@ -30,7 +31,6 @@ const selectedCurrency = ref("");
 const currencies = ref([] as currency[]);
 currencies.value.push({ cc: "SAT", symbol: "S", name: "Satoshi" });
 const countries = ref([] as country[]);
-const zones = ref([] as newShipping[]);
 const disabled = ref(true);
 const agsi = ref(true);
 
@@ -43,6 +43,30 @@ function popZone() {
   storeProfile.value.shipping.pop();
 }
 
+async function updateStore() {
+  if (!nostrProvider.value.ndk?.signer) {
+    nostrProvider.value = await new NostrProviderService();
+  }
+  if (agsi.value) {
+    storeProfile.value.shipping.forEach((zone) => {
+      if (zone.id === "") {
+        zone.id = appStore.utils.generateUUID().replaceAll("-", "");
+      }
+    });
+  }
+  store.value.content = JSON.stringify(storeProfile.value);
+  // console.log(store.value);
+  const editEvent: Event = new Event({
+    pubkey: store.value.pubkey,
+    kind: store.value.kind,
+    tags: store.value.tags,
+    content: store.value.content,
+  });
+  console.log(editEvent);
+  const retEvent = await appStore.nostrProvider.updateStall(editEvent);
+  console.log(retEvent);
+}
+
 watch(editStore, (newval) => {
   console.log(editStore.value);
   console.log(storeProfile.value);
@@ -52,9 +76,7 @@ watch(editStore, (newval) => {
   }
 });
 
-watch(zones.value, (newval) => {
-  // console.log(newval);
-  // console.log(disabled.value);
+watch(storeProfile.value.shipping, (newval) => {
   if (newval.length > 1) {
     disabled.value = false;
   } else {
@@ -112,47 +134,47 @@ onMounted(async () => {
           </v-row>
           <template v-for="(zone, index) in storeProfile.shipping" :key="index">
             <v-sheet class="mt-4" elevation="12">
-            <v-row>
-              <template v-if="!agsi">
-                <v-col cols="12" sm="6">
+              <v-row>
+                <template v-if="!agsi">
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      v-model="zone.id"
+                      label="ID"
+                      hint="Create a unique ID for this shipping option"
+                    ></v-text-field>
+                  </v-col>
+                </template>
+                <v-col>
                   <v-text-field
-                    v-model="zone.id"
-                    label="ID"
-                    hint="Create a unique ID for this shipping option"
+                    v-model="zone.name"
+                    label="Name"
+                    hint="Unique to this store"
                   ></v-text-field>
                 </v-col>
-              </template>
-              <v-col>
-                <v-text-field
-                  v-model="zone.name"
-                  label="Name"
-                  hint="Unique to this store"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="zone.country"
-                  label="Countries"
-                  multiple
-                  chips
-                  :items="countries"
-                  item-title="name"
-                  item-value="name"
-                  hint="Select the countries you're willing to ship to"
-                ></v-select>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  v-model="zone.cost"
-                  type="number"
-                  label="Cost"
-                  hint="Cost in your accepted currencies you will charge for shipping"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-        </v-sheet>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-select
+                    v-model="zone.country"
+                    label="Countries"
+                    multiple
+                    chips
+                    :items="countries"
+                    item-title="name"
+                    item-value="name"
+                    hint="Select the countries you're willing to ship to"
+                  ></v-select>
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="zone.cost"
+                    type="number"
+                    label="Cost"
+                    hint="Cost in your accepted currencies you will charge for shipping"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-sheet>
           </template>
           <v-row>
             <v-btn density="compact" icon="mdi-plus" @click="addZone"></v-btn>
@@ -167,7 +189,7 @@ onMounted(async () => {
         </v-container>
       </v-form>
       <v-card-actions>
-        <v-btn>Update</v-btn>
+        <v-btn @click="updateStore">Update</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

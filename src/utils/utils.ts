@@ -6,7 +6,7 @@ import {
   Shipping,
 } from "@/models";
 import { v4 as uuidv4 } from "uuid";
-import { NDKEvent } from "@/ndk";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import json from "./currencies.json";
@@ -173,4 +173,8 @@ export class Utils {
     const countries = cjson;
     return countries;
   };
+
+  uploadImages = async () => {
+    const url: string = import.meta.env.BASE_URL;
+  }
 }

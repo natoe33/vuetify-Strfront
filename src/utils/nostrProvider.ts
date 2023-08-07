@@ -15,9 +15,9 @@ import NDK, {
   NDKSigner,
   NDKPrivateKeySigner,
   NDKKind,
-} from "@/ndk";
+} from "@nostr-dev-kit/ndk";
 import { nip19 } from "@/nostr-tools";
-import { Relay, newStall } from "@/models";
+import { Relay, newStall, Event } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
 import { useAppStore } from "@/store";
 import { BehaviorSubject } from "rxjs";
@@ -137,42 +137,37 @@ export class NostrProviderService {
 
   attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
     const appStore = useAppStore();
-    const { setLoggingIn, setPrivKey, setPubkeyLogin } = appStore;
-    // const nostrStore = useNostrStore();
-    // const { setNpub, setPubkeyLogin } = nostrStore;
+    const { loggingIn, privkey, loggedIn, pubkeyLogin, user } =
+      storeToRefs(appStore);
     try {
-      this.loggingIn = true;
-      this.loginError = undefined;
+      loggingIn.value = true;
       const hexPrivateKey = this.validateAndGetHexKey(enteredKey);
       if (enteredKey.startsWith("nsec")) {
         this.signer = new NDKPrivateKeySigner(hexPrivateKey);
-        this.signer.user().then((user) => {
-          setPrivKey(hexPrivateKey);
+        this.signer.user().then((suser) => {
+          privkey.value = hexPrivateKey;
+          user.value = suser;
           this.isLoggedInUsingNsec = true;
           this.canWriteToNostr = true;
-          this.tryLoginUsingNpub(user.npub);
+          this.tryLoginUsingNpub(user.value.npub);
         });
       } else if (enteredKey.startsWith("npub")) {
-        // localStorage.setItem(Constants.NPUB, enteredKey);
-        // localStorage.setItem(Constants.LOGGEDINUSINGPUBKEY, 'true');
-        setPubkeyLogin(true);
+        pubkeyLogin.value = true;
         this.isLoggedInUsingPubKey$.next(true);
         this.tryLoginUsingNpub(enteredKey);
       } else {
         this.loginError = "Invalid input. Enter either nsec or npub id";
       }
-      setLoggingIn(false);
     } catch (e: any) {
       console.error(e);
       this.loginError = e.message;
-      setLoggingIn(false);
+      loggingIn.value = false;
     }
   }
 
   async tryLoginUsingNpub(npubFromLocal: string) {
     const appStore = useAppStore();
-    const { loggingIn } = storeToRefs(appStore);
-    const { setLoggingIn } = appStore;
+    const { relay } = storeToRefs(appStore);
     // setLoggingIn(true);
 
     // loggingIn.value = true;
@@ -192,6 +187,7 @@ export class NostrProviderService {
       debug: this.debug,
     };
     this.ndk = new NDK(params);
+    relay.value = this.ndk;
 
     await this.ndk.connect(1000);
     this.initializeUsingNpub(npubFromLocal);
@@ -453,11 +449,28 @@ export class NostrProviderService {
     return ndkEvent;
   }
 
+  async updateStall(event: Event): Promise<NDKEvent> {
+    console.log(window.nostr);
+    const ndkEvent = new NDKEvent(this.ndk);
+    console.log(ndkEvent);
+    ndkEvent.pubkey = event.pubkey;
+    ndkEvent.kind = event.kind;
+    ndkEvent.tags = event.tags;
+    ndkEvent.content = event.content;
+    console.log(ndkEvent);
+    await ndkEvent.publish();
+    return ndkEvent;
+  }
+
   async fetchSingleMerchantEvent(
     pubkey: string
   ): Promise<NDKEvent | null | undefined> {
-    const filter: NDKFilter = { authors: [pubkey], kinds: [30017] };
-    return await this.ndk?.fetchEvent(filter, {});
+    const filter: NDKFilter = {
+      authors: [pubkey],
+      kinds: [NDKKind.MarketStall],
+    };
+    // return await this.ndk?.fetchEvent(filter, {});
+    return await this.ndk?.fetchEvent(filter);
   }
 
   async createSub(kind: number, events: Map<string, NDKEvent>) {
@@ -485,26 +498,26 @@ export class NostrProviderService {
 
   async fetchProfileEvent(pubkey: string): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { authors: [pubkey], kinds: [0] };
-    return await this.ndk?.fetchEvents(filter, {});
+    return await this.ndk?.fetchEvents(filter);
   }
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
     // console.log("Fetching events");
-    console.log(this.ndk);
+    // console.log(this.ndk);
     while (!this.ndk) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     // console.log(this.ndk);
     const filter: NDKFilter = { kinds: [kind] };
-    return await this.ndk?.fetchEvents(filter, {});
+    return await this.ndk?.fetchEvents(filter);
   }
 
   async fetchEventLimit(
     kind: number,
     limit: number
   ): Promise<Set<NDKEvent> | undefined> {
-    const filter: NDKFilter = { kinds: [30018], limit: limit };
-    const productEvents = await this.ndk?.fetchEvents(filter, {});
+    const filter: NDKFilter = { kinds: [kind], limit: limit };
+    const productEvents = await this.ndk?.fetchEvents(filter);
     return productEvents;
   }
 
@@ -512,7 +525,7 @@ export class NostrProviderService {
     authors: string[]
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30018], authors: authors };
-    const prodEvents = await this.ndk?.fetchEvents(filter, {});
+    const prodEvents = await this.ndk?.fetchEvents(filter);
     console.log(prodEvents?.values());
     return prodEvents;
   }
@@ -521,7 +534,7 @@ export class NostrProviderService {
     authors: string[]
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30017], authors: authors };
-    const stallEvents = await this.ndk?.fetchEvents(filter, {});
+    const stallEvents = await this.ndk?.fetchEvents(filter);
     // console.log(stallEvents?.values());
     return stallEvents;
   }
@@ -537,7 +550,7 @@ export class NostrProviderService {
     let relayEvent: NDKEvent | null | undefined;
     // nip 65 specifies a kind 10002 event to broadcast a user's subscribed relays
     const filter: NDKFilter = { kinds: [10002], authors: [hexPubKey] };
-    const relayEvents = await this.ndk?.fetchEvents(filter, {});
+    const relayEvents = await this.ndk?.fetchEvents(filter);
     if (relayEvents) {
       const sortedRelayEvents = [...relayEvents].sort(
         (a: NDKEvent, b: NDKEvent) => b.created_at! - a.created_at!
@@ -547,7 +560,7 @@ export class NostrProviderService {
         // failover to the damus/snort relay event
         // some clients use kind 3 (contacts) events to broadcast a user's subscribed relays
         const filter2: NDKFilter = { kinds: [3], authors: [hexPubKey] };
-        relayEvent = await this.ndk?.fetchEvent(filter2, {});
+        relayEvent = await this.ndk?.fetchEvent(filter2);
       }
     }
     return relayEvent;

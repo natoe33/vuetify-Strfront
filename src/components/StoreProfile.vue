@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref, defineAsyncComponent } from "vue";
 import { useAppStore } from "@/store";
-import { newStall, newShipping, IEvent, Event } from "@/models";
+import { newShipping, IEvent, Event } from "@/models";
 import { storeToRefs } from "pinia";
-import { NDKEvent } from "@/ndk";
+
 const StoreCard = defineAsyncComponent(
   () => import("@/components/StoreCard.vue")
 );
 
 const appStore = useAppStore();
-const { openStore, store } = storeToRefs(appStore);
+const { openStore, store, addItem } = storeToRefs(appStore);
 const stores = ref([] as Event[]);
 
 const storeProfile = ref({
@@ -24,20 +24,18 @@ function showOpenStore() {
   openStore.value = !openStore.value;
 }
 
+function showAddItem() {
+  addItem.value = !addItem.value;
+}
+
 onMounted(async () => {
   if (store.value.content === "") {
     const storeList = await appStore.getUserMerchantEvents;
-    console.log(storeList);
     if (storeList && storeList.size > 0) {
       storeList.forEach((store) => {
         const newStore: IEvent = store;
         stores.value.push(new Event(newStore));
       });
-      console.log(stores.value);
-      // store.value = storeList;
-      // console.log(store.value);
-      // storeProfile.value = JSON.parse(storeList.content);
-      console.log(storeProfile.value);
     }
   }
 });
@@ -66,7 +64,13 @@ onMounted(async () => {
     <v-divider inset></v-divider>
     <v-card title="My Listings">
       <v-card-actions>
-        <v-btn color="primary" elevation="4">Create Listing</v-btn>
+        <v-btn
+          color="primary"
+          elevation="4"
+          :disabled="stores.length === 0"
+          @click="showAddItem"
+          >Create Listing</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-sheet>

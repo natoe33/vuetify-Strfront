@@ -66,13 +66,9 @@ onMounted(async () => {
   countries.value = countryList;
   const newz: newShipping = { id: "", name: "", cost: 0, country: [] };
   zones.value.push(newz);
-  // currencies.value = currencyList.map(currency => currency.cc);
-  // currencies.value = currencies.value.concat(currencyList);
 });
 
 watch(zones.value, (newval) => {
-  // console.log(newval);
-  // console.log(disabled.value);
   if (newval.length > 1) {
     disabled.value = false;
   } else {
@@ -120,47 +116,47 @@ watch(zones.value, (newval) => {
           </v-row>
           <template v-for="(zone, index) in zones" :key="index">
             <v-sheet class="mt-4" elevation="12">
-            <v-row>
-              <template v-if="!agsi">
-                <v-col cols="12" sm="6">
+              <v-row>
+                <template v-if="!agsi">
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      v-model="zone.id"
+                      label="ID"
+                      hint="Create a unique ID for this shipping option"
+                    ></v-text-field>
+                  </v-col>
+                </template>
+                <v-col>
                   <v-text-field
-                    v-model="zone.id"
-                    label="ID"
-                    hint="Create a unique ID for this shipping option"
+                    v-model="zone.name"
+                    label="Name"
+                    hint="Unique to this store"
                   ></v-text-field>
                 </v-col>
-              </template>
-              <v-col>
-                <v-text-field
-                  v-model="zone.name"
-                  label="Name"
-                  hint="Unique to this store"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" sm="6">
-                <v-select
-                  v-model="zone.country"
-                  label="Countries"
-                  multiple
-                  chips
-                  :items="countries"
-                  item-title="name"
-                  item-value="name"
-                  hint="Select the countries you're willing to ship to"
-                ></v-select>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  v-model="zone.cost"
-                  type="number"
-                  label="Cost"
-                  hint="Cost in your accepted currencies you will charge for shipping"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-sheet>
+              </v-row>
+              <v-row>
+                <v-col cols="12" sm="6">
+                  <v-select
+                    v-model="zone.country"
+                    label="Countries"
+                    multiple
+                    chips
+                    :items="countries"
+                    item-title="name"
+                    item-value="name"
+                    hint="Select the countries you're willing to ship to"
+                  ></v-select>
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="zone.cost"
+                    type="number"
+                    label="Cost"
+                    hint="Cost in your accepted currencies you will charge for shipping"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-sheet>
           </template>
           <v-row>
             <v-btn density="compact" icon="mdi-plus" @click="addZone"></v-btn>

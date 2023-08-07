@@ -46,14 +46,20 @@ onMounted(() => {
       <p>Shipping</p>
       <v-row>
         <template v-for="(ship, index) in storeProfile.shipping" :key="index">
-          <v-col>
+          <v-col cols="12">
             <v-card :title="ship.name" variant="outlined">
               <v-card-text>
-                <p>Cost: {{ ship.cost }}</p>
+                <p>Cost: {{ ship.cost }} {{ storeProfile.currency }}</p>
                 <p>Shipping to:</p>
-                <template v-for="(country, index) in ship.country" :key="index">
-                  <p>{{ country }}</p>
-                </template>
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="(country, i) in ship.country"
+                    :key="i"
+                    variant="tonal"
+                  >
+                    {{ country }}
+                  </v-list-item>
+                </v-list>
               </v-card-text>
             </v-card>
           </v-col>
@@ -65,6 +71,7 @@ onMounted(() => {
         variant="tonal"
         color="primary"
         elevation="4"
+        disabled
         @click="openEditStore"
         >Edit</v-btn
       >
