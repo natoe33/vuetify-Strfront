@@ -7,11 +7,11 @@
 - [x] View Merchant's Stall Information
 - [x] Login With npub/nsec
 - [x] Nip07 Login
+- [x] Set Up a Marketplace Stall
 
 ## What's planned
 - [ ] View Merchant's Other Items
 - [ ] View Items By Tag
-- [ ] Set Up a Marketplace Stall
 - [ ] LN Wallet Connect
 - [ ] LN Payments
 - [ ] Other Things I Can Think Of
