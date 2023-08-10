@@ -15,7 +15,7 @@ import NDK, {
   NDKSigner,
   NDKPrivateKeySigner,
   NDKKind,
-} from "@nostr-dev-kit/ndk";
+} from "@/ndk";
 import { nip19 } from "@/nostr-tools";
 import { Relay, newStall, Event } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
@@ -467,7 +467,7 @@ export class NostrProviderService {
   ): Promise<NDKEvent | null | undefined> {
     const filter: NDKFilter = {
       authors: [pubkey],
-      kinds: [NDKKind.MarketStall],
+      kinds: [30017],
     };
     // return await this.ndk?.fetchEvent(filter, {});
     return await this.ndk?.fetchEvent(filter);

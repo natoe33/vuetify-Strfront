@@ -1,14 +1,14 @@
-import fetch from "node-fetch";
+import fetch from 'node-fetch'
 
-import { useFetchImplementation, validateGithub } from "./nip39.ts";
+import {useFetchImplementation, validateGithub} from './nip39.ts'
 
-test("validate github claim", async () => {
-  useFetchImplementation(fetch);
+test('validate github claim', async () => {
+  useFetchImplementation(fetch)
 
-  const result = await validateGithub(
-    "npub1gcxzte5zlkncx26j68ez60fzkvtkm9e0vrwdcvsjakxf9mu9qewqlfnj5z",
-    "vitorpamplona",
-    "cf19e2d1d7f8dac6348ad37b35ec8421"
-  );
-  expect(result).toBe(true);
-});
+  let result = await validateGithub(
+    'npub1gcxzte5zlkncx26j68ez60fzkvtkm9e0vrwdcvsjakxf9mu9qewqlfnj5z',
+    'vitorpamplona',
+    'cf19e2d1d7f8dac6348ad37b35ec8421'
+  )
+  expect(result).toBe(true)
+})

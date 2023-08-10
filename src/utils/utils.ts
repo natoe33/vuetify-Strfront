@@ -6,7 +6,7 @@ import {
   Shipping,
 } from "@/models";
 import { v4 as uuidv4 } from "uuid";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
+import { NDKEvent } from "@/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
 import json from "./currencies.json";

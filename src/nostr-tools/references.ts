@@ -3,62 +3,62 @@ import {
   type AddressPointer,
   type ProfilePointer,
   type EventPointer,
-} from "./nip19";
+} from './nip19.ts'
 
-import type { Event } from "./event";
+import type {Event} from './event.ts'
 
 type Reference = {
-  text: string;
-  profile?: ProfilePointer;
-  event?: EventPointer;
-  address?: AddressPointer;
-};
+  text: string
+  profile?: ProfilePointer
+  event?: EventPointer
+  address?: AddressPointer
+}
 
 const mentionRegex =
-  /\bnostr:((note|npub|naddr|nevent|nprofile)1\w+)\b|#\[(\d+)\]/g;
+  /\bnostr:((note|npub|naddr|nevent|nprofile)1\w+)\b|#\[(\d+)\]/g
 
 export function parseReferences(evt: Event): Reference[] {
-  const references: Reference[] = [];
-  for (const ref of evt.content.matchAll(mentionRegex)) {
+  let references: Reference[] = []
+  for (let ref of evt.content.matchAll(mentionRegex)) {
     if (ref[2]) {
       // it's a NIP-27 mention
       try {
-        const { type, data } = decode(ref[1]);
+        let {type, data} = decode(ref[1])
         switch (type) {
-          case "npub": {
+          case 'npub': {
             references.push({
               text: ref[0],
-              profile: { pubkey: data as string, relays: [] },
-            });
-            break;
+              profile: {pubkey: data as string, relays: []}
+            })
+            break
           }
-          case "nprofile": {
+          case 'nprofile': {
             references.push({
               text: ref[0],
-              profile: data as ProfilePointer,
-            });
-            break;
+              profile: data as ProfilePointer
+            })
+            break
           }
-          case "note": {
+          case 'note': {
             references.push({
               text: ref[0],
-              event: { id: data as string, relays: [] },
-            });
-            break;
+              event: {id: data as string, relays: []}
+            })
+            break
           }
-          case "nevent": {
+          case 'nevent': {
             references.push({
               text: ref[0],
-              event: data as EventPointer,
-            });
-            break;
+              event: data as EventPointer
+            })
+            break
           }
-          case "naddr": {
+          case 'naddr': {
             references.push({
               text: ref[0],
-              address: data as AddressPointer,
-            });
-            break;
+              address: data as AddressPointer
+            })
+            break
           }
         }
       } catch (err) {
@@ -66,45 +66,45 @@ export function parseReferences(evt: Event): Reference[] {
       }
     } else if (ref[3]) {
       // it's a NIP-10 mention
-      const idx = parseInt(ref[3], 10);
-      const tag = evt.tags[idx];
-      if (!tag) continue;
+      let idx = parseInt(ref[3], 10)
+      let tag = evt.tags[idx]
+      if (!tag) continue
 
       switch (tag[0]) {
-        case "p": {
+        case 'p': {
           references.push({
             text: ref[0],
-            profile: { pubkey: tag[1], relays: tag[2] ? [tag[2]] : [] },
-          });
-          break;
+            profile: {pubkey: tag[1], relays: tag[2] ? [tag[2]] : []}
+          })
+          break
         }
-        case "e": {
+        case 'e': {
           references.push({
             text: ref[0],
-            event: { id: tag[1], relays: tag[2] ? [tag[2]] : [] },
-          });
-          break;
+            event: {id: tag[1], relays: tag[2] ? [tag[2]] : []}
+          })
+          break
         }
-        case "a": {
+        case 'a': {
           try {
-            const [kind, pubkey, identifier] = tag[1].split(":");
+            let [kind, pubkey, identifier] = tag[1].split(':')
             references.push({
               text: ref[0],
               address: {
                 identifier,
                 pubkey,
                 kind: parseInt(kind, 10),
-                relays: tag[2] ? [tag[2]] : [],
-              },
-            });
+                relays: tag[2] ? [tag[2]] : []
+              }
+            })
           } catch (err) {
             /***/
           }
-          break;
+          break
         }
       }
     }
   }
 
-  return references;
+  return references
 }

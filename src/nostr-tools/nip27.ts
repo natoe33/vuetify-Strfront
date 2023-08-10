@@ -1,32 +1,32 @@
-import { decode } from "./nip19";
-import { NOSTR_URI_REGEX, type NostrURI } from "./nip21";
+import {decode} from './nip19.ts'
+import {NOSTR_URI_REGEX, type NostrURI} from './nip21.ts'
 
 /** Regex to find NIP-21 URIs inside event content. */
-export const regex = () => new RegExp(`\\b${NOSTR_URI_REGEX.source}\\b`, "g");
+export const regex = () => new RegExp(`\\b${NOSTR_URI_REGEX.source}\\b`, 'g')
 
 /** Match result for a Nostr URI in event content. */
 export interface NostrURIMatch extends NostrURI {
   /** Index where the URI begins in the event content. */
-  start: number;
+  start: number
   /** Index where the URI ends in the event content. */
-  end: number;
+  end: number
 }
 
 /** Find and decode all NIP-21 URIs. */
-export function* matchAll(content: string): Iterable<NostrURIMatch> {
-  const matches = content.matchAll(regex());
+export function * matchAll(content: string): Iterable<NostrURIMatch> {
+  const matches = content.matchAll(regex())
 
   for (const match of matches) {
     try {
-      const [uri, value] = match;
+      const [uri, value] = match
 
       yield {
         uri: uri as `nostr:${string}`,
         value,
         decoded: decode(value),
         start: match.index!,
-        end: match.index! + uri.length,
-      };
+        end: match.index! + uri.length
+      }
     } catch (_e) {
       // do nothing
     }
@@ -52,15 +52,15 @@ export function* matchAll(content: string): Iterable<NostrURIMatch> {
  * })
  * ```
  */
-// export function replaceAll(
-//   content: string,
-//   replacer: (match: NostrURI) => string
-// ): string {
-//   return content.replaceAll(regex(), (uri, value) => {
-//     return replacer({
-//       uri: uri as `nostr:${string}`,
-//       value,
-//       decoded: decode(value),
-//     });
-//   });
-// }
+export function replaceAll(
+  content: string,
+  replacer: (match: NostrURI) => string
+): string {
+  return content.replaceAll(regex(), (uri, value: string) => {
+    return replacer({
+      uri: uri as `nostr:${string}`,
+      value,
+      decoded: decode(value)
+    })
+  })
+}

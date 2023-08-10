@@ -1,8 +1,8 @@
-import { hexToBytes } from "@noble/hashes/utils";
+import {hexToBytes} from '@noble/hashes/utils'
 
 /** Get POW difficulty from a Nostr hex ID. */
 export function getPow(id: string): number {
-  return getLeadingZeroBits(hexToBytes(id));
+  return getLeadingZeroBits(hexToBytes(id))
 }
 
 /**
@@ -10,16 +10,16 @@ export function getPow(id: string): number {
  * https://github.com/Cameri/nostream/blob/fb6948fd83ca87ce552f39f9b5eb780ea07e272e/src/utils/proof-of-work.ts
  */
 function getLeadingZeroBits(hash: Uint8Array): number {
-  let total: number, i: number, bits: number;
+  let total: number, i: number, bits: number
 
   for (i = 0, total = 0; i < hash.length; i++) {
-    bits = msb(hash[i]);
-    total += bits;
+    bits = msb(hash[i])
+    total += bits
     if (bits !== 8) {
-      break;
+      break
     }
   }
-  return total;
+  return total
 }
 
 /**
@@ -27,16 +27,16 @@ function getLeadingZeroBits(hash: Uint8Array): number {
  * https://github.com/Cameri/nostream/blob/fb6948fd83ca87ce552f39f9b5eb780ea07e272e/src/utils/proof-of-work.ts
  */
 function msb(b: number) {
-  let n = 0;
+  let n = 0
 
   if (b === 0) {
-    return 8;
+    return 8
   }
 
   // eslint-disable-next-line no-cond-assign
-  while ((b >>= 1)) {
-    n++;
+  while (b >>= 1) {
+    n++
   }
 
-  return 7 - n;
+  return 7 - n
 }

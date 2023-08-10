@@ -13,14 +13,14 @@ import { NDKRelaySet } from "./index.js";
  * @returns Promise<NDKRelaySet>
  */
 export function calculateRelaySetFromEvent(
-  ndk: NDK,
-  event: Event
+    ndk: NDK,
+    event: Event
 ): NDKRelaySet {
-  const relays: Set<NDKRelay> = new Set();
+    const relays: Set<NDKRelay> = new Set();
 
-  ndk.pool?.relays.forEach((relay) => relays.add(relay));
+    ndk.pool?.relays.forEach((relay) => relays.add(relay));
 
-  return new NDKRelaySet(relays, ndk);
+    return new NDKRelaySet(relays, ndk);
 }
 
 /**
@@ -30,20 +30,20 @@ export function calculateRelaySetFromEvent(
  * @returns Promise<NDKRelaySet>
  */
 export function calculateRelaySetFromFilter(
-  ndk: NDK,
-  filter: NDKFilter
+    ndk: NDK,
+    filter: NDKFilter
 ): NDKRelaySet {
-  const relays: Set<NDKRelay> = new Set();
+    const relays: Set<NDKRelay> = new Set();
 
-  ndk.pool?.relays.forEach((relay) => {
-    if (!relay.complaining) {
-      relays.add(relay);
-    } else {
-      ndk.debug(`Relay ${relay.url} is complaining, not adding to set`);
-    }
-  });
+    ndk.pool?.relays.forEach((relay) => {
+        if (!relay.complaining) {
+            relays.add(relay);
+        } else {
+            ndk.debug(`Relay ${relay.url} is complaining, not adding to set`);
+        }
+    });
 
-  return new NDKRelaySet(relays, ndk);
+    return new NDKRelaySet(relays, ndk);
 }
 
 /**
@@ -52,15 +52,15 @@ export function calculateRelaySetFromFilter(
  * @param filters
  */
 export function calculateRelaySetsFromFilters(
-  ndk: NDK,
-  filters: NDKFilter[]
+    ndk: NDK,
+    filters: NDKFilter[]
 ): Map<NDKFilter, NDKRelaySet> {
-  const sets: Map<NDKFilter, NDKRelaySet> = new Map();
+    const sets: Map<NDKFilter, NDKRelaySet> = new Map();
 
-  filters.forEach((filter) => {
-    const set = calculateRelaySetFromFilter(ndk, filter);
-    sets.set(filter, set);
-  });
+    filters.forEach((filter) => {
+        const set = calculateRelaySetFromFilter(ndk, filter);
+        sets.set(filter, set);
+    });
 
-  return sets;
+    return sets;
 }

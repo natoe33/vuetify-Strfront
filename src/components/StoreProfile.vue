@@ -9,7 +9,7 @@ const StoreCard = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-const { openStore, store, addItem } = storeToRefs(appStore);
+const { openStore, store, addItem, userStores } = storeToRefs(appStore);
 const stores = ref([] as Event[]);
 
 const storeProfile = ref({
@@ -35,6 +35,7 @@ onMounted(async () => {
       storeList.forEach((store) => {
         const newStore: IEvent = store;
         stores.value.push(new Event(newStore));
+        userStores.value.push(new Event(newStore));
       });
     }
   }

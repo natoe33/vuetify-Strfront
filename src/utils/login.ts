@@ -73,7 +73,7 @@ export class LoginUtil {
     try {
       const nKey = bech32.decode(str, 1_000);
       const buff = bech32.fromWords(nKey.words);
-      return secp.utils.bytesToHex(Uint8Array.from(buff));
+      return secp.etc.bytesToHex(Uint8Array.from(buff));
     } catch {
       return str;
     }
@@ -147,7 +147,7 @@ export class LoginUtil {
   static generateNewCredential(): NewCredential {
     const ent = LoginUtil.generateBip39Entropy();
     const privateKey = LoginUtil.entropyToPrivateKey(ent);
-    const publicKey = utils.bytesToHex(secp.schnorr.getPublicKey(privateKey));
+    const publicKey = utils.bytesToHex(secp.getPublicKey(privateKey));
     return {
       pubkey: this.hexToBech32("npub", publicKey),
       privateKey: this.hexToBech32("nsec", privateKey),
@@ -169,7 +169,7 @@ export class LoginUtil {
   }
 
   static getPublicKey(privKey: string) {
-    return secp.utils.bytesToHex(secp.schnorr.getPublicKey(privKey));
+    return secp.etc.bytesToHex(secp.getPublicKey(privKey));
   }
 
   static getNpubFromHex(hex?: string) {
@@ -177,7 +177,7 @@ export class LoginUtil {
       return "";
     }
     try {
-      const buf = secp.utils.hexToBytes(hex);
+      const buf = secp.etc.hexToBytes(hex);
       return bech32.encode("npub", bech32.toWords(buf));
     } catch (e) {
       console.warn("Invalid hex", hex, e);

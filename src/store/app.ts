@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
-import NDK, { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKKind, NDKUser } from "@/ndk";
 import { nip19 } from "@/nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
@@ -45,6 +45,7 @@ type State = {
   products: RemovableRef<Product[]>;
   stalls: RemovableRef<Stall[]>;
   store: Event;
+  userStores: Event[];
   events: RemovableRef<Map<string, NDKEvent>>;
 };
 
@@ -80,6 +81,7 @@ export const useAppStore = defineStore({
     products: useLocalStorage("products", [] as Product[]),
     stalls: useLocalStorage("stalls", [] as Stall[]),
     store: new Event(),
+    userStores: [] as Event[],
     // products: useLocalStorage("products", [] as Product[]),
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
     events: useLocalStorage("events", new Map()),

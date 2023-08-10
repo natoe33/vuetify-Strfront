@@ -2,14 +2,14 @@
 import { ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
-import { IContent } from "@/models";
-import { NDKEvent } from "@nostr-dev-kit/ndk";
+import { IContent, Stall } from "@/models";
+import { NDKEvent } from "@/ndk";
 
 const appStore = useAppStore();
-const { addItem } = storeToRefs(appStore);
-const stores = ref([] as Event[]);
+const { addItem, userStores } = storeToRefs(appStore);
+const stores = ref([] as Stall[]);
 const storeList = ref(new Set());
-const uploadFiles = ref([] as File[]);
+const images = ref([]);
 
 const prodProfile = ref({
   id: "",
@@ -21,6 +21,24 @@ const prodProfile = ref({
   price: 0,
   quantity: 0,
 });
+
+function addImage() {
+  console.log(images.value)
+}
+
+watch(addItem, (newval) => {
+  if(newval) {
+    console.log(userStores.value);
+    userStores.value.forEach((store) => {
+
+    })
+  }
+})
+
+watch(images, (newval) => {
+  console.log(newval);
+
+})
 
 onMounted(async () => {
   const tempStore = await appStore.getUserMerchantEvents;
@@ -57,16 +75,17 @@ onMounted(async () => {
           </v-row>
           <v-row>
             <v-file-input
-              v-model="uploadFiles"
+              v-model="images"
               label="Add Pictures"
               accept="image/png, image/jpeg, image/bmp"
               multiple
               show-size
               counter
               chips
-              prepend-icon="mdi-cloud-upload"              
+              prepend-icon="mdi-cloud-upload"
+              @change="addImage"
             />
-          </v-row>
+            </v-row>
           <v-row>
             <v-col>
               <v-text-field v-model="prodProfile.price" label="Item Price" />

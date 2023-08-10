@@ -1,11 +1,11 @@
-let _fetch: any;
+var _fetch: any
 
 try {
-  _fetch = fetch;
+  _fetch = fetch
 } catch {}
 
 export function useFetchImplementation(fetchImplementation: any) {
-  _fetch = fetchImplementation;
+  _fetch = fetchImplementation
 }
 
 export async function validateGithub(
@@ -14,14 +14,14 @@ export async function validateGithub(
   proof: string
 ): Promise<boolean> {
   try {
-    const res = await (
+    let res = await (
       await _fetch(`https://gist.github.com/${username}/${proof}/raw`)
-    ).text();
+    ).text()
     return (
       res ===
       `Verifying that I control the following Nostr public key: ${pubkey}`
-    );
+    )
   } catch (_) {
-    return false;
+    return false
   }
 }
