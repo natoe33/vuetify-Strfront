@@ -10,6 +10,9 @@
 - [x] Set Up a Marketplace Stall
 
 ## What's planned
+- [ ] List Items For Sale (obviously)
+- [ ] Upload Listing Photos to Nostr.build
+- [ ] Nip-98 Auth for Photos
 - [ ] View Merchant's Other Items
 - [ ] View Items By Tag
 - [ ] LN Wallet Connect
