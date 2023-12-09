@@ -15,8 +15,8 @@ import NDK, {
   NDKFilter,
   NDKUser,
   type NDKUserProfile,
-} from "@/ndk";
-import { type Filter } from "@/nostr-tools";
+} from "@nostr-dev-kit/ndk";
+import { type Filter } from "nostr-tools";
 
 const relayUrls: string[] = [
   "wss://relay.damus.io",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { NDKUser } from "@/ndk";
+import { NDKUser } from "@nostr-dev-kit/ndk";
 import { useAppStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { NostrProviderService } from "@/utils";
@@ -41,6 +41,7 @@ function goToProfile() {
 
 watch(npub, (newval) => {
   if (newval !== "") {
+    console.log('NavDrawer npub updated')
     nostrProvider.value = new NostrProviderService();
   }
 });
@@ -60,6 +61,7 @@ watch(group, () => {
 
 onMounted(() => {
   if (user.value.profile?.image) image.value = user.value.profile?.image;
+  
 });
 //TODO: Fix tag loading
 const items = await getSortedTags;
