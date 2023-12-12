@@ -2,14 +2,15 @@
 import { ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
-import { IContent, Stall } from "@/models";
-import { NDKEvent } from "@/ndk";
+import { newStall } from "@/models";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 
 const appStore = useAppStore();
-const { addItem, userStores } = storeToRefs(appStore);
-const stores = ref([] as Stall[]);
+const { addItem, userStores, utils } = storeToRefs(appStore);
+const stores = ref([] as newStall[]);
 const storeList = ref(new Set());
-const images = ref([]);
+const images = ref([] as File[]);
+//TODO: Add product tags
 
 const prodProfile = ref({
   id: "",
@@ -24,13 +25,21 @@ const prodProfile = ref({
 
 function addImage() {
   console.log(images.value)
+  utils.value.uploadImage(images.value[0])
+}
+
+function createItem() {
+  prodProfile.value.id = utils.value.generateUUID();
+  prodProfile.value.currency = stores.value.find(store => store.id = prodProfile.value.stall_id)?.currency || 'SAT';
+  console.log(prodProfile.value);
 }
 
 watch(addItem, (newval) => {
   if(newval) {
     console.log(userStores.value);
     userStores.value.forEach((store) => {
-
+      const stall: newStall = JSON.parse(store.content);
+      stores.value.push(stall);
     })
   }
 })
@@ -59,6 +68,9 @@ onMounted(async () => {
               <v-select
                 v-model="prodProfile.stall_id"
                 label="Create in store"
+                :items="stores"
+                item-title="name"
+                item-value="id"
               />
             </v-col>
             <v-col>
@@ -96,6 +108,9 @@ onMounted(async () => {
           </v-row>
         </v-container>
       </v-form>
+      <v-card-actions>
+        <v-btn @click="createItem">Create</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

@@ -6,7 +6,7 @@ import { onMounted, defineAsyncComponent, watch } from "vue";
 import AppBar from "@/components/AppBar.vue";
 import NavDrawer from "@/components/NavDrawer.vue";
 import OverFlow from "@/components/OverFlow.vue";
-import { NDKSubscription } from "./ndk";
+import { NDKSubscription } from "@nostr-dev-kit/ndk";
 
 const LoginDialog = defineAsyncComponent(
   () => import("@/components/LoginDialog.vue")
@@ -20,15 +20,14 @@ const EditStore = defineAsyncComponent(
 );
 
 const AddItem = defineAsyncComponent(() => import("@/components/AddItem.vue"));
-// import LoginDialog from "@/components/LoginDialog.vue";
 
 const appStore = useAppStore();
-const { productsLoading } = storeToRefs(appStore);
-// const sub: NDKSubscription = await appStore.nostrProvider.createSub(30018);
+const { productsLoading, user  } = storeToRefs(appStore);
 
-// watch(sub, (newval) => {
-//   console.log(newval)
-// })
+watch(user, (newval) => {
+  console.log('App user updated');
+})
+
 
 onMounted(async () => {
   // appStore.db.products.clear();

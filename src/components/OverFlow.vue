@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NDKUser } from "@/ndk";
+import { NDKUser } from "@nostr-dev-kit/ndk";
 import { useAppStore } from "@/store";
 
 const appStore = useAppStore();

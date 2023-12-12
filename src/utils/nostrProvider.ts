@@ -1,6 +1,10 @@
 // import { NostrFetcher, eventKind, type NostrEvent } from "nostr-fetch";
+
+// TODO: Don't load users' relays? See if ndk supports this
+// Just create a single instance and track the logged in user separately
+
 import debug from "debug";
-import { Ref } from "vue";
+// import { Ref } from "vue";
 import { storeToRefs } from "pinia";
 import NDK, {
   type NDKConstructorParams,
@@ -9,14 +13,14 @@ import NDK, {
   type NDKUserProfile,
   NDKFilter,
   NDKEvent,
-  NostrEvent,
+  //NostrEvent,
   NDKTag,
   NDKSubscription,
   NDKSigner,
   NDKPrivateKeySigner,
-  NDKKind,
-} from "@/ndk";
-import { nip19 } from "@/nostr-tools";
+  //NDKKind,
+} from "@nostr-dev-kit/ndk";
+import { nip19 } from "nostr-tools";
 import { Relay, newStall, Event } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
 import { useAppStore } from "@/store";
@@ -54,7 +58,8 @@ export class NostrProviderService {
     this.debug = debug("ndk");
     const appStore = useAppStore();
     const { npub } = storeToRefs(appStore);
-    const { getNpub, getPrivKey, getPubKey, getUser } = appStore;
+    // const { getNpub, getPrivKey, getPubKey, getUser } = appStore;
+    const { getNpub, getPrivKey, getPubKey } = appStore;
     this.explicitRelayUrls = explicitUrls;
     this.relayUrls = explicitUrls;
     this.npub = npub ? npub.value : "";
@@ -64,6 +69,7 @@ export class NostrProviderService {
     // // this.nostrStore = useNostrStore();
     // console.log(getNpub);
 
+    // TODO: This might be going away
     if (!npub || npub.value === "") {
       console.log("unauth session");
       this.startWithUnauthSession();
@@ -98,8 +104,8 @@ export class NostrProviderService {
   }
 
   private async startWithUnauthSession() {
-    const appStore = useAppStore();
-    const { loggingIn, loggedIn } = storeToRefs(appStore);
+    // const appStore = useAppStore();
+    // const { loggingIn, loggedIn } = storeToRefs(appStore);
     // loggingIn.value = true;
     // setLoggingIn(true);
     // setLoggingIn(true)
@@ -137,12 +143,14 @@ export class NostrProviderService {
 
   attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
     const appStore = useAppStore();
-    const { loggingIn, privkey, loggedIn, pubkeyLogin, user } =
+    const { loggingIn, privkey, nsec, pubkeyLogin, user } =
       storeToRefs(appStore);
     try {
       loggingIn.value = true;
       const hexPrivateKey = this.validateAndGetHexKey(enteredKey);
       if (enteredKey.startsWith("nsec")) {
+        nsec.value = enteredKey;
+        this.isNip07 = false;
         this.signer = new NDKPrivateKeySigner(hexPrivateKey);
         this.signer.user().then((suser) => {
           privkey.value = hexPrivateKey;
@@ -289,7 +297,7 @@ export class NostrProviderService {
         if (hexPubKey === hexPubKeyFromRemote) {
           verified = true;
           // raise this only for the current logged in user
-          if (hexPubKey === this.currentUser?.hexpubkey())
+          if (hexPubKey === this.currentUser?.hexpubkey)
             this.isNip05Verified$.next(true);
         }
       }
@@ -344,7 +352,7 @@ export class NostrProviderService {
 
     await this.checkIfNIP05Verified(
       this.currentUserProfile?.nip05,
-      this.currentUser?.hexpubkey()
+      this.currentUser?.hexpubkey
     );
   }
 
@@ -428,6 +436,15 @@ export class NostrProviderService {
   //   });
   //   if (productEvent) return parseProduct(productEvent);
   // }
+
+  async buildEvent(kind: number, content: string): Promise<NDKEvent> {
+    //TODO: Build events based on kind
+    //TODO: Switch statement? for each kind
+    const ndkEvent = new NDKEvent(this.ndk);
+    ndkEvent.kind = kind;
+    ndkEvent.content = content;
+    return ndkEvent;
+  }
 
   async createStall(stall: newStall): Promise<NDKEvent> {
     const appStore = useAppStore();
@@ -623,8 +640,8 @@ export class NostrProviderService {
     console.log("Getting user relays");
     const relays: Relay[] = [];
     let author: string = "";
-    if (this.currentUser?.hexpubkey()) {
-      author = this.currentUser.hexpubkey();
+    if (this.currentUser?.hexpubkey) {
+      author = this.currentUser.hexpubkey;
     }
     const relayEvent: NDKEvent | null | undefined = await this.fetchRelayEvent(
       author
