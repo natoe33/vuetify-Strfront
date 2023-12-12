@@ -6,9 +6,11 @@ import {
   Shipping,
 } from "@/models";
 import { v4 as uuidv4 } from "uuid";
-import { NDKEvent } from "@/ndk";
+import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store";
+import { nip98, nip19, finishEvent, getBlankEvent, utils } from "nostr-tools";
+import { base64 } from "@scure/base";
 import json from "./currencies.json";
 import cjson from "./countries.json";
 // import MyWorker from "@/worker?worker";
@@ -157,7 +159,7 @@ export class Utils {
   };
 
   generateUUID = (): string => {
-    console.log(uuidv4());
+    // console.log(uuidv4());
     return uuidv4();
   };
 
@@ -174,7 +176,66 @@ export class Utils {
     return countries;
   };
 
-  uploadImages = async () => {
-    const url: string = import.meta.env.BASE_URL;
+  /**
+   * Generate NIP-98 auth header
+   *
+   * @param {string} url - api endpoint for image upload service
+   * @param {string} httpMethod - http method required by api endpoint
+   * @returns {string}
+   * @example
+   * await getSignedToken('https://imageapi.com/v1/upload', 'POST')
+   */
+  async getSignedToken(url: string, httpMethod: string) {
+    const appStore = useAppStore();
+    const { npub, nostrProvider } = storeToRefs(appStore);
+    console.log(nostrProvider.value);
+    const event = getBlankEvent(27235);
+    event.tags = [
+      ["u", url],
+      ["method", httpMethod],
+    ];
+    event.created_at = Math.round(new Date().getTime() / 1000);
+    const { type, data } = nip19.decode(npub.value);
+    const pubkey = type === "npub" ? data : "";
+    const nEvent: NostrEvent = {
+      pubkey: (await window.nostr?.getPublicKey()) || pubkey,
+      tags: event.tags,
+      created_at: event.created_at,
+      content: "",
+    };
+    nEvent.sig = await nostrProvider.value.ndk?.signer?.sign(nEvent);
+    return "Nostr " + base64.encode(utils.utf8Encoder.encode(JSON.stringify(nEvent)));
+  }
+
+  /**
+   * Generate NIP-98 auth header for nostr.build and upload image
+   *
+   * @param {file} file - image being uploaded
+   *
+   * @return {String} - image url
+   * @example
+   * await uploadImages(file)
+   */
+  async uploadImage(file: File): Promise<string> {
+    // Generate NIP-98 auth header for nostr.build
+    const url: string = import.meta.env.VITE_UPLOAD_URL;
+    console.log(url);
+    const token = await this.getSignedToken(url, "POST");
+    console.log(token);
+    const formData = new FormData();
+    formData.append(file.name, file);
+    const headers = new Headers();
+    headers.append("Authorization", token);
+    headers.append("Accept", "application/json");
+    const data = await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: headers,
+      body: formData,
+    })
+    const response = await data.json();
+    console.log(response.data);
+    console.log(response.data[0].url);
+    return response.data[0].url;
   }
 }
