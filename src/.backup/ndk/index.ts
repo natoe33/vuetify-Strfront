@@ -36,7 +36,8 @@ export * from "./signers/nip46/index.js";
 export * from "./signers/private-key/index.js";
 export * from "./subscription/index.js";
 export * from "./user/profile.js";
-export { NDKZapInvoice, zapInvoiceFromEvent } from "./zap/invoice.js";
+// export { NDKZapInvoice, zapInvoiceFromEvent } from "./zap/invoice.js";
+export * from "./zap/invoice"
 
 export interface NDKConstructorParams {
     explicitRelayUrls?: string[];

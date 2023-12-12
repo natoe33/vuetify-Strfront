@@ -3,8 +3,8 @@ import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
-import NDK, { NDKEvent, NDKKind, NDKUser } from "@/ndk";
-import { nip19 } from "@/nostr-tools";
+import NDK, { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
+import { nip19 } from "nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
 
@@ -26,7 +26,8 @@ type State = {
   loggedIn: RemovableRef<boolean>;
   user: RemovableRef<NDKUser>;
   npub: RemovableRef<string>;
-  privkey: string;
+  nsec: RemovableRef<string>;
+  privkey: RemovableRef<string>;
   pubkeyLogin: RemovableRef<boolean>;
   drawer: boolean;
   overflow: boolean;
@@ -62,7 +63,8 @@ export const useAppStore = defineStore({
     loggedIn: useLocalStorage("loggedIn", false),
     user: useLocalStorage("user", new NDKUser({})),
     npub: useLocalStorage("npub", ""),
-    privkey: "",
+    nsec: useLocalStorage("nsec", ""),
+    privkey: useLocalStorage("pkey", ""),
     pubkeyLogin: useLocalStorage("pubkeyLogin", false),
     drawer: false,
     overflow: false,
