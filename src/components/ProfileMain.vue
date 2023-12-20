@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 import { useTheme } from "vuetify";
 import { ref, defineAsyncComponent } from "vue";

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type PropType } from "vue";
 import { useClipboard } from "@vueuse/core";
-import { useNostrStore, useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { NewCredential } from "@/utils/login";
 import { storeToRefs } from "pinia";
 

@@ -2,7 +2,7 @@
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { NDKUser } from "@nostr-dev-kit/ndk";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 import { NostrProviderService } from "@/utils";
 

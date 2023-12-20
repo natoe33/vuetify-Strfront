@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 const appStore = useAppStore();
 const { user } = storeToRefs(appStore);

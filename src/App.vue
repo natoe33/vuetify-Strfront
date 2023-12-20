@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { onMounted, defineAsyncComponent, watch } from "vue";
 import AppBar from "@/components/AppBar.vue";
 import NavDrawer from "@/components/NavDrawer.vue";

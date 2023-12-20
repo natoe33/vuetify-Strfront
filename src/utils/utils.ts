@@ -8,7 +8,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { nip98, nip19, finishEvent, getBlankEvent, utils } from "nostr-tools";
 import { base64 } from "@scure/base";
 import json from "./currencies.json";

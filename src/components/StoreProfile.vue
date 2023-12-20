@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, defineAsyncComponent } from "vue";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { newShipping, IEvent, Event } from "@/models";
 import { storeToRefs } from "pinia";
 

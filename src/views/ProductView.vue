@@ -5,9 +5,9 @@
 import { ref, onMounted, defineAsyncComponent } from "vue";
 import { useDisplay } from "vuetify";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { Product, Stall, IProfile } from "@/models";
-import { NDKEvent } from "@/ndk";
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 // import ProductSection from "@/components/ProductSection.vue";
 const ProductSection = defineAsyncComponent(
   () => import("@/components/ProductSection.vue")
@@ -49,8 +49,8 @@ async function setProductObjects() {
     merchant.value && merchant.value.pubkey
       ? merchant.value.pubkey
       : product.value && product.value.pubkey
-      ? product.value.pubkey
-      : "";
+        ? product.value.pubkey
+        : "";
   const tempProfile = await getMerchantProfile.value(merchKey);
   if (tempProfile && tempProfile.size > 0) {
     const tmp: NDKEvent = tempProfile.values().next().value;

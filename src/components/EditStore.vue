@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { Event, newShipping, newStall } from "@/models";
 import { NostrProviderService } from "@/utils";
 

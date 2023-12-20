@@ -23,7 +23,7 @@ import NDK, {
 import { nip19 } from "nostr-tools";
 import { Relay, newStall, Event } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { BehaviorSubject } from "rxjs";
 
 const explicitUrls: string[] = [
@@ -262,7 +262,7 @@ export class NostrProviderService {
         if (user.npub) {
           console.log(
             "Permission granted to read their public key:",
-            user.npub
+            user.npub,
           );
           await this.initializeUsingNpub(user.npub);
         } else {
@@ -276,7 +276,7 @@ export class NostrProviderService {
 
   async checkIfNIP05Verified(
     nip05: string | undefined,
-    hexPubKey: string | undefined
+    hexPubKey: string | undefined,
   ): Promise<boolean> {
     let nip05Domain;
     let verificationEndpoint;
@@ -352,7 +352,7 @@ export class NostrProviderService {
 
     await this.checkIfNIP05Verified(
       this.currentUserProfile?.nip05,
-      this.currentUser?.hexpubkey
+      this.currentUser?.hexpubkey,
     );
   }
 
@@ -480,7 +480,7 @@ export class NostrProviderService {
   }
 
   async fetchSingleMerchantEvent(
-    pubkey: string
+    pubkey: string,
   ): Promise<NDKEvent | null | undefined> {
     const filter: NDKFilter = {
       authors: [pubkey],
@@ -495,7 +495,7 @@ export class NostrProviderService {
     // const { events } = storeToRefs(appStore);
     const subscription = this.ndk?.subscribe(
       { kinds: [kind] },
-      { closeOnEose: false }
+      { closeOnEose: false },
     );
     console.log(subscription);
     subscription?.on("event", (event: NDKEvent) => {
@@ -531,7 +531,7 @@ export class NostrProviderService {
 
   async fetchEventLimit(
     kind: number,
-    limit: number
+    limit: number,
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [kind], limit: limit };
     const productEvents = await this.ndk?.fetchEvents(filter);
@@ -539,7 +539,7 @@ export class NostrProviderService {
   }
 
   async fetchMerchantProducts(
-    authors: string[]
+    authors: string[],
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30018], authors: authors };
     const prodEvents = await this.ndk?.fetchEvents(filter);
@@ -548,7 +548,7 @@ export class NostrProviderService {
   }
 
   async fetchMerchantEvents(
-    authors: string[]
+    authors: string[],
   ): Promise<Set<NDKEvent> | undefined> {
     const filter: NDKFilter = { kinds: [30017], authors: authors };
     const stallEvents = await this.ndk?.fetchEvents(filter);
@@ -562,7 +562,7 @@ export class NostrProviderService {
   }
 
   async fetchRelayEvent(
-    hexPubKey: string
+    hexPubKey: string,
   ): Promise<NDKEvent | null | undefined> {
     let relayEvent: NDKEvent | null | undefined;
     // nip 65 specifies a kind 10002 event to broadcast a user's subscribed relays
@@ -570,7 +570,7 @@ export class NostrProviderService {
     const relayEvents = await this.ndk?.fetchEvents(filter);
     if (relayEvents) {
       const sortedRelayEvents = [...relayEvents].sort(
-        (a: NDKEvent, b: NDKEvent) => b.created_at! - a.created_at!
+        (a: NDKEvent, b: NDKEvent) => b.created_at! - a.created_at!,
       );
       relayEvent = sortedRelayEvents[0]; //take the latest event
       if (!relayEvent) {
@@ -643,9 +643,8 @@ export class NostrProviderService {
     if (this.currentUser?.hexpubkey) {
       author = this.currentUser.hexpubkey;
     }
-    const relayEvent: NDKEvent | null | undefined = await this.fetchRelayEvent(
-      author
-    );
+    const relayEvent: NDKEvent | null | undefined =
+      await this.fetchRelayEvent(author);
     if (relayEvent) {
       if (relayEvent.kind === 10002) {
         const relayTag: Relay[] = this.parseRelayEventTags(relayEvent.tags);
@@ -660,7 +659,7 @@ export class NostrProviderService {
       } else if (relayEvent.kind === 3) {
         try {
           const contentRelays: Relay[] = this.parseRelayEventContent(
-            relayEvent.content
+            relayEvent.content,
           );
           contentRelays.forEach((relay) => {
             if (
@@ -693,7 +692,7 @@ export class NostrProviderService {
     const { getRelays } = appStore;
     const subscribedRelaysFromCache = getRelays;
     console.log(
-      `Subscribed Relays from cache : ${subscribedRelaysFromCache?.length}`
+      `Subscribed Relays from cache : ${subscribedRelaysFromCache?.length}`,
     );
 
     const subscribedRelaysFromRelay: Relay[] =

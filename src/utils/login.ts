@@ -4,7 +4,7 @@ import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import { HDKey } from "@scure/bip32";
 import { bech32 } from "bech32";
-import { NDKUser } from "@/ndk";
+import { NDKUser } from "@nostr-dev-kit/ndk";
 import { Util } from "./invoice";
 
 /*

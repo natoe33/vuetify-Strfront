@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, defineAsyncComponent } from "vue";
 import { newStall, newShipping, Event } from "@/models";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 const EditStore = defineAsyncComponent(
   () => import("@/components/EditStore.vue")

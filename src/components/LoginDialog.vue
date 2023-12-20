@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { watch, ref, onMounted, defineAsyncComponent } from "vue";
 
 const NewUser = defineAsyncComponent(() => import("@/components/NewUser.vue"));

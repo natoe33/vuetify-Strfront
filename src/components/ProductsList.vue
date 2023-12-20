@@ -5,7 +5,7 @@ import ProductCard from "./ProductCard.vue";
 import { onMounted, ref, watch, computed, defineAsyncComponent } from "vue";
 import { useRouter } from "vue-router";
 import { Product } from "@/models";
-import { useAppStore } from "@/store";
+import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
 const LoadingOverlay = defineAsyncComponent(
   () => import("@/components/LoadingOverlay.vue")
