@@ -1,7 +1,10 @@
-// import { NostrFetcher, eventKind, type NostrEvent } from "nostr-fetch";
-
-// TODO: Don't load users' relays? See if ndk supports this
-// Just create a single instance and track the logged in user separately
+// TODO: Redo almost this entire thing
+/**
+ * intialize ndk with only default relays
+ * possibly use the strfront relay
+ * ndk now allows you to set a signer after ndk object is created
+ * 
+ */
 
 import debug from "debug";
 // import { Ref } from "vue";
@@ -33,7 +36,7 @@ const explicitUrls: string[] = [
 ];
 
 export class NostrProviderService {
-  ndk: NDK | undefined;
+  ndk: NDK;
   debug: debug.Debugger;
   currentUserProfile: NDKUserProfile | undefined;
   currentUser: NDKUser | undefined;
@@ -55,6 +58,7 @@ export class NostrProviderService {
 
   constructor() {
     // this.fetcher = NostrFetcher.init();
+    this.ndk = this.initialize();
     this.debug = debug("ndk");
     const appStore = useAppStore();
     const { npub } = storeToRefs(appStore);
@@ -97,6 +101,14 @@ export class NostrProviderService {
         }
       }
     }
+  }
+
+  initialize(): NDK {
+    return this.ndk
+  }
+
+  logIn() {
+    this.ndk.signer = new NDKPrivateKeySigner('');
   }
 
   createNDKEvent(): NDKEvent {

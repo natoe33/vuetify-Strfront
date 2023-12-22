@@ -29,7 +29,7 @@ function addImage() {
 }
 
 function createItem() {
-  prodProfile.value.id = utils.value.generateUUID();
+  prodProfile.value.id = utils.value.generateUUID().replaceAll("-","");
   prodProfile.value.currency = stores.value.find(store => store.id = prodProfile.value.stall_id)?.currency || 'SAT';
   console.log(prodProfile.value);
 }
@@ -39,6 +39,7 @@ watch(addItem, (newval) => {
     console.log(userStores.value);
     userStores.value.forEach((store) => {
       const stall: newStall = JSON.parse(store.content);
+      // TODO: Deduplicate stores
       stores.value.push(stall);
     })
   }

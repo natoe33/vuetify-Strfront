@@ -82,6 +82,8 @@ const items = await getSortedTags;
           </v-avatar>
         </template>
       </v-list-item>
+      <v-list-item title="Marketplace"></v-list-item>
+      <v-list-item title="Classifieds"></v-list-item>
       <template v-if="loggedIn">
         <v-list-item title="Sign Out" @click="Logout">
           <template v-slot:prepend>
