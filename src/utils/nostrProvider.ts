@@ -35,6 +35,8 @@ const explicitUrls: string[] = [
   "wss://relay.nostr.band",
 ];
 
+const devRelays: string[] = import.meta.env.DEV ? ["wss://relay.strfront.com"] : [];
+
 export class NostrProviderService {
   ndk: NDK;
   debug: debug.Debugger;
@@ -43,7 +45,6 @@ export class NostrProviderService {
   currentUserNpub: string | undefined;
   isNip05Verified$ = new BehaviorSubject<boolean>(false);
   peopleIFollowEmitter: NDKSubscription | undefined;
-  explicitRelayUrls: string[];
   private signer: NDKSigner | undefined = undefined;
   loggedIn: boolean = false;
   loggingIn: boolean = false;
@@ -52,9 +53,6 @@ export class NostrProviderService {
   isNip07 = false;
   isLoggedInUsingPubKey$ = new BehaviorSubject<boolean>(false);
   isLoggedInUsingNsec: boolean = false;
-  relayUrls: string[];
-  // user: NDKUser;
-  npub: string;
 
   constructor() {
     // this.fetcher = NostrFetcher.init();
@@ -62,48 +60,14 @@ export class NostrProviderService {
     this.debug = debug("ndk");
     const appStore = useAppStore();
     const { npub } = storeToRefs(appStore);
-    // const { getNpub, getPrivKey, getPubKey, getUser } = appStore;
-    const { getNpub, getPrivKey, getPubKey } = appStore;
-    this.explicitRelayUrls = explicitUrls;
-    this.relayUrls = explicitUrls;
-    this.npub = npub ? npub.value : "";
-    // this.user = getUser;
-    // console.log(this.user);
-    // // private appStore = useAppStore();
-    // // this.nostrStore = useNostrStore();
-    // console.log(getNpub);
-
-    // TODO: This might be going away
-    if (!npub || npub.value === "") {
-      console.log("unauth session");
-      this.startWithUnauthSession();
-    } else {
-      console.log("auth session");
-      console.log(npub.value);
-      if (npub && npub.value !== "") {
-        if (getPrivKey && getPrivKey !== "") {
-          console.log("privkey session");
-          this.isNip07 = false;
-          this.isLoggedInUsingNsec = true;
-          this.signer = new NDKPrivateKeySigner(getPrivKey);
-          this.canWriteToNostr = true;
-          this.tryLoginUsingNpub(getNpub);
-        } else {
-          console.log("pubkey session");
-          if (getPubKey && getPubKey !== "") {
-            this.isNip07 = true;
-            this.isLoggedInUsingPubKey$.next(true);
-          } else {
-            this.isNip07 = true;
-            this.canWriteToNostr = true;
-          }
-          this.tryLoginUsingNpub(getNpub);
-        }
-      }
-    }
   }
 
   initialize(): NDK {
+    const parms: NDKConstructorParams = {
+      devWriteRelayUrls: devRelays,
+      explicitRelayUrls: explicitUrls
+    };
+    this.ndk = new NDK(parms);
     return this.ndk
   }
 
