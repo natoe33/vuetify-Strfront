@@ -14,6 +14,7 @@ import NDK, {
   NDKNip07Signer,
   NDKUser,
   type NDKUserProfile,
+  NDKUserParams,
   NDKFilter,
   NDKEvent,
   //NostrEvent,
@@ -55,7 +56,7 @@ export class NostrProviderService {
   isLoggedInUsingNsec: boolean = false;
 
   constructor() {
-    // this.fetcher = NostrFetcher.init();
+    console.log('NDK constructor')
     this.ndk = this.initialize();
     this.debug = debug("ndk");
     const appStore = useAppStore();
@@ -63,6 +64,7 @@ export class NostrProviderService {
   }
 
   initialize(): NDK {
+    console.log('NDK initialize')
     const parms: NDKConstructorParams = {
       devWriteRelayUrls: devRelays,
       explicitRelayUrls: explicitUrls
@@ -117,28 +119,35 @@ export class NostrProviderService {
     return LoginUtil.getHexFromPrivateOrPubKey(enteredKey);
   }
 
-  attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
+  async attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
     const appStore = useAppStore();
     const { loggingIn, privkey, nsec, pubkeyLogin, user } =
       storeToRefs(appStore);
     try {
       loggingIn.value = true;
-      const hexPrivateKey = this.validateAndGetHexKey(enteredKey);
+      const hexKey = this.validateAndGetHexKey(enteredKey);
       if (enteredKey.startsWith("nsec")) {
         nsec.value = enteredKey;
         this.isNip07 = false;
-        this.signer = new NDKPrivateKeySigner(hexPrivateKey);
-        this.signer.user().then((suser) => {
-          privkey.value = hexPrivateKey;
-          user.value = suser;
-          this.isLoggedInUsingNsec = true;
-          this.canWriteToNostr = true;
-          this.tryLoginUsingNpub(user.value.npub);
-        });
+        this.signer = new NDKPrivateKeySigner(hexKey);
+        this.ndk.activeUser = await this.signer.blockUntilReady();
+        // this.signer.blockUntilReady();
+        // this.signer.user().then((suser) => {
+        //   privkey.value = hexPrivateKey;
+        //   user.value = suser;
+        //   this.isLoggedInUsingNsec = true;
+        //   this.canWriteToNostr = true;
+        //   this.tryLoginUsingNpub(user.value.npub);
+        // });
       } else if (enteredKey.startsWith("npub")) {
         pubkeyLogin.value = true;
+        const opts: NDKUserParams = {
+          npub: enteredKey,
+          pubkey: hexKey
+        }
         this.isLoggedInUsingPubKey$.next(true);
-        this.tryLoginUsingNpub(enteredKey);
+        this.ndk.activeUser = new NDKUser(opts);
+        // this.tryLoginUsingNpub(enteredKey);
       } else {
         this.loginError = "Invalid input. Enter either nsec or npub id";
       }
@@ -149,6 +158,10 @@ export class NostrProviderService {
     }
   }
 
+  /**
+   * @deprecated
+   * @param npubFromLocal
+   */
   async tryLoginUsingNpub(npubFromLocal: string) {
     const appStore = useAppStore();
     const { relay } = storeToRefs(appStore);
@@ -167,7 +180,7 @@ export class NostrProviderService {
 
     const params: NDKConstructorParams = {
       signer: this.signer,
-      explicitRelayUrls: this.relayUrls,
+      // explicitRelayUrls: this.relayUrls,
       debug: this.debug,
     };
     this.ndk = new NDK(params);
@@ -223,16 +236,17 @@ export class NostrProviderService {
     try {
       // console.log(`initialize with signer`);
       this.signer?.user().then(async (user) => {
-        let relayUrls: string[] | undefined = [];
-        if (this.relayUrls !== undefined) {
-          relayUrls = this.relayUrls;
-        }
-        const params: NDKConstructorParams = {
-          signer: this.signer,
-          explicitRelayUrls: relayUrls ? relayUrls : this.explicitRelayUrls,
-          debug: this.debug,
-        };
-        this.ndk = new NDK(params);
+        // let relayUrls: string[] | undefined = [];
+        // if (this.relayUrls !== undefined) {
+        //   relayUrls = this.relayUrls;
+        // }
+        // const params: NDKConstructorParams = {
+        //   signer: this.signer,
+        //   explicitRelayUrls: relayUrls ? relayUrls : this.explicitRelayUrls,
+        //   debug: this.debug,
+        // };
+        // this.ndk = new NDK(params);
+        this.ndk.signer = this.signer;
         await this.ndk.assertSigner();
         await this.ndk.connect(1000);
         if (user.npub) {
@@ -285,39 +299,40 @@ export class NostrProviderService {
     // const { user, loggedIn, loggingIn, npub } = storeToRefs(this.appStore);
     const appStore = useAppStore();
     const { setLoggedIn, setLoggingIn, setUser, setNpub } = appStore;
-    const { relay } = storeToRefs(appStore);
-    // const nostrStore = useNostrStore();
-    // const { setNpub, setUser } = nostrStore;
-    // setNpub(pubkey);
-    // npub.value = pubkey;
-    this.currentUserProfile = await this.getProfileFromNpub(pubkey);
-    this.currentUser = await this.getNdkUserFromNpub(pubkey);
-    // const relayUrls: string[] = explicitUrls;
-    const userRelays = await this.fetchSubscribedRelaysFromCache();
-    const relayUrls: string[] = [];
-    userRelays.forEach((x) => {
-      relayUrls.push(x.url);
-    });
-    // console.log(relayUrls);
-    // console.log(this.signer);
-    if (relayUrls && relayUrls.length > 0) {
-      const newNDKParams: NDKConstructorParams = {
-        signer: this.signer,
-        explicitRelayUrls: relayUrls,
-        debug: this.debug,
-      };
-      const newNDK: NDK = new NDK(newNDKParams);
-      if (this.isNip07) {
-        await newNDK.assertSigner();
-      }
-      try {
-        await newNDK.connect(1000).catch((e) => console.log(e));
-        this.ndk = newNDK;
-        relay.value = newNDK;
-      } catch (e) {
-        console.log(`Error connecting NDK: ${e}`);
-      }
-    }
+    
+    // const { relay } = storeToRefs(appStore);
+    // // const nostrStore = useNostrStore();
+    // // const { setNpub, setUser } = nostrStore;
+    // // setNpub(pubkey);
+    // // npub.value = pubkey;
+    // this.currentUserProfile = await this.getProfileFromNpub(pubkey);
+    // this.currentUser = await this.getNdkUserFromNpub(pubkey);
+    // // const relayUrls: string[] = explicitUrls;
+    // const userRelays = await this.fetchSubscribedRelaysFromCache();
+    // const relayUrls: string[] = [];
+    // userRelays.forEach((x) => {
+    //   relayUrls.push(x.url);
+    // });
+    // // console.log(relayUrls);
+    // // console.log(this.signer);
+    // if (relayUrls && relayUrls.length > 0) {
+    //   const newNDKParams: NDKConstructorParams = {
+    //     signer: this.signer,
+    //     explicitRelayUrls: relayUrls,
+    //     debug: this.debug,
+    //   };
+    //   const newNDK: NDK = new NDK(newNDKParams);
+    //   if (this.isNip07) {
+    //     await newNDK.assertSigner();
+    //   }
+    //   try {
+    //     await newNDK.connect(1000).catch((e) => console.log(e));
+    //     this.ndk = newNDK;
+    //     relay.value = newNDK;
+    //   } catch (e) {
+    //     console.log(`Error connecting NDK: ${e}`);
+    //   }
+    //}
     setLoggingIn(false);
     setLoggedIn(true);
     // console.log(this.currentUser);
@@ -340,7 +355,7 @@ export class NostrProviderService {
       const relayEvent: NDKEvent = new NDKEvent(this.ndk);
       relayEvent.kind = 10002;
       relayEvent.content = "";
-      relayEvent.tags = await this.getSuggestedRelays();
+      // relayEvent.tags = await this.getSuggestedRelays();
       console.log(relayEvent);
       relayEvent.publish();
 
@@ -357,9 +372,13 @@ export class NostrProviderService {
     };
   }
 
-  async getSuggestedRelays(): Promise<NDKTag[]> {
-    const relayTags = this.relayUrls.map((val) => ["r", val]);
-    return relayTags;
+  /**
+   * 
+   * @deprecated
+   */
+  async getSuggestedRelays() { //Promise<NDKTag[]> {
+    // const relayTags = this.relayUrls.map((val) => ["r", val]);
+    // return relayTags;
   }
 
   isLoggedIn(): boolean {
