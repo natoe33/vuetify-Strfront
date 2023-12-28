@@ -21,6 +21,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+/src/.backup
 
 #NPM files
 package-lock.json
