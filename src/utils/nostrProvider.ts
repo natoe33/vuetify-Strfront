@@ -340,7 +340,7 @@ export class NostrProviderService {
       const relayEvent: NDKEvent = new NDKEvent(this.ndk);
       relayEvent.kind = 10002;
       relayEvent.content = "";
-      relayEvent.tags = await this.getSuggestedRelays();
+      // relayEvent.tags = await this.getSuggestedRelays();
       console.log(relayEvent);
       relayEvent.publish();
 
