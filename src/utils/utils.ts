@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store/app";
-import { nip98, nip19, finishEvent, getBlankEvent, utils } from "nostr-tools";
+import { nip98, nip19, utils } from "nostr-tools";
 import { base64 } from "@scure/base";
 import json from "./currencies.json";
 import cjson from "./countries.json";
@@ -189,22 +189,23 @@ export class Utils {
     const appStore = useAppStore();
     const { npub, nostrProvider } = storeToRefs(appStore);
     console.log(nostrProvider.value);
-    const event = getBlankEvent(27235);
-    event.tags = [
-      ["u", url],
-      ["method", httpMethod],
-    ];
-    event.created_at = Math.round(new Date().getTime() / 1000);
-    const { type, data } = nip19.decode(npub.value);
-    const pubkey = type === "npub" ? data : "";
-    const nEvent: NostrEvent = {
-      pubkey: (await window.nostr?.getPublicKey()) || pubkey,
-      tags: event.tags,
-      created_at: event.created_at,
-      content: "",
-    };
-    nEvent.sig = await nostrProvider.value.ndk?.signer?.sign(nEvent);
-    return "Nostr " + base64.encode(utils.utf8Encoder.encode(JSON.stringify(nEvent)));
+    // const event = getBlankEvent(27235);
+    // event.tags = [
+    //   ["u", url],
+    //   ["method", httpMethod],
+    // ];
+    // event.created_at = Math.round(new Date().getTime() / 1000);
+    // const { type, data } = nip19.decode(npub.value);
+    // const pubkey = type === "npub" ? data : "";
+    // const nEvent: NostrEvent = {
+    //   pubkey: (await window.nostr?.getPublicKey()) || pubkey,
+    //   tags: event.tags,
+    //   created_at: event.created_at,
+    //   content: "",
+    // };
+    // nEvent.sig = await nostrProvider.value.ndk?.signer?.sign(nEvent);
+    // return "Nostr " + base64.encode(utils.utf8Encoder.encode(JSON.stringify(nEvent)));
+    return "Nostr " + "test";
   }
 
   /**

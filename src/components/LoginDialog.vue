@@ -42,11 +42,12 @@ function attemptGenerateNewCredential() {
 
 watch(loggingIn, (newVal) => {
   console.log(`LoginDialog watch triggered: ${newVal}, ${getNpub}`);
-  if (newVal && getNpub === "") {
-    dialog.value = newVal;
-  } else {
-    dialog.value = newVal;
-  }
+  dialog.value = newVal;
+  // if (newVal && getNpub === "") {
+  //   dialog.value = newVal;
+  // } else {
+  //   dialog.value = newVal;
+  // }
 });
 
 onMounted(() => {

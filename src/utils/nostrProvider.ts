@@ -70,6 +70,7 @@ export class NostrProviderService {
       explicitRelayUrls: explicitUrls
     };
     this.ndk = new NDK(parms);
+    this.ndk.connect();
     return this.ndk
   }
 
@@ -164,7 +165,7 @@ export class NostrProviderService {
    */
   async tryLoginUsingNpub(npubFromLocal: string) {
     const appStore = useAppStore();
-    const { relay } = storeToRefs(appStore);
+    // const { relay } = storeToRefs(appStore);
     // setLoggingIn(true);
 
     // loggingIn.value = true;
@@ -184,7 +185,7 @@ export class NostrProviderService {
       debug: this.debug,
     };
     this.ndk = new NDK(params);
-    relay.value = this.ndk;
+    // relay.value = this.ndk;
 
     await this.ndk.connect(1000);
     this.initializeUsingNpub(npubFromLocal);
@@ -233,7 +234,6 @@ export class NostrProviderService {
   }
 
   private async initializeClientWithSigner() {
-    try {
       // console.log(`initialize with signer`);
       this.signer?.user().then(async (user) => {
         // let relayUrls: string[] | undefined = [];
@@ -258,10 +258,10 @@ export class NostrProviderService {
         } else {
           console.log("Permission not granted");
         }
+      })
+      .catch((error) => {
+        console.error(error);
       });
-    } catch (err) {
-      console.log(err);
-    }
   }
 
   async checkIfNIP05Verified(
@@ -349,7 +349,7 @@ export class NostrProviderService {
 
   async createNewUserOnNostr(displayName: string) {
     const appStore = useAppStore();
-    const { relay } = storeToRefs(appStore);
+    // const { relay } = storeToRefs(appStore);
     if (this.canWriteToNostr) {
       //create a relay follow list event and send it across
       const relayEvent: NDKEvent = new NDKEvent(this.ndk);
@@ -443,11 +443,11 @@ export class NostrProviderService {
 
   async createStall(stall: newStall): Promise<NDKEvent> {
     const appStore = useAppStore();
-    const { npub, user, relay } = storeToRefs(appStore);
+    const { npub, user } = storeToRefs(appStore);
     const { type, data } = nip19.decode(npub.value);
     console.log(type);
     console.log(data);
-    console.log(relay.value);
+    // console.log(relay.value);
     console.log(this.ndk);
     const ndkEvent = new NDKEvent(this.ndk);
     const tags: NDKTag[] = [];
@@ -514,14 +514,15 @@ export class NostrProviderService {
   }
 
   async fetchEvents(kind: number): Promise<Set<NDKEvent> | undefined> {
-    // console.log("Fetching events");
+    console.log("Fetching events");
     // console.log(this.ndk);
     while (!this.ndk) {
+      console.log('Waiting for ndk');
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    // console.log(this.ndk);
     const filter: NDKFilter = { kinds: [kind] };
-    return await this.ndk?.fetchEvents(filter);
+    const results = await this.ndk.fetchEvents(filter);
+    return results;
   }
 
   async fetchEventLimit(

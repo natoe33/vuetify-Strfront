@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useLocalStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
-import NDK, { NDKEvent, NDKKind, NDKUser } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
 import { nip19 } from "nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
@@ -16,7 +16,7 @@ type ProductTags = {
 };
 
 type State = {
-  relay: NDK;
+  // relay: NDK;
   // helper: RelayHelper;
   nostrProvider: NostrProviderService;
   utils: Utils;
@@ -53,7 +53,7 @@ type State = {
 export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
-    relay: new NDK({ explicitRelayUrls: relayUrls }),
+    // relay: new NDK({ explicitRelayUrls: relayUrls }),
     // helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     utils: new Utils(),
@@ -136,7 +136,8 @@ export const useAppStore = defineStore({
         await state.nostrProvider.fetchProfileEvent(pubkey);
     },
     getUserMerchantEvents: async (state) => {
-      const { type, data } = nip19.decode(state.npub);
+      if (state.npub){
+        const { type, data } = nip19.decode(state.npub);
       console.log(type);
       console.log(data);
       if (type === "npub") {
@@ -145,6 +146,7 @@ export const useAppStore = defineStore({
         // console.log(state.nostrProvider.ndk?.pool.relays);
         //return await state.nostrProvider.fetchSingleMerchantEvent(data.toString());
         return await state.nostrProvider.fetchMerchantEvents([data.toString()]);
+      }
       }
       return new Set<NDKEvent>();
     },
@@ -235,10 +237,10 @@ export const useAppStore = defineStore({
       this.products = [];
       this.stalls = [];
       const eventSet: Set<NDKEvent> | undefined =
-        await this.nostrProvider.fetchEvents(NDKKind.MarketProduct);
+        await this.nostrProvider.fetchEvents(30018);
       // console.log(eventSet);
       const merchSet: Set<NDKEvent> | undefined =
-        await this.nostrProvider.fetchEvents(NDKKind.MarketStall);
+        await this.nostrProvider.fetchEvents(30017);
       // console.log(merchSet);
       if (eventSet) {
         eventSet.forEach((event) => {
