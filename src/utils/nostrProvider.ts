@@ -167,7 +167,7 @@ export class NostrProviderService {
 
     const params: NDKConstructorParams = {
       signer: this.signer,
-      explicitRelayUrls: this.relayUrls,
+      // explicitRelayUrls: this.relayUrls,
       debug: this.debug,
     };
     this.ndk = new NDK(params);
@@ -224,12 +224,12 @@ export class NostrProviderService {
       // console.log(`initialize with signer`);
       this.signer?.user().then(async (user) => {
         let relayUrls: string[] | undefined = [];
-        if (this.relayUrls !== undefined) {
-          relayUrls = this.relayUrls;
-        }
+        // if (this.relayUrls !== undefined) {
+        //   relayUrls = this.relayUrls;
+        // }
         const params: NDKConstructorParams = {
           signer: this.signer,
-          explicitRelayUrls: relayUrls ? relayUrls : this.explicitRelayUrls,
+          explicitRelayUrls: relayUrls ? relayUrls : explicitUrls,
           debug: this.debug,
         };
         this.ndk = new NDK(params);
@@ -357,9 +357,13 @@ export class NostrProviderService {
     };
   }
 
-  async getSuggestedRelays(): Promise<NDKTag[]> {
-    const relayTags = this.relayUrls.map((val) => ["r", val]);
-    return relayTags;
+  /**
+   * 
+   * @deprecated
+   */
+  async getSuggestedRelays() { //Promise<NDKTag[]> {
+    // const relayTags = this.relayUrls.map((val) => ["r", val]);
+    // return relayTags;
   }
 
   isLoggedIn(): boolean {
