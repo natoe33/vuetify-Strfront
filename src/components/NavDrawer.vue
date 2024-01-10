@@ -4,17 +4,16 @@ import { useRouter } from "vue-router";
 import { NDKUser } from "@nostr-dev-kit/ndk";
 import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
-import { NostrProviderService } from "@/utils";
+// import { NostrProviderService } from "@/utils";
 
 const appStore = useAppStore();
-const { getSortedTags, setTagandLoading, setLoggedIn, getLoggedIn, setUser } =
+const { getSortedTags, setTagandLoading, setLoggedIn } =
   appStore;
-const { drawer, loggingIn, loggedIn, user, nostrProvider, npub } =
+const { drawer, loggingIn, loggedIn } =
   storeToRefs(appStore);
 
 const router = useRouter();
 const group = ref(null);
-const lnpub = ref("");
 const image = ref("");
 
 function loadWithTags(tag: string) {
@@ -23,7 +22,7 @@ function loadWithTags(tag: string) {
 
 function Logout() {
   // setNpub("");
-  setUser(new NDKUser({}));
+  // setUser(new NDKUser({}));
   setLoggedIn(false);
 }
 
@@ -39,19 +38,18 @@ function goToProfile() {
   router.push({ name: "profile" });
 }
 
-watch(npub, (newval) => {
-  if (newval !== "") {
-    console.log('NavDrawer npub updated')
-    nostrProvider.value = new NostrProviderService();
-  }
-});
+// watch(appStore.nostrProvider.ndk.activeUser?.npub, (newval) => {
+//   if (newval !== "") {
+//     console.log('NavDrawer npub updated')
+//     nostrProvider.value = new NostrProviderService();
+//   }
+// });
 
-watch(user, (newval) => {
+watch(loggedIn, (newval) => {
   // TODO: Update ndk here instead of MainView
-  if (newval.profile?.image) image.value = newval.profile?.image;
-  if (newval.npub) {
-    console.log("user updated");
-    lnpub.value = newval.npub;
+  console.log(appStore.nostrProvider.ndk.activeUser?.profile?.image);
+  if (newval && appStore.nostrProvider.ndk.activeUser?.profile?.image){
+    image.value = appStore.nostrProvider.ndk.activeUser?.profile?.image
   }
 });
 
@@ -60,8 +58,9 @@ watch(group, () => {
 });
 
 onMounted(() => {
-  if (user.value.profile?.image) image.value = user.value.profile?.image;
-  
+  if (appStore.nostrProvider.ndk.activeUser?.profile?.image){
+    image.value = appStore.nostrProvider.ndk.activeUser.profile.image
+  }  
 });
 //TODO: Fix tag loading
 const items = await getSortedTags;
@@ -73,11 +72,11 @@ const items = await getSortedTags;
       <v-list-item title="Profile" @click="profileHandler">
         <template v-slot:prepend>
           <v-avatar>
-            <template v-if="!user.profile?.image || user.profile?.image === ''">
+            <template v-if="!appStore.nostrProvider.ndk.activeUser?.profile?.image || appStore.nostrProvider.ndk.activeUser?.profile?.image">
               <v-icon icon="mdi-account-circle"></v-icon>
             </template>
             <template v-else>
-              <v-img :src="image" :alt="user.profile?.nip05"></v-img>
+              <v-img :src="image" :alt="appStore.nostrProvider.ndk.activeUser.profile?.nip05"></v-img>
             </template>
           </v-avatar>
         </template>

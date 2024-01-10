@@ -11,6 +11,7 @@ const { getNpub } = appStore;
 
 const dialog = ref(false);
 const key = ref("");
+const token = ref("");
 const winnostr = ref(false);
 const step = ref(1);
 const pubkey = ref("");
@@ -24,6 +25,11 @@ function closeDialog() {
 function attemptNip07Login() {
   console.log("Attempting NIP-07 Login");
   appStore.nostrProvider.attemptLoginWithNip07();
+}
+
+function attemptNip46Login() {
+  console.log("Attempting NIP-46 Login");
+  appStore.nostrProvider.attemptLoginWithNip46(token.value);
 }
 
 function attemptKeyLogin() {
@@ -58,7 +64,7 @@ onMounted(() => {
 </script>
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" persistent width="1024">
+    <v-dialog v-model="dialog" scrollable persistent width="1024">
       <v-window v-model="step">
         <v-window-item :value="1">
           <v-card>
@@ -71,15 +77,9 @@ onMounted(() => {
                   <v-col cols="12">
                     <v-card color="accent">
                       <v-card-title>New to Nostr</v-card-title>
-                      <v-card-subtitle
-                        >Create a new Nostr account</v-card-subtitle
-                      >
+                      <v-card-subtitle>Create a new Nostr account</v-card-subtitle>
                       <v-card-actions>
-                        <v-btn
-                          variant="text"
-                          @click="attemptGenerateNewCredential"
-                          >Create Account</v-btn
-                        >
+                        <v-btn variant="text" @click="attemptGenerateNewCredential">Create Account</v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-col>
@@ -87,17 +87,12 @@ onMounted(() => {
                 <v-row dense>
                   <v-col cols="12">
                     <v-card color="#385F73" theme="dark">
-                      <v-card-title
-                        >Nip-07 Extension (Recommended) 🔐</v-card-title
-                      >
+                      <v-card-title>Nip-07 Extension (Recommended) 🔐</v-card-title>
                       <v-card-subtitle>
                         Secure login requires a NIP-07 extension. Don't have a
                         NIP-07 extension? Refer to
-                        <a
-                          href="https://github.com/nostr-protocol/nips/blob/master/07.md#implementation"
-                          target="_blank"
-                          >this page</a
-                        >
+                        <a href="https://github.com/nostr-protocol/nips/blob/master/07.md#implementation"
+                          target="_blank">this page</a>
                       </v-card-subtitle>
                       <v-card-actions>
                         <template v-if="winnostr">
@@ -108,27 +103,35 @@ onMounted(() => {
                       </v-card-actions>
                     </v-card>
                   </v-col>
+                  <!-- <v-col cols="12">
+                    <v-card color="#385F73" theme="dark">
+                      <v-card-title>NIP-46 Token (e.g. nsecBunker) 🔐</v-card-title>
+                      <v-card-subtitle>Log in using a NIP-46 token. Refer to <a
+                          href="https://github.com/nostr-protocol/nips/blob/master/46.md#implementation"
+                          target="_blank">this page</a></v-card-subtitle>
+                      <v-row class="mx-1">
+                        <v-col cols="10">
+                          <v-text-field label="nsecBunker token" type="text" variant="underlined"
+                            prepend-inner-icon="mdi-form-textbox-password" v-model="token"></v-text-field>
+                        </v-col>
+                        <v-col cols="1">
+                          <v-btn variant="text" @click="attemptNip46Login">Log In</v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-card>
+                  </v-col> -->
                   <v-col cols="12">
                     <v-card color="#1F7087" theme="dark">
                       <v-card-title>Alternate Login 🗝️</v-card-title>
-                      <v-card-subtitle
-                        >Key starting with nsec(for read+write) or
-                        npub(read-only)</v-card-subtitle
-                      >
+                      <v-card-subtitle>Key starting with nsec(for read+write) or
+                        npub(read-only)</v-card-subtitle>
                       <v-row class="mx-1">
                         <v-col cols="10">
-                          <v-text-field
-                            label="nsec or npub"
-                            type="password"
-                            variant="underlined"
-                            prepend-inner-icon="mdi-form-textbox-password"
-                            v-model="key"
-                          ></v-text-field>
+                          <v-text-field label="nsec or npub" type="password" variant="underlined"
+                            prepend-inner-icon="mdi-form-textbox-password" v-model="key"></v-text-field>
                         </v-col>
                         <v-col cols="1">
-                          <v-btn variant="text" @click="attemptKeyLogin"
-                            >Log In</v-btn
-                          >
+                          <v-btn variant="text" @click="attemptKeyLogin">Log In</v-btn>
                         </v-col>
                       </v-row>
                     </v-card>

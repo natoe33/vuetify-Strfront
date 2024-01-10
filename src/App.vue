@@ -22,11 +22,11 @@ const EditStore = defineAsyncComponent(
 const AddItem = defineAsyncComponent(() => import("@/components/AddItem.vue"));
 
 const appStore = useAppStore();
-const { productsLoading, user  } = storeToRefs(appStore);
+// const { productsLoading, user  } = storeToRefs(appStore);
 
-watch(user, (newval) => {
-  console.log('App user updated');
-})
+// watch(user, (newval) => {
+//   console.log('App user updated');
+// })
 
 
 onMounted(async () => {
