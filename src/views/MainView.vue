@@ -7,6 +7,7 @@ import ProductsList from "@/components/ProductsList.vue";
 onMounted(() => {
   const appStore = useAppStore();
   const { loaded } = storeToRefs(appStore);
+  console.log('loaded value ' + loaded.value);
   if (!loaded.value || loaded.value === undefined) {
     appStore.initialEvents();
   }

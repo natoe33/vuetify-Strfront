@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "declaration": true,
     "baseUrl": ".",
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -22,7 +21,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "src/utils/worker.ts"

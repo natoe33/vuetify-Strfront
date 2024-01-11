@@ -8,7 +8,8 @@ const EditStore = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-const { store, editStore } = storeToRefs(appStore);
+const { store, editStore, deleteStore } = storeToRefs(appStore);
+
 
 const props = defineProps({
   storeEvent: {
@@ -20,6 +21,12 @@ const props = defineProps({
 function openEditStore() {
   store.value = props.storeEvent;
   editStore.value = !editStore.value;
+}
+
+function deleteSelectedStore() {
+  store.value = props.storeEvent;
+  console.log(store.value);
+  deleteStore.value = !deleteStore.value;
 }
 
 const storeProfile = ref({
@@ -71,10 +78,15 @@ onMounted(() => {
         variant="tonal"
         color="primary"
         elevation="4"
-        disabled
         @click="openEditStore"
         >Edit</v-btn
       >
+      <v-btn
+      variant="tonal"
+      color="accent"
+      elevation="4"
+      @click="deleteSelectedStore"
+      >Delete</v-btn>
     </v-card-actions>
   </v-card>
 </template>

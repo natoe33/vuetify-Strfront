@@ -12,7 +12,7 @@ const props = defineProps({
 });
 
 onMounted(() => {
-  // console.log(props.merchant);
+  console.log(props.merchant);
   // console.log(props.profile);
 });
 </script>

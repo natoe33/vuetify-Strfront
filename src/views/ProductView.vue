@@ -8,6 +8,7 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store/app";
 import { Product, Stall, IProfile } from "@/models";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
+// import { NDKEvent } from "@nostr-dev-kit/ndk";
 // import ProductSection from "@/components/ProductSection.vue";
 const ProductSection = defineAsyncComponent(
   () => import("@/components/ProductSection.vue")

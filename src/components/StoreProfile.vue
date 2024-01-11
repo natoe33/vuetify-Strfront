@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, defineAsyncComponent } from "vue";
+import { onMounted, watch, ref, defineAsyncComponent } from "vue";
 import { useAppStore } from "@/store/app";
 import { newShipping, IEvent, Event } from "@/models";
 import { storeToRefs } from "pinia";
@@ -9,8 +9,9 @@ const StoreCard = defineAsyncComponent(
 );
 
 const appStore = useAppStore();
-const { openStore, store, addItem, userStores } = storeToRefs(appStore);
+const { openStore, store, addItem, userStores, deleteStore } = storeToRefs(appStore);
 const stores = ref([] as Event[]);
+const showDelete = ref(false);
 
 const storeProfile = ref({
   id: "",
@@ -27,6 +28,24 @@ function showOpenStore() {
 function showAddItem() {
   addItem.value = !addItem.value;
 }
+
+function showDeleteStore() {
+  deleteStore.value = !deleteStore.value;
+}
+
+function hideDeleteStore() {
+  deleteStore.value = !deleteStore.value;
+}
+
+function confirmDeleteStore() {
+  console.log(`Sending Kind 5 event for ${storeProfile.value.name}`);
+}
+
+watch(store, (newVal) => {
+  console.log(newVal.content);
+  storeProfile.value = JSON.parse(newVal.content);
+  console.log(storeProfile.value);
+})
 
 onMounted(async () => {
   if (store.value.content === "") {
@@ -75,4 +94,19 @@ onMounted(async () => {
       </v-card-actions>
     </v-card>
   </v-sheet>
+  <v-dialog width="400" v-model="deleteStore">
+    <v-card>
+      <v-card-title>
+        Delete Store
+      </v-card-title>
+      <v-card-text>{{ storeProfile.name }}</v-card-text>
+      <v-card-subtitle>
+        Are you sure you want to delete this stall?
+      </v-card-subtitle>
+      <v-card-actions>
+        <v-btn @click="hideDeleteStore">Close</v-btn>
+        <v-btn @click="confirmDeleteStore">Confirm</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>

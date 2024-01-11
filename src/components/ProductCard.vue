@@ -32,9 +32,12 @@ const props = defineProps({
         }}</v-card-text>
       </v-card-item>
       <v-card-item class="ma-auto pa-1" height="10">
-        <v-card-text class="ma-auto pa-0"
-          >{{ props.product.price }} {{ props.product.currency }}</v-card-text
-        >
+        <template v-if="props.product.currency == 'sat'">
+          <v-card-text class="ma-auto pa-0">{{ props.product.price }} <i class="fak fa-satoshisymbol-solidtilt" > </i></v-card-text>
+        </template>
+        <template v-else>
+          <v-card-text class="ma-auto pa-0">{{ props.product.price }} {{ props.product.currency }}</v-card-text>
+        </template>
       </v-card-item>
     </v-card-item>
   </v-card>
