@@ -1,4 +1,4 @@
-import { SimplePool, type Filter, type Sub } from "nostr-tools";
+import { SimplePool, type Filter } from "nostr-tools";
 import { Utils } from "@/utils";
 
 export class RelayHelper {
