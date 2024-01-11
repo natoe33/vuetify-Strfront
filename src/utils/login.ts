@@ -5,7 +5,6 @@ import { wordlist } from "@scure/bip39/wordlists/english";
 import { HDKey } from "@scure/bip32";
 import { bech32 } from "bech32";
 import { NDKUser } from "@nostr-dev-kit/ndk";
-import { Util } from "./invoice";
 
 /*
 Most of this logic is adapted from snort.social repository.  Thanks to them :)

@@ -4,12 +4,11 @@ import { useAppStore } from "@/store/app";
 
 const appStore = useAppStore();
 // const nostrStore = useNostrStore();
-const { setLoggedIn, getLoggedIn, setUser } = appStore;
+const { setLoggedIn, getLoggedIn } = appStore;
 // const { setNpub } = nostrStore;
 
 function Logout() {
   // setNpub("");
-  setUser(new NDKUser({}));
   setLoggedIn(false);
 }
 </script>

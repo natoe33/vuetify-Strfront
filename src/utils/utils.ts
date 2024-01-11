@@ -187,7 +187,7 @@ export class Utils {
    */
   async getSignedToken(url: string, httpMethod: string) {
     const appStore = useAppStore();
-    const { npub, nostrProvider } = storeToRefs(appStore);
+    const { nostrProvider } = storeToRefs(appStore);
     console.log(nostrProvider.value);
     // const event = getBlankEvent(27235);
     // event.tags = [
