@@ -32,9 +32,10 @@ function attemptNip46Login() {
   appStore.nostrProvider.attemptLoginWithNip46(token.value);
 }
 
-function attemptKeyLogin() {
+async function attemptKeyLogin() {
   console.log("Attempting login with key");
-  appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
+  await appStore.nostrProvider.attemptLoginUsingPrivateOrPubKey(key.value);
+  key.value = '';
 }
 
 function attemptGenerateNewCredential() {

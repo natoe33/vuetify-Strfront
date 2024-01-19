@@ -1,10 +1,9 @@
 // Utilities
 import { defineStore } from "pinia";
-import { useLocalStorage, type RemovableRef } from "@vueuse/core";
+import { useLocalStorage, useSessionStorage, type RemovableRef } from "@vueuse/core";
 import { Product, Relay, Stall, Event } from "@/models";
 import { Utils, NostrProviderService, db, dbService } from "@/utils";
 import { NDKEvent, NDKUser } from "@nostr-dev-kit/ndk";
-import { nip19 } from "nostr-tools";
 
 const relayUrls: string[] = ["wss://relay.damus.io", "wss://relay.nostr.band"];
 
@@ -16,21 +15,21 @@ type ProductTags = {
 };
 
 type State = {
-  // relay: NDK;
-  // helper: RelayHelper;
   nostrProvider: NostrProviderService;
+  ndkInitialized: boolean;
+  nip07: RemovableRef<boolean>;
+  // signer: RemovableRef<NDKSigner | undefined>;
+  // // user: RemovableRef<NDKUser | undefined>;
+  user: NDKUser | undefined;
   utils: Utils;
   db: dbService;
   loaded: RemovableRef<boolean>;
   loggingIn: boolean;
   loggedIn: RemovableRef<boolean>;
-  // user: RemovableRef<NDKUser>;
-  // npub: RemovableRef<string>;
+  npub: RemovableRef<string>;
   nsec: RemovableRef<string>;
-  privkey: RemovableRef<string>;
-  // pubkeyLogin: RemovableRef<boolean>;
+  // privkey: RemovableRef<string>;
   drawer: boolean;
-  overflow: boolean;
   openStore: boolean;
   editStore: boolean;
   deleteStore: boolean;
@@ -57,18 +56,19 @@ export const useAppStore = defineStore({
     // relay: new NDK({ explicitRelayUrls: relayUrls }),
     // helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
+    ndkInitialized: false,
+    nip07: useLocalStorage("nip07", false),
+    // signer: useLocalStorage("signer", undefined),
+    // // user: useLocalStorage("user", undefined),
+    user: undefined,
     utils: new Utils(),
     db: db,
     loaded: useLocalStorage("loaded", false),
     loggingIn: false,
     loggedIn: useLocalStorage("loggedIn", false),
-    // user: useLocalStorage("user", new NDKUser({})),
-    // npub: useLocalStorage("npub", ""),
-    nsec: useLocalStorage("nsec", ""),
-    privkey: useLocalStorage("pkey", ""),
-    // pubkeyLogin: useLocalStorage("pubkeyLogin", false),
+    npub: useLocalStorage("npub", ""),
+    nsec: useSessionStorage("nsec", ""),
     drawer: false,
-    overflow: false,
     openStore: false,
     editStore: false,
     deleteStore: false,
@@ -96,18 +96,20 @@ export const useAppStore = defineStore({
       // return state.relay;
     },
     getUser: (state) => {
-      return state.nostrProvider.ndk.activeUser;
+      // const localUser = localStorage.getItem('user');
+      // return localUser ? JSON.parse(localUser) : undefined;
+      return state.user;
     },
-    getPrivKey: (state) => {
-      return state.privkey;
-    },
+    // getPrivKey: (state) => {
+    //   return state.privkey;
+    // },
     getPubKey: (state) => {
       return state.nostrProvider.ndk.activeUser?.pubkey;
       // const { type, data } = nip19.decode(state.npub);
       // return data.toString();
     },
     getNpub: (state) => {
-      return state.nostrProvider.ndk.activeUser?.npub;
+      return state.npub;
       // return state.npub;
     },
     getSortedTags: async (state) => {
@@ -140,7 +142,9 @@ export const useAppStore = defineStore({
         await state.nostrProvider.fetchProfileEvent(pubkey);
     },
     getUserMerchantEvents: async (state) => {
-      console.log(`Fetching stall for ${state.nostrProvider.ndk.activeUser?.pubkey}`);
+      console.log(
+        `Fetching stall for ${state.nostrProvider.ndk.activeUser?.pubkey}`,
+      );
       if (state.nostrProvider.ndk.activeUser?.pubkey)
         return await state.nostrProvider.fetchMerchantEvents([
           state.nostrProvider.ndk.activeUser?.pubkey,
@@ -162,11 +166,13 @@ export const useAppStore = defineStore({
       return new Set<NDKEvent>();
     },
     getUserProductEvents: async (state) => {
-      if (state.nostrProvider.ndk.activeUser){
-        console.log(`Fetching products for ${state.nostrProvider.ndk.activeUser.pubkey}`)
+      if (state.nostrProvider.ndk.activeUser) {
+        console.log(
+          `Fetching products for ${state.nostrProvider.ndk.activeUser.pubkey}`,
+        );
         return await state.nostrProvider.fetchMerchantProducts([
           state.nostrProvider.ndk.activeUser.pubkey,
-        ])
+        ]);
       }
       // const { type, data } = nip19.decode(state.npub);
       // if (type === "npub") {
@@ -181,7 +187,7 @@ export const useAppStore = defineStore({
       // const numItems = await state.db.products.count();
       const numItems = state.products.length;
       console.log(
-        `${numItems} stored for ${Math.ceil(numItems / ITEMS_PER_PAGE)} pages`
+        `${numItems} stored for ${Math.ceil(numItems / ITEMS_PER_PAGE)} pages`,
       );
       return Math.ceil(numItems / ITEMS_PER_PAGE);
     },
@@ -204,24 +210,18 @@ export const useAppStore = defineStore({
     },
   },
   actions: {
-    // setUser(user: NDKUser) {
-    //   this.user = user;
-    // },
-    // setNpub(npub: string) {
-    //   this.npub = npub;
-    // },
     setLoggedIn(loggedIn: boolean) {
       this.loggedIn = loggedIn;
     },
     setLoggingIn(loggingIn: boolean) {
       this.loggingIn = loggingIn;
     },
-    // setPubkeyLogin(pubkeyLogin: boolean) {
-    //   this.pubkeyLogin = pubkeyLogin;
-    // },
-    setPrivKey(pkey: string) {
-      this.privkey = pkey;
+    setUser(ndkUser: NDKUser) {
+      this.user = ndkUser; // JSON.stringify(ndkUser);
     },
+    // setPrivKey(pkey: string) {
+    //   this.privkey = pkey;
+    // },
     // createSub(filters: Filter) {
     //   this.helper.createSub(this.helper.getPool(), filters);
     // },
