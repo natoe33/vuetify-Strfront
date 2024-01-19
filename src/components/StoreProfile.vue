@@ -3,6 +3,7 @@ import { onMounted, watch, ref, defineAsyncComponent } from "vue";
 import { useAppStore } from "@/store/app";
 import { newShipping, IEvent, Event } from "@/models";
 import { storeToRefs } from "pinia";
+import { NDKTag } from "@nostr-dev-kit/ndk";
 
 const StoreCard = defineAsyncComponent(
   () => import("@/components/StoreCard.vue")
@@ -29,16 +30,31 @@ function showAddItem() {
   addItem.value = !addItem.value;
 }
 
-function showDeleteStore() {
-  deleteStore.value = !deleteStore.value;
+async function getStalls() {
+  console.log(appStore.ndkInitialized);
+  const storeList = await appStore.getUserMerchantEvents;
+  if (storeList && storeList.size > 0) {
+    storeList.forEach((store) => {
+      const newStore: IEvent = store;
+      stores.value.push(new Event(newStore));
+      userStores.value.push(new Event(newStore));
+    });
+  }
 }
 
 function hideDeleteStore() {
   deleteStore.value = !deleteStore.value;
 }
 
-function confirmDeleteStore() {
+async function confirmDeleteStore() {
   console.log(`Sending Kind 5 event for ${storeProfile.value.name}`);
+  const tag = store.value.tags.find(tag => tag[0] === 'd');
+  console.log(tag);
+  const event = await appStore.nostrProvider.deleteEvent(store.value.kind, store.value.id, tag ? tag[1]: '');
+  if (event) {
+    deleteStore.value = !deleteStore.value;
+    getStalls();
+  }
 }
 
 watch(store, (newVal) => {

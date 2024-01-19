@@ -25,7 +25,6 @@ import NDK, {
   NDKPrivateKeySigner,
   //NDKKind,
 } from "@nostr-dev-kit/ndk";
-import { nip19 } from "nostr-tools";
 import { Relay, newStall, Event } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
 import { useAppStore } from "@/store/app";
@@ -59,18 +58,16 @@ export class NostrProviderService {
   isLoggedInUsingNsec: boolean = false;
 
   constructor() {
-    console.log("NDK constructor");
     this.ndk = this.initialize();
     this.debug = debug("ndk");
-    // const appStore = useAppStore();
-    // const { npub } = storeToRefs(appStore);
   }
 
   initialize(): NDK {
-    console.log("NDK initialize");
     const parms: NDKConstructorParams = {
       devWriteRelayUrls: devRelays,
       explicitRelayUrls: explicitUrls,
+      enableOutboxModel: true,
+      clientName: "strfront",
     };
     this.ndk = new NDK(parms);
     this.ndk.connect();
@@ -126,41 +123,59 @@ export class NostrProviderService {
     return LoginUtil.getHexFromPrivateOrPubKey(enteredKey);
   }
 
+  async reloadPrivPubKey(key: string) {
+    const appStore = useAppStore();
+    const {setUser} = appStore;
+    const hexKey = this.validateAndGetHexKey(key);
+    if (key.startsWith("nsec")) {
+      this.ndk.signer = new NDKPrivateKeySigner(hexKey);
+      this.ndk.activeUser = await this.ndk.signer.blockUntilReady();
+      this.ndk.activeUser.ndk = this.ndk;
+      await this.ndk.activeUser.fetchProfile();
+      setUser(this.ndk.activeUser);
+    }
+  }
+
   async attemptLoginUsingPrivateOrPubKey(enteredKey: string) {
     const appStore = useAppStore();
-    const { loggingIn } = storeToRefs(appStore);
+    const { setLoggingIn, setLoggedIn, setUser } = appStore;
+    const { nsec, npub } = storeToRefs(appStore);
+    setLoggingIn(true);
     try {
-      loggingIn.value = true;
       const hexKey = this.validateAndGetHexKey(enteredKey);
       if (enteredKey.startsWith("nsec")) {
-        // nsec.value = enteredKey;
+        nsec.value = enteredKey;
         this.isNip07 = false;
-        this.signer = new NDKPrivateKeySigner(hexKey);
-        this.ndk.activeUser = await this.signer.blockUntilReady();
-        // this.signer.blockUntilReady();
-        // this.signer.user().then((suser) => {
-        //   privkey.value = hexPrivateKey;
-        //   user.value = suser;
-        //   this.isLoggedInUsingNsec = true;
-        //   this.canWriteToNostr = true;
-        //   this.tryLoginUsingNpub(user.value.npub);
-        // });
+        this.ndk.signer = new NDKPrivateKeySigner(hexKey);
+        this.ndk.activeUser = await this.ndk.signer.blockUntilReady();
+        this.ndk.activeUser.ndk = this.ndk;
+        console.log(this.ndk.activeUser.ndk);
+        await this.ndk.activeUser.fetchProfile();
+        setUser(this.ndk.activeUser);
+        npub.value = this.ndk.activeUser.npub;
+        setLoggingIn(false);
+        setLoggedIn(true);
       } else if (enteredKey.startsWith("npub")) {
-        // pubkeyLogin.value = true;
+        npub.value = enteredKey;
         const opts: NDKUserParams = {
           npub: enteredKey,
           pubkey: hexKey,
         };
         this.isLoggedInUsingPubKey$.next(true);
         this.ndk.activeUser = new NDKUser(opts);
-        // this.tryLoginUsingNpub(enteredKey);
+        this.ndk.activeUser.ndk = this.ndk;
+        setUser(this.ndk.activeUser);
+        setLoggingIn(false);
+        setLoggedIn(true);
       } else {
         this.loginError = "Invalid input. Enter either nsec or npub id";
       }
     } catch (e: any) {
       console.error(e);
       this.loginError = e.message;
-      loggingIn.value = false;
+      setLoggingIn(false);
+    } finally {
+      setLoggingIn(false);
     }
   }
 
@@ -200,26 +215,30 @@ export class NostrProviderService {
     // console.log("Logging in with NIP07");
     const appStore = useAppStore();
     const { setLoggingIn, setLoggedIn } = appStore;
-    // const { user } = storeToRefs(appStore);
+    const { user, nip07 } = storeToRefs(appStore);
     setLoggingIn(true);
-    const signer: NDKSigner = new NDKNip07Signer();
-    this.ndk.signer = signer;
-    const nuser: NDKUser = await this.ndk.signer.blockUntilReady();
-    // console.log(this.ndk.signer);
-    nuser.ndk = this.ndk;
-    await nuser.fetchProfile();
-    // user.profile = await user.fetchProfile();
-    this.ndk.activeUser = nuser;
-    console.log(this.ndk.activeUser);
-    // user.value = nuser;
+    this.ndk.signer = new NDKNip07Signer();
+    this.ndk.activeUser = await this.ndk.signer.blockUntilReady();
+    this.ndk.activeUser.ndk = this.ndk;
+    await this.ndk.activeUser.fetchProfile();
+    user.value = this.ndk.activeUser;
+    nip07.value = true;
     setLoggingIn(false);
     setLoggedIn(true);
-    // this.canWriteToNostr = true;
-    // this.resolveNip07Extension();
+  }
+
+  async reloadNip07() {
+    const appStore = useAppStore();
+    const { user } = storeToRefs(appStore);
+    this.ndk.signer = new NDKNip07Signer();
+    this.ndk.activeUser = await this.ndk.signer.blockUntilReady();
+    this.ndk.activeUser.ndk = this.ndk;
+    await this.ndk.activeUser.fetchProfile();
+    user.value = this.ndk.activeUser;
   }
 
   async attemptLoginWithNip46(token: string) {
-    console.log('Logging in with NIP46');
+    console.log("Logging in with NIP46");
     const appStore = useAppStore();
     const { setLoggingIn, setLoggedIn } = appStore;
     setLoggingIn(true);
@@ -377,7 +396,7 @@ export class NostrProviderService {
 
     await this.checkIfNIP05Verified(
       this.currentUserProfile?.nip05,
-      this.currentUser?.hexpubkey,
+      this.currentUser?.pubkey,
     );
   }
 
@@ -467,10 +486,48 @@ export class NostrProviderService {
   //   if (productEvent) return parseProduct(productEvent);
   // }
 
+  /**
+   *
+   * @param {number} kind - Event kind being deleted
+   * @param {string} eventId - ID of event being deleted
+   * @param {string} paramId - Parameterized id of event being deleted
+   */
+  async deleteEvent(
+    kind: number,
+    eventId: string,
+    paramId?: string,
+  ): Promise<NDKEvent> {
+    const ndkEvent = new NDKEvent(this.ndk);
+    ndkEvent.kind = 5;
+    if (this.ndk.activeUser) {
+      ndkEvent.pubkey = this.ndk.activeUser?.pubkey;
+    }
+    const tags: NDKTag[] = [];
+    tags.push(["e", eventId]);
+    tags.push([
+      "a",
+      kind + ":" + this.ndk.activeUser?.pubkey.toLowerCase() + ":" + paramId,
+    ]);
+    ndkEvent.tags = tags;
+    console.log(ndkEvent);
+    await ndkEvent.publish();
+    return ndkEvent;
+  }
+
   async buildEvent(kind: number, content: string): Promise<NDKEvent> {
     //TODO: Build events based on kind
     //TODO: Switch statement? for each kind
     const ndkEvent = new NDKEvent(this.ndk);
+    switch (kind) {
+      case 5:
+        if (this.ndk.activeUser) {
+          ndkEvent.pubkey = this.ndk.activeUser?.pubkey;
+        }
+
+        break;
+      default:
+        break;
+    }
     ndkEvent.kind = kind;
     ndkEvent.content = content;
     return ndkEvent;
@@ -486,15 +543,15 @@ export class NostrProviderService {
     console.log(this.ndk);
     const ndkEvent = new NDKEvent(this.ndk);
     const tags: NDKTag[] = [];
-    if (this.ndk.activeUser){
-    tags.push(["d", stall.id]);
-    ndkEvent.kind = 30017;
-    ndkEvent.content = JSON.stringify(stall);
-    ndkEvent.tags = tags;
-    ndkEvent.pubkey = this.ndk.activeUser?.pubkey
-    // ndkEvent.pubkey = data.toString();
-    console.log(ndkEvent);
-    await ndkEvent.publish();
+    if (this.ndk.activeUser) {
+      tags.push(["d", stall.id]);
+      ndkEvent.kind = 30017;
+      ndkEvent.content = JSON.stringify(stall);
+      ndkEvent.tags = tags;
+      ndkEvent.pubkey = this.ndk.activeUser?.pubkey;
+      // ndkEvent.pubkey = data.toString();
+      console.log(ndkEvent);
+      await ndkEvent.publish();
     }
     return ndkEvent;
   }

@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { NDKUser } from "@nostr-dev-kit/ndk";
 import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
-// import { NostrProviderService } from "@/utils";
 
 const appStore = useAppStore();
 const { getSortedTags, setTagandLoading, setLoggedIn } =
   appStore;
-const { drawer, loggingIn, loggedIn } =
+const { drawer, loggingIn, loggedIn, user, nip07, nsec, npub } =
   storeToRefs(appStore);
 
 const router = useRouter();
@@ -23,6 +21,9 @@ function loadWithTags(tag: string) {
 function Logout() {
   // setNpub("");
   // setUser(new NDKUser({}));
+  if (nip07.value) nip07.value = false;
+  user.value = undefined;
+  nsec.value = npub.value = '';
   setLoggedIn(false);
 }
 
@@ -45,11 +46,13 @@ function goToProfile() {
 //   }
 // });
 
-watch(loggedIn, (newval) => {
+watch(user, (newval) => {
   // TODO: Update ndk here instead of MainView
-  console.log(appStore.nostrProvider.ndk.activeUser?.profile?.image);
-  if (newval && appStore.nostrProvider.ndk.activeUser?.profile?.image){
-    image.value = appStore.nostrProvider.ndk.activeUser?.profile?.image
+  console.log(newval);
+  if (newval && appStore.getUser?.profile?.image){
+    image.value = appStore.getUser.profile.image
+  } else {
+    image.value = '';
   }
 });
 
@@ -57,9 +60,12 @@ watch(group, () => {
   drawer.value = false;
 });
 
-onMounted(() => {
-  if (appStore.nostrProvider.ndk.activeUser?.profile?.image){
-    image.value = appStore.nostrProvider.ndk.activeUser.profile.image
+onMounted(async () => {
+  console.log(appStore.getUser?.profile?.image);
+  console.log(user.value?.profile?.image);
+  if (appStore.getUser?.profile?.image){
+    console.log(appStore.getUser.profile.image);
+    image.value = appStore.getUser.profile.image
   }  
 });
 //TODO: Fix tag loading
@@ -72,11 +78,11 @@ const items = await getSortedTags;
       <v-list-item title="Profile" @click="profileHandler">
         <template v-slot:prepend>
           <v-avatar>
-            <template v-if="!appStore.nostrProvider.ndk.activeUser?.profile?.image || appStore.nostrProvider.ndk.activeUser?.profile?.image">
+            <template v-if="!user || !user?.profile?.image">
               <v-icon icon="mdi-account-circle"></v-icon>
             </template>
             <template v-else>
-              <v-img :src="image" :alt="appStore.nostrProvider.ndk.activeUser.profile?.nip05"></v-img>
+              <v-img :src="image" :alt="user.profile?.nip05"></v-img>
             </template>
           </v-avatar>
         </template>

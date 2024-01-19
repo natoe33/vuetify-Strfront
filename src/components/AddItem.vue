@@ -6,7 +6,7 @@ import { newStall } from "@/models";
 import { NDKEvent } from "@nostr-dev-kit/ndk";
 
 const appStore = useAppStore();
-const { addItem, userStores, utils } = storeToRefs(appStore);
+const { addItem, userStores, utils, nip07, nsec, user, nostrProvider } = storeToRefs(appStore);
 const stores = ref([] as newStall[]);
 const storeList = ref(new Set());
 const images = ref([] as File[]);
@@ -51,6 +51,15 @@ watch(images, (newval) => {
 })
 
 onMounted(async () => {
+  // This is stupid to do it here, but it's the only place pinia is loaded
+  if (nip07.value){
+    await nostrProvider.value.reloadNip07();
+  }
+  console.log(nsec.value);
+  if (nsec.value){
+    await nostrProvider.value.reloadPrivPubKey(nsec.value);
+  }
+
   const tempStore = await appStore.getUserMerchantEvents;
   if (tempStore && tempStore.size > 0) {
     storeList.value = tempStore;
