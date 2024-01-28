@@ -64,6 +64,7 @@ watch(page, () => {
 
 watch(loading, (newval) => {
   showLoading.value = newval;
+  if(!newval) loadProducts();
 });
 
 onMounted(() => {
@@ -75,6 +76,7 @@ onMounted(() => {
   <v-container class="mx-auto px-0">
     <v-sheet
       class="d-flex flex-wrap align-content-center mx-auto pa-2"
+      color="background"
       rounded="lg"
     >
       <template v-for="event of showEvents" :key="event.event_id">

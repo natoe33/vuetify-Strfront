@@ -29,11 +29,12 @@ const props = defineProps({
         <v-card-text>{{ props.product?.quantity }} Available</v-card-text>
         <v-card-actions>
           <template v-if="props.product?.currency == 'sat'">
-            <v-btn class="ms-2" variant="outlined" size="small">{{ props.product?.price }} <i class="fak fa-satoshisymbol-solidtilt" > </i></v-btn>
+            <v-btn class="ms-2" color="tertiary" size="small">{{ props.product?.price }} <i class="fak fa-satoshisymbol-solidtilt" > </i></v-btn>
           </template>
           <template v-else>
-            <v-btn class="ms-2" variant="outlined" size="small">{{ props.product?.price }} {{ props.product?.currency }}</v-btn>
+            <v-btn class="ms-2" color="tertiary" size="small">{{ props.product?.price }} {{ props.product?.currency }}</v-btn>
           </template>
+          <v-btn class="ms-2" color="primary">Add to Cart</v-btn>
         </v-card-actions>
       </v-card-item>
       <v-card-item>

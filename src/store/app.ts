@@ -18,8 +18,6 @@ type State = {
   nostrProvider: NostrProviderService;
   ndkInitialized: boolean;
   nip07: RemovableRef<boolean>;
-  // signer: RemovableRef<NDKSigner | undefined>;
-  // // user: RemovableRef<NDKUser | undefined>;
   user: NDKUser | undefined;
   utils: Utils;
   db: dbService;
@@ -28,7 +26,6 @@ type State = {
   loggedIn: RemovableRef<boolean>;
   npub: RemovableRef<string>;
   nsec: RemovableRef<string>;
-  // privkey: RemovableRef<string>;
   drawer: boolean;
   openStore: boolean;
   editStore: boolean;
@@ -48,18 +45,15 @@ type State = {
   store: Event;
   userStores: Event[];
   events: RemovableRef<Map<string, NDKEvent>>;
+  dark: RemovableRef<boolean>; 
 };
 
 export const useAppStore = defineStore({
   id: "app",
   state: (): State => ({
-    // relay: new NDK({ explicitRelayUrls: relayUrls }),
-    // helper: new RelayHelper(relayUrls),
     nostrProvider: new NostrProviderService(),
     ndkInitialized: false,
     nip07: useLocalStorage("nip07", false),
-    // signer: useLocalStorage("signer", undefined),
-    // // user: useLocalStorage("user", undefined),
     user: undefined,
     utils: new Utils(),
     db: db,
@@ -90,6 +84,7 @@ export const useAppStore = defineStore({
     // productTags: useLocalStorage("productTags", [] as ProductTags[]),
     events: useLocalStorage("events", new Map()),
     // tags: useLocalStorage("tags", [] as string[]),
+    dark: useLocalStorage('dark', true),
   }),
   getters: {
     getNDK: (state) => {

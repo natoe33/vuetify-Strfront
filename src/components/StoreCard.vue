@@ -43,7 +43,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <v-card variant="outlined">
+  <v-card color="primary-lighten-2" class="mx-auto" max-width="20%">
     <v-card-title>{{ storeProfile.name }}</v-card-title>
     <v-card-subtitle>{{ storeProfile.description }}</v-card-subtitle>
     <v-card-text>
@@ -81,6 +81,7 @@ onMounted(() => {
         @click="openEditStore"
         >Edit</v-btn
       >
+      <v-spacer></v-spacer>
       <v-btn
       variant="tonal"
       color="accent"

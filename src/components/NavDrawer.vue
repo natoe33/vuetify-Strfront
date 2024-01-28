@@ -3,24 +3,28 @@ import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAppStore } from "@/store/app";
 import { storeToRefs } from "pinia";
+import { useTheme } from "vuetify";
 
 const appStore = useAppStore();
 const { getSortedTags, setTagandLoading, setLoggedIn } =
   appStore;
-const { drawer, loggingIn, loggedIn, user, nip07, nsec, npub } =
+const { drawer, dark, loggingIn, loggedIn, user, nip07, nsec, npub } =
   storeToRefs(appStore);
+const theme = useTheme();
 
 const router = useRouter();
 const group = ref(null);
 const image = ref("");
+
+function toggleTheme() {
+  theme.global.name.value = dark.value ? "dark" : "light";
+}
 
 function loadWithTags(tag: string) {
   setTagandLoading(tag);
 }
 
 function Logout() {
-  // setNpub("");
-  // setUser(new NDKUser({}));
   if (nip07.value) nip07.value = false;
   user.value = undefined;
   nsec.value = npub.value = '';
@@ -39,15 +43,7 @@ function goToProfile() {
   router.push({ name: "profile" });
 }
 
-// watch(appStore.nostrProvider.ndk.activeUser?.npub, (newval) => {
-//   if (newval !== "") {
-//     console.log('NavDrawer npub updated')
-//     nostrProvider.value = new NostrProviderService();
-//   }
-// });
-
 watch(user, (newval) => {
-  // TODO: Update ndk here instead of MainView
   console.log(newval);
   if (newval && appStore.getUser?.profile?.image){
     image.value = appStore.getUser.profile.image
@@ -96,12 +92,6 @@ const items = await getSortedTags;
           </template>
         </v-list-item>
       </template>
-      <!-- <v-list-item
-        v-for="(link, i) in links"
-        :key="i"
-        :title="link"
-        :value="link"
-      ></v-list-item> -->
     </v-list>
     <v-list>
       <v-list-group value="Tags">
@@ -116,6 +106,17 @@ const items = await getSortedTags;
           @click="loadWithTags(item)"
         ></v-list-item>
       </v-list-group>
+    </v-list>
+    <v-list>
+      <v-list-item title="Theme">
+        <v-switch
+              inset
+              color="info"
+              v-model="dark"
+              @change="toggleTheme()"
+              :label="`${dark ? 'Dark' : 'Light'}`"
+            ></v-switch>
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>

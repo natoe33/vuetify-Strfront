@@ -4,6 +4,7 @@ import {
   type IContent,
   type IMerchContent,
   Shipping,
+  type Nip96Spec
 } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
@@ -13,6 +14,7 @@ import { nip98, nip19, utils } from "nostr-tools";
 import { base64 } from "@scure/base";
 import json from "./currencies.json";
 import cjson from "./countries.json";
+import { Nip96 } from "./nip96";
 // import MyWorker from "@/worker?worker";
 
 interface IProductData {
@@ -30,6 +32,9 @@ interface IMerchantData {
   content: string;
   tags: string[][];
 }
+
+
+
 export class Utils {
   /**
    *
@@ -217,26 +222,17 @@ export class Utils {
    * @example
    * await uploadImages(file)
    */
-  async uploadImage(file: File): Promise<string> {
+  async uploadImage(file: File) {
     // Generate NIP-98 auth header for nostr.build
-    const url: string = import.meta.env.VITE_UPLOAD_URL;
-    console.log(url);
-    const token = await this.getSignedToken(url, "POST");
-    console.log(token);
-    const formData = new FormData();
-    formData.append(file.name, file);
-    const headers = new Headers();
-    headers.append("Authorization", token);
-    headers.append("Accept", "application/json");
-    const data = await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      headers: headers,
-      body: formData,
-    })
-    const response = await data.json();
-    console.log(response.data);
-    console.log(response.data[0].url);
-    return response.data[0].url;
+    const url: string = import.meta.env.VITE_NIP96_URL;
+    const nip96 = new Nip96(url);
+    const blob = new Blob([file]);
+    const response = await nip96.upload(blob);
+    console.log(response);
+    
+    // const response = await data.json();
+    // console.log(response.data);
+    // console.log(response.data[0].url);
+    // return response.data[0].url;
   }
 }

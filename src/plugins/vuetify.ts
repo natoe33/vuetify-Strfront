@@ -11,35 +11,36 @@ import "vuetify/styles";
 // Composables
 import { createVuetify, ThemeDefinition } from "vuetify";
 
-const lightTheme: ThemeDefinition = {
-  dark: false,
+const dark: ThemeDefinition = {
+  dark: true,
   colors: {
-    primary: "#9163cb",
-    secondary: "#c19ee0",
-    tertiary: "#dec9e9",
-    accent: "#e7c6ff",
-    quarternary: "#e7d8f7",
+    background: "#5E35B1",
+    primary: "#7E3FF2",
+    secondary: "#3AC421",
+    accent: "#B2AEB8",
   },
 };
 
-const darkTheme: ThemeDefinition = {
-  dark: true,
+const light: ThemeDefinition = {
+  dark: false,
   colors: {
-    primary: "#2196F3",
-    secondary: "#424242",
-    tertiary: "#E57373",
-    accent: "#8A2BE2",
-    quarternary: "#B0D1E8",
+    background: "#9575CD",
+    primary: "#7E3FF2",
   },
 };
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
-    defaultTheme: "lightTheme",
+    defaultTheme: "dark",
+    variations: {
+      colors: ['primary'],
+      lighten: 2,
+      darken: 2,
+    },
     themes: {
-      lightTheme,
-      darkTheme,
+      dark,
+      light,
     },
   },
 });

@@ -46,7 +46,7 @@ watch(addItem, (newval) => {
 })
 
 watch(images, (newval) => {
-  console.log(newval);
+  // console.log(newval);
 
 })
 

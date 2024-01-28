@@ -5,7 +5,7 @@ const appStore = useAppStore();
 // const { user } = storeToRefs(appStore);
 </script>
 <template>
-  <v-sheet class="bg-accent">
+  <v-sheet color="primary-lighten-2">
     <p>{{ appStore.nostrProvider.ndk.activeUser?.profile?.about }}</p>
     <p>{{ appStore.nostrProvider.ndk.activeUser?.profile?.nip05 }}</p>
     <p>{{ appStore.nostrProvider.ndk.activeUser?.profile?.website }}</p>

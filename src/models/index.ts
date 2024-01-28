@@ -3,3 +3,4 @@ export * from "./Merchant";
 export * from "./Relay";
 export * from "./Profile";
 export * from "./Event";
+export * from "./nip96";

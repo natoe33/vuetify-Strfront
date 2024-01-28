@@ -21,7 +21,7 @@ const AddItem = defineAsyncComponent(() => import("@/components/AddItem.vue"));
 </script>
 <template>
   <v-app>
-    <v-main class="bg-grey-lighten-3">
+    <v-main color="bg-grey-lighten-3">
       <Suspense>
         <AppBar />
       </Suspense>
