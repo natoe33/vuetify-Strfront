@@ -4,18 +4,15 @@ import {
   type IContent,
   type IMerchContent,
   Shipping,
-  type Nip96Spec
+  type Nip96UploadResponse
 } from "@/models";
 import { v4 as uuidv4 } from "uuid";
-import { NDKEvent, NostrEvent } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKTag } from "@nostr-dev-kit/ndk";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "@/store/app";
-import { nip98, nip19, utils } from "nostr-tools";
-import { base64 } from "@scure/base";
 import json from "./currencies.json";
 import cjson from "./countries.json";
 import { Nip96 } from "./nip96";
-// import MyWorker from "@/worker?worker";
 
 interface IProductData {
   id: string;
@@ -164,7 +161,6 @@ export class Utils {
   };
 
   generateUUID = (): string => {
-    // console.log(uuidv4());
     return uuidv4();
   };
 
@@ -182,39 +178,7 @@ export class Utils {
   };
 
   /**
-   * Generate NIP-98 auth header
-   *
-   * @param {string} url - api endpoint for image upload service
-   * @param {string} httpMethod - http method required by api endpoint
-   * @returns {string}
-   * @example
-   * await getSignedToken('https://imageapi.com/v1/upload', 'POST')
-   */
-  async getSignedToken(url: string, httpMethod: string) {
-    const appStore = useAppStore();
-    const { nostrProvider } = storeToRefs(appStore);
-    console.log(nostrProvider.value);
-    // const event = getBlankEvent(27235);
-    // event.tags = [
-    //   ["u", url],
-    //   ["method", httpMethod],
-    // ];
-    // event.created_at = Math.round(new Date().getTime() / 1000);
-    // const { type, data } = nip19.decode(npub.value);
-    // const pubkey = type === "npub" ? data : "";
-    // const nEvent: NostrEvent = {
-    //   pubkey: (await window.nostr?.getPublicKey()) || pubkey,
-    //   tags: event.tags,
-    //   created_at: event.created_at,
-    //   content: "",
-    // };
-    // nEvent.sig = await nostrProvider.value.ndk?.signer?.sign(nEvent);
-    // return "Nostr " + base64.encode(utils.utf8Encoder.encode(JSON.stringify(nEvent)));
-    return "Nostr " + "test";
-  }
-
-  /**
-   * Generate NIP-98 auth header for nostr.build and upload image
+   * Generate NIP-98 auth header for image host and upload image
    *
    * @param {file} file - image being uploaded
    *
@@ -222,17 +186,13 @@ export class Utils {
    * @example
    * await uploadImages(file)
    */
-  async uploadImage(file: File) {
+  async uploadImage(file: File): Promise<string | undefined>{
     // Generate NIP-98 auth header for nostr.build
-    const url: string = import.meta.env.VITE_NIP96_URL;
-    const nip96 = new Nip96(url);
-    const blob = new Blob([file]);
-    const response = await nip96.upload(blob);
-    console.log(response);
-    
-    // const response = await data.json();
-    // console.log(response.data);
-    // console.log(response.data[0].url);
-    // return response.data[0].url;
+    const api: string = import.meta.env.VITE_NIP96_URL;
+    const nip96: Nip96 = new Nip96(api);
+    const blob: Blob = new Blob([file]);
+    const response: Nip96UploadResponse = await nip96.upload(blob);
+    const urlTag: NDKTag | undefined = response.nip94_event?.tags.find(t => t[0] === 'url');
+    if (urlTag) return urlTag[1];
   }
 }

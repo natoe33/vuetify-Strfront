@@ -9,7 +9,7 @@ const ProfileMain = defineAsyncComponent(
 const appStore = useAppStore();
 
 onMounted(() => {
-  console.log(appStore.nostrProvider.ndk);
+  // console.log(appStore.nostrProvider.ndk);
 })
 </script>
 <template>

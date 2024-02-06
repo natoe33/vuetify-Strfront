@@ -1,3 +1,5 @@
+import {newShipping} from './Merchant'
+
 interface IProduct {
   product_id: string;
   event_id: string;
@@ -66,7 +68,7 @@ export class Product implements IProduct {
 
 export type TProduct = {
   product_id: string;
-  event_id: string;
+  event_id?: string;
   stall_id: string;
   name: string;
   description: string;
@@ -74,9 +76,10 @@ export type TProduct = {
   currency: string;
   price: number;
   quantity: number;
-  tags: string[];
-  created_at: number;
-  pubkey: string;
+  tags: string[][];
+  shipping: newShipping[];
+  created_at?: number;
+  pubkey?: string;
 };
 
 export interface IContent {
@@ -88,4 +91,16 @@ export interface IContent {
   currency: string;
   price: number;
   quantity: number;
+}
+
+export interface newContent {
+  id: string;
+  stall_id: string;
+  name: string;
+  description: string;
+  images: string[];
+  currency: string;
+  price: number;
+  quantity: number;
+  shipping: newShipping[];
 }

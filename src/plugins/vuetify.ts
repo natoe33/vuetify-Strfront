@@ -14,18 +14,20 @@ import { createVuetify, ThemeDefinition } from "vuetify";
 const dark: ThemeDefinition = {
   dark: true,
   colors: {
-    background: "#5E35B1",
-    primary: "#7E3FF2",
-    secondary: "#3AC421",
-    accent: "#B2AEB8",
+    background: "#000000",
+    primary: "#9E7EF9",
+    secondary: "#383838",
+    accent: "#FFFFFF",
   },
 };
 
 const light: ThemeDefinition = {
   dark: false,
   colors: {
-    background: "#9575CD",
-    primary: "#7E3FF2",
+    background: "#F6F6F8",
+    primary: "#6C5DD3",
+    secondary: "#1B1D21",
+    accent: "#B8DCE9",
   },
 };
 

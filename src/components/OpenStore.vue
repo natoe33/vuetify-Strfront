@@ -39,9 +39,9 @@ function popZone() {
 }
 
 async function createStore() {
-  if (nostrProvider.value.ndk?.signer === undefined) {
-    nostrProvider.value = await new NostrProviderService();
-  }
+  // if (nostrProvider.value.ndk?.signer === undefined) {
+  //   nostrProvider.value = await new NostrProviderService();
+  // }
   if (agsi.value) {
     zones.value.forEach((zone) => {
       zone.id = appStore.utils.generateUUID().replaceAll("-", "");

@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { onMounted, watch, ref, defineAsyncComponent } from "vue";
+import { onMounted, watch, ref, computed, defineAsyncComponent } from "vue";
 import { useAppStore } from "@/store/app";
 import { newShipping, IEvent, Event } from "@/models";
 import { storeToRefs } from "pinia";
+import { useDisplay } from "vuetify";
 import { NDKTag } from "@nostr-dev-kit/ndk";
 
 const StoreCard = defineAsyncComponent(
   () => import("@/components/StoreCard.vue")
 );
 
+const {xs, sm, name} = useDisplay();
+const cols = computed(() => xs.value ? 12 : sm.value ? 6 : 3);
+
 const appStore = useAppStore();
 const { openStore, store, addItem, userStores, deleteStore } = storeToRefs(appStore);
-const stores = ref([] as Event[]);
+// const stores = ref([] as Event[]);
 const showDelete = ref(false);
 
 const storeProfile = ref({
@@ -32,11 +36,11 @@ function showAddItem() {
 
 async function getStalls() {
   console.log(appStore.ndkInitialized);
+  userStores.value = [] as Event[];
   const storeList = await appStore.getUserMerchantEvents;
   if (storeList && storeList.size > 0) {
     storeList.forEach((store) => {
       const newStore: IEvent = store;
-      stores.value.push(new Event(newStore));
       userStores.value.push(new Event(newStore));
     });
   }
@@ -64,12 +68,14 @@ watch(store, (newVal) => {
 })
 
 onMounted(async () => {
+  console.log(name.value);
   if (store.value.content === "") {
+    userStores.value = [] as Event[];
     const storeList = await appStore.getUserMerchantEvents;
+    console.log(storeList);
     if (storeList && storeList.size > 0) {
       storeList.forEach((store) => {
         const newStore: IEvent = store;
-        stores.value.push(new Event(newStore));
         userStores.value.push(new Event(newStore));
       });
     }
@@ -80,11 +86,11 @@ onMounted(async () => {
   <v-sheet>
     <v-card>
       <v-card-title>My Stores</v-card-title>
-      <template v-if="stores.length > 0">
+      <template v-if="userStores.length > 0">
         <v-container>
           <v-row>
-            <template v-for="(store, index) in stores" :key="index">
-              <v-col>
+            <template v-for="(store, index) in userStores" :key="index">
+              <v-col :cols="cols">
                 <StoreCard :storeEvent="store" />
               </v-col>
             </template>
@@ -103,7 +109,7 @@ onMounted(async () => {
         <v-btn
           color="primary"
           elevation="4"
-          :disabled="stores.length === 0"
+          :disabled="userStores.length === 0"
           @click="showAddItem"
           >Create Listing</v-btn
         >

@@ -44,7 +44,7 @@ function goToProfile() {
 }
 
 watch(user, (newval) => {
-  console.log(newval);
+  // console.log(newval);
   if (newval && appStore.getUser?.profile?.image){
     image.value = appStore.getUser.profile.image
   } else {
@@ -57,10 +57,10 @@ watch(group, () => {
 });
 
 onMounted(async () => {
-  console.log(appStore.getUser?.profile?.image);
-  console.log(user.value?.profile?.image);
+  // console.log(appStore.getUser?.profile?.image);
+  // console.log(user.value?.profile?.image);
   if (appStore.getUser?.profile?.image){
-    console.log(appStore.getUser.profile.image);
+    // console.log(appStore.getUser.profile.image);
     image.value = appStore.getUser.profile.image
   }  
 });

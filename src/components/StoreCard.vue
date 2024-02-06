@@ -38,12 +38,12 @@ const storeProfile = ref({
 });
 
 onMounted(() => {
-  console.log(props.storeEvent);
+  // console.log(props.storeEvent);
   storeProfile.value = JSON.parse(props.storeEvent.content);
 });
 </script>
 <template>
-  <v-card color="primary-lighten-2" class="mx-auto" max-width="20%">
+  <v-card color="primary-lighten-2" class="mx-auto">
     <v-card-title>{{ storeProfile.name }}</v-card-title>
     <v-card-subtitle>{{ storeProfile.description }}</v-card-subtitle>
     <v-card-text>

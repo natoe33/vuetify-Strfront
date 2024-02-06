@@ -25,7 +25,7 @@ import NDK, {
   NDKPrivateKeySigner,
   //NDKKind,
 } from "@nostr-dev-kit/ndk";
-import { Relay, newStall, Event } from "@/models";
+import { Relay, newStall, Event, TProduct, newContent } from "@/models";
 import { LoginUtil, NewCredential } from "./login";
 import { useAppStore } from "@/store/app";
 import { BehaviorSubject } from "rxjs";
@@ -125,7 +125,7 @@ export class NostrProviderService {
 
   async reloadPrivPubKey(key: string) {
     const appStore = useAppStore();
-    const {setUser} = appStore;
+    const { setUser } = appStore;
     const hexKey = this.validateAndGetHexKey(key);
     if (key.startsWith("nsec")) {
       this.ndk.signer = new NDKPrivateKeySigner(hexKey);
@@ -533,13 +533,31 @@ export class NostrProviderService {
     return ndkEvent;
   }
 
+  async createProduct(product: TProduct): Promise<NDKEvent> {
+    const ndkEvent = new NDKEvent(this.ndk);
+    const content: newContent = {
+      id: product.product_id,
+      stall_id: product.stall_id,
+      name: product.name,
+      description: product.description,
+      images: product.images,
+      currency: product.currency,
+      price: product.price,
+      quantity: product.quantity,
+      shipping: product.shipping
+    }
+    if (this.ndk.activeUser){
+      ndkEvent.kind = 30018;
+      ndkEvent.content = JSON.stringify(content);
+      ndkEvent.tags = product.tags;
+      ndkEvent.pubkey = this.ndk.activeUser.pubkey
+      console.log(ndkEvent);
+      await ndkEvent.publish();
+    }
+    return ndkEvent;
+  }
+
   async createStall(stall: newStall): Promise<NDKEvent> {
-    const appStore = useAppStore();
-    // const { npub, user } = storeToRefs(appStore);
-    // const { type, data } = nip19.decode(npub.value);
-    // console.log(type);
-    // console.log(data);
-    // console.log(relay.value);
     console.log(this.ndk);
     const ndkEvent = new NDKEvent(this.ndk);
     const tags: NDKTag[] = [];
